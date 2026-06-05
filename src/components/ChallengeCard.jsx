@@ -1,17 +1,20 @@
 import { STATS_CONFIG, SUB_STATS, CAT_LABELS } from "../data/stats.js";
 import { PATHS } from "../data/paths.js";
+import { DOMAINS } from "../data/domains.js";
 
 // ============================================================
-// CHALLENGE CARD
+// CHALLENGE CARD — Prompt 8 Update
+// Zeigt jetzt: reason, Goal-Badge, Domain-Label (neu)
 // ============================================================
-export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommended }) => {
+export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommended, goals = [] }) => {
   const typeColors = {
     daily:"#3b82f6", weekly:"#8b5cf6", milestone:"#f59e0b",
     custom:"#06b6d4", personalized:"#a78bfa", recovery:"#22c55e",
   };
   const typeLabels = {
     daily:"◈ DAILY", weekly:"◉ WEEKLY", milestone:"★ MEILENSTEIN",
-    custom:"✦ EIGENE", personalized:"★ FÜR MICH", recovery:"💚 RECOVERY",
+    custom:"✦ EIGENE", personalized:"◈ FÜR MICH", recovery:"💚 RECOVERY",
+    gate:"🔑 GATE",
   };
 
   const tc = challenge.recovery
@@ -28,9 +31,19 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
   const statCfg     = SUB_STATS[statKey] || STATS_CONFIG.find(s => s.key === statKey);
   const statColor   = statCfg?.color || "#aaa";
   const pathInfo    = challenge.path ? PATHS[challenge.path] : null;
-  const domainLabel = challenge.cat ? (CAT_LABELS[challenge.cat] || challenge.cat) : null;
 
-  // Background style
+  // Domain label: try new domains.js, fall back to CAT_LABELS
+  const domainInfo  = challenge.domain ? DOMAINS[challenge.domain] : null;
+  const catLabel    = challenge.cat ? CAT_LABELS[challenge.cat] : null;
+  const domainLabel = domainInfo?.label
+    ? `${domainInfo.icon} ${domainInfo.label}`
+    : catLabel || null;
+
+  // Goal badge: find linked goal
+  const linkedGoal = challenge.goalId
+    ? goals.find(g => g.id === challenge.goalId)
+    : null;
+
   const bgStyle = done
     ? "rgba(255,255,255,0.01)"
     : challenge.recovery
@@ -38,13 +51,13 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
       : isMilestone
         ? `linear-gradient(135deg,rgba(255,255,255,0.04),${tc}08)`
         : challenge.personalized
-          ? `linear-gradient(135deg,rgba(167,139,250,0.04),rgba(167,139,250,0.08))`
+          ? `linear-gradient(135deg,rgba(167,139,250,0.03),rgba(167,139,250,0.06))`
           : "rgba(255,255,255,0.035)";
 
   return (
     <div style={{
       background: bgStyle,
-      border: `1px solid ${done ? "#111" : recommended ? tc + "88" : isMilestone ? tc + "55" : tc + "33"}`,
+      border: `1px solid ${done ? "#111" : recommended ? tc+"88" : isMilestone ? tc+"55" : tc+"33"}`,
       borderRadius: 10,
       padding: "11px 13px",
       opacity: done ? 0.38 : 1,
@@ -52,7 +65,7 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
       position: "relative",
       overflow: "hidden",
     }}>
-      {/* Top accent */}
+      {/* Top accent line */}
       {!done && (
         <div style={{ position:"absolute",top:0,left:0,right:0,height:recommended?3:2,background:`linear-gradient(90deg,transparent,${tc},transparent)`,opacity:isMilestone?0.8:recommended?0.9:0.45 }}/>
       )}
@@ -60,24 +73,20 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:10 }}>
         <div style={{ flex:1, minWidth:0 }}>
 
-          {/* Meta row: type · XP · stat · path · topic · domain */}
+          {/* Meta row */}
           <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:4, marginBottom:4, lineHeight:1 }}>
-            {/* Type label */}
             <span style={{ color:tc, fontSize:"0.58rem", letterSpacing:"0.08em", fontWeight:700 }}>{typeLabel}</span>
 
-            {/* Recommended badge */}
             {recommended && !done && (
               <span style={{ background:`${tc}22`, border:`1px solid ${tc}44`, color:tc, borderRadius:20, padding:"1px 6px", fontSize:"0.52rem", letterSpacing:"0.06em", fontWeight:700 }}>EMPFOHLEN</span>
             )}
 
             <span style={{ color:"#222" }}>·</span>
 
-            {/* XP */}
             <span style={{ color: isMilestone ? "#22c55e" : "#22c55e88", fontSize:"0.6rem", fontWeight:700 }}>
               +{challenge.xp} XP
             </span>
 
-            {/* Stat points (milestones only) */}
             {isMilestone && challenge.statPts > 0 && (
               <>
                 <span style={{ color:"#222" }}>·</span>
@@ -85,7 +94,6 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
               </>
             )}
 
-            {/* Path */}
             {pathInfo && (
               <>
                 <span style={{ color:"#222" }}>·</span>
@@ -93,7 +101,6 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
               </>
             )}
 
-            {/* Topic */}
             {challenge.topic && (
               <>
                 <span style={{ color:"#222" }}>·</span>
@@ -123,12 +130,29 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
             </div>
           )}
 
-          {/* Domain tag */}
-          {domainLabel && !challenge.recovery && (
-            <div style={{ marginTop:5 }}>
-              <span style={{ background:"rgba(255,255,255,0.04)", border:"1px solid #1a1a2e", borderRadius:4, padding:"2px 6px", fontSize:"0.54rem", color:"#334155" }}>
-                {domainLabel}
-              </span>
+          {/* Bottom tags row: domain + goal badge + reason */}
+          {(!done) && (
+            <div style={{ display:"flex",flexWrap:"wrap",gap:5,marginTop:5,alignItems:"center" }}>
+              {/* Domain */}
+              {domainLabel && !challenge.recovery && (
+                <span style={{ background:"rgba(255,255,255,0.04)",border:"1px solid #1a1a2e",borderRadius:4,padding:"2px 6px",fontSize:"0.54rem",color:"#334155" }}>
+                  {domainLabel}
+                </span>
+              )}
+
+              {/* Goal Badge */}
+              {linkedGoal && (
+                <span style={{ background:"rgba(245,158,11,0.1)",border:"1px solid #f59e0b33",color:"#f59e0b",borderRadius:4,padding:"2px 6px",fontSize:"0.54rem",fontWeight:700 }}>
+                  🎯 {linkedGoal.title.slice(0,22)}{linkedGoal.title.length>22?"…":""}
+                </span>
+              )}
+
+              {/* Reason (why suggested) */}
+              {challenge.reason && challenge.personalized && (
+                <span style={{ color:"#1e293b",fontSize:"0.52rem" }}>
+                  ↳ {challenge.reason}
+                </span>
+              )}
             </div>
           )}
         </div>

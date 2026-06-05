@@ -20,7 +20,7 @@ export const defaultState = (name) => ({
   xpHistory: [],
   unlockedAchievements: [],
 
-  // ── Player Model v2 (neu) ──
+  // ── Player Model ──
   player: {
     name,
     mainPath: null,
@@ -28,13 +28,19 @@ export const defaultState = (name) => ({
     titles: [],
     activeTitle: null,
     affinities: {
-      fighter:  0,
-      runner:   0,
-      scholar:  0,
-      engineer: 0,
-      artisan:  0,
-      charmer:  0,
-      shadow:   0,
+      fighter:    0,
+      runner:     0,
+      scholar:    0,
+      engineer:   0,
+      artisan:    0,
+      charmer:    0,
+      strategist: 0,
+      guardian:   0,
+      merchant:   0,
+      creator:    0,
+      monk:       0,
+      explorer:   0,
+      shadow:     0,
     },
     preferences: {
       interests:            [],
@@ -43,13 +49,39 @@ export const defaultState = (name) => ({
       preferredQuestLength: "medium",
       activePaths:          [],
       balanceAreas:         [],
+      difficulty:           "normal",
     },
   },
 
-  // ── Quest History v2 (neu) ──
+  // ── Quest History ──
   questHistory: [],
 
-  // ── Gate Progress (neu) ──
+  // ── Completion Status (getrennt von History — Lockout-Tracking) ──
+  // daily: { "YYYY-MM-DD": [questIds] }
+  // weekly: { "YYYY-WNN": [questIds] }
+  // gates: { gateId: { completed, rewardClaimed } }
+  // goals: { goalId: { completed, rewardClaimed } }
+  completionStatus: {
+    daily:  {},
+    weekly: {},
+    gates:  {},
+    goals:  {},
+  },
+
+  // ── Gate Progress ──
   // { [gateId]: { stepsDone: [0,1,2,...], completed: bool, rewardClaimed: bool } }
   gateProgress: {},
+
+  // ── Progress Logs ──
+  // Einträge werden beim Quest-Abschluss optional hinzugefügt.
+  progressLogs: [],
+
+  // ── Goals ──
+  // Echte Ziele mit targetValue, currentValue etc. (Prompt 5)
+  goals: [],
+
+  // ── Weekly Reviews ──
+  // Wöchentliche Reflexionen (Prompt 14)
+  weeklyReviews: [],
 });
+

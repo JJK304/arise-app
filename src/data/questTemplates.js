@@ -1,156 +1,364 @@
 // ============================================================
-// QUEST TEMPLATES
-// Basis-Templates für personalisierte Quest-Generierung.
-// Variablen werden zur Laufzeit durch Nutzer-Interessen ersetzt.
+// QUEST TEMPLATES — Erweitertes System für Prompt 8
+// Deckt alle 12+ Domains ab: mind, body, craft, creativity,
+// social, appearance, discipline, career, finance, home,
+// recovery, adventure
 // ============================================================
-
-// Jedes Template hat:
-//   id           – eindeutig, beginnt mit "tpl_"
-//   titleTemplate– "{duration} Min. {topic} Deep Work" etc.
-//   descTemplate – kurze Beschreibung, optional {topic}
-//   type         – "daily"
-//   domain       – cat-Key (uni, skill_tech, …)
-//   paths        – Pfade die davon profitieren
-//   stats        – { statKey: pts } nur bei Milestones, sonst leer
-//   variables    – { duration: [25,45,60], topic: "userInterest" }
-//   baseXp       – XP bei "medium" Quest-Länge
-//   lengthScale  – { short: 0.7, medium: 1.0, long: 1.35 }
 
 export const QUEST_TEMPLATES = [
 
-  // ── Mind / Lernen ──
+  // ════════════════════════════════════════════════════════
+  // MIND / LERNEN
+  // ════════════════════════════════════════════════════════
   {
     id: "tpl_deep_work",
     titleTemplate: "{duration} Min. {topic} Deep Work",
-    descTemplate: "Fokussierte Arbeitszeit – kein Handy, kein Multitasking.",
-    type: "daily", domain: "uni",
-    paths: ["scholar", "engineer"],
-    stats: {}, baseXp: 40,
+    descTemplate:  "Fokussierte Arbeitszeit – kein Handy, kein Multitasking.",
+    type: "daily", domain: "mind",
+    paths: ["scholar", "engineer", "strategist"],
+    baseXp: 40, actionType: "action",
     variables: { duration: [25, 45, 60], topic: "interest_mind" },
   },
   {
     id: "tpl_aufgaben",
     titleTemplate: "{count} {topic}-Aufgaben lösen",
-    descTemplate: "Eigenständig lösen – kein Abschauen.",
-    type: "daily", domain: "uni",
+    descTemplate:  "Eigenständig lösen – kein Abschauen.",
+    type: "daily", domain: "mind",
     paths: ["scholar"],
-    stats: {}, baseXp: 35,
+    baseXp: 35, actionType: "action",
     variables: { count: [3, 5, 8], topic: "interest_mind" },
   },
   {
     id: "tpl_notizen",
     titleTemplate: "{topic} Notizen nacharbeiten",
-    descTemplate: "Aktives Erinnern: Stoff in eigenen Worten aufschreiben.",
-    type: "daily", domain: "uni",
+    descTemplate:  "Aktives Erinnern: Stoff in eigenen Worten aufschreiben.",
+    type: "daily", domain: "mind",
     paths: ["scholar"],
-    stats: {}, baseXp: 28,
+    baseXp: 28, actionType: "reflection",
+    variables: { topic: "interest_mind" },
+  },
+  {
+    id: "tpl_lesen",
+    titleTemplate: "{duration} Min. {topic} lesen",
+    descTemplate:  "Nicht überfliegen – wirklich verstehen und notieren.",
+    type: "daily", domain: "mind",
+    paths: ["scholar", "monk"],
+    baseXp: 30, actionType: "action",
+    variables: { duration: [20, 30, 45], topic: "interest_mind" },
+  },
+  {
+    id: "tpl_konzept_erklaeren",
+    titleTemplate: "{topic}-Konzept in eigenen Worten erklären",
+    descTemplate:  "Schreib auf was du verstanden hast – ohne Vorlage.",
+    type: "daily", domain: "mind",
+    paths: ["scholar"],
+    baseXp: 32, actionType: "reflection",
     variables: { topic: "interest_mind" },
   },
 
-  // ── Tech / Programmieren ──
+  // ════════════════════════════════════════════════════════
+  // CRAFT / TECHNIK
+  // ════════════════════════════════════════════════════════
   {
     id: "tpl_code_session",
-    titleTemplate: "{duration} Min. {topic} Projekt",
-    descTemplate: "Eigenes Projekt voranbringen – konkretes Ziel setzen.",
-    type: "daily", domain: "skill_tech",
+    titleTemplate: "{duration} Min. {topic}-Projekt",
+    descTemplate:  "Eigenes Projekt voranbringen – konkretes Ziel setzen.",
+    type: "daily", domain: "craft",
     paths: ["engineer", "scholar"],
-    stats: {}, baseXp: 38,
+    baseXp: 38, actionType: "project",
     variables: { duration: [25, 45, 60], topic: "interest_tech" },
   },
   {
     id: "tpl_datenblatt",
-    titleTemplate: "{topic} Datenblatt lesen",
-    descTemplate: "Technische Dokumentation verstehen und Kerninfos notieren.",
-    type: "daily", domain: "skill_tech",
+    titleTemplate: "{topic}-Datenblatt lesen",
+    descTemplate:  "Technische Dokumentation verstehen und Kerninfos notieren.",
+    type: "daily", domain: "craft",
     paths: ["engineer"],
-    stats: {}, baseXp: 30,
+    baseXp: 30, actionType: "action",
     variables: { topic: "interest_tech" },
   },
+  {
+    id: "tpl_fehler_debuggen",
+    titleTemplate: "{topic}-Fehler analysieren und lösen",
+    descTemplate:  "Bug oder Problem systematisch eingrenzen und lösen.",
+    type: "daily", domain: "craft",
+    paths: ["engineer"],
+    baseXp: 36, actionType: "project",
+    variables: { topic: "interest_tech" },
+  },
+  {
+    id: "tpl_projekt_schritt",
+    titleTemplate: "{topic}-Projekt: nächsten Schritt abschließen",
+    descTemplate:  "Einen konkreten Schritt im Projekt voranbringen.",
+    type: "daily", domain: "craft",
+    paths: ["engineer", "strategist"],
+    baseXp: 35, actionType: "project",
+    variables: { topic: "interest_tech" },
+  },
+  {
+    id: "tpl_kochen",
+    titleTemplate: "{topic} kochen",
+    descTemplate:  "Selbst zubereitet, frische Zutaten.",
+    type: "daily", domain: "craft",
+    paths: ["artisan", "guardian"],
+    baseXp: 25, actionType: "action",
+    variables: { topic: "interest_kitchen" },
+  },
 
-  // ── Kreativität ──
+  // ════════════════════════════════════════════════════════
+  // CREATIVITY
+  // ════════════════════════════════════════════════════════
   {
     id: "tpl_creative_session",
     titleTemplate: "{duration} Min. {topic} üben",
-    descTemplate: "Konzentrierte Übungseinheit mit konkretem Ziel.",
-    type: "daily", domain: "skill_creative",
-    paths: ["artisan"],
-    stats: {}, baseXp: 32,
+    descTemplate:  "Konzentrierte Übungseinheit mit konkretem Fokus.",
+    type: "daily", domain: "creativity",
+    paths: ["artisan", "creator"],
+    baseXp: 32, actionType: "action",
     variables: { duration: [15, 25, 40], topic: "interest_creative" },
   },
   {
     id: "tpl_sketch",
-    titleTemplate: "Skizze: {topic}",
-    descTemplate: "Schnelle Skizze ohne Perfektionsanspruch – einfach machen.",
-    type: "daily", domain: "skill_creative",
+    titleTemplate: "Skizze: {topic}-Idee",
+    descTemplate:  "Schnelle Skizze ohne Perfektionsanspruch – einfach machen.",
+    type: "daily", domain: "creativity",
     paths: ["artisan"],
-    stats: {}, baseXp: 22,
+    baseXp: 22, actionType: "action",
     variables: { topic: "interest_creative" },
   },
+  {
+    id: "tpl_werk_starten",
+    titleTemplate: "Neues {topic}-Werk beginnen",
+    descTemplate:  "Ersten Entwurf, ersten Akkord oder ersten Strich setzen.",
+    type: "daily", domain: "creativity",
+    paths: ["creator", "artisan"],
+    baseXp: 28, actionType: "project",
+    variables: { topic: "interest_creative" },
+  },
+  {
+    id: "tpl_content",
+    titleTemplate: "{duration} Min. {topic}-Content erstellen",
+    descTemplate:  "Skript, Design, Video, Post – irgendetwas produzieren.",
+    type: "daily", domain: "creativity",
+    paths: ["creator"],
+    baseXp: 34, actionType: "project",
+    variables: { duration: [20, 35, 50], topic: "interest_creative" },
+  },
 
-  // ── Fitness / Bewegung ──
+  // ════════════════════════════════════════════════════════
+  // BODY / FITNESS
+  // ════════════════════════════════════════════════════════
   {
     id: "tpl_training",
     titleTemplate: "{duration} Min. Training",
-    descTemplate: "Gym, Calisthenics, Cardio – Hauptsache bewegen.",
-    type: "daily", domain: "strength",
+    descTemplate:  "Gym, Calisthenics, Sport – Hauptsache bewegen.",
+    type: "daily", domain: "body",
     paths: ["fighter"],
-    stats: {}, baseXp: 35,
+    baseXp: 35, actionType: "metric",
     variables: { duration: [30, 45, 60] },
   },
   {
     id: "tpl_laufen",
     titleTemplate: "{distance} km laufen",
-    descTemplate: "Konstantes Tempo, kein Stopp.",
-    type: "daily", domain: "cardio",
+    descTemplate:  "Konstantes Tempo, kein Stopp.",
+    type: "daily", domain: "body",
     paths: ["runner"],
-    stats: {}, baseXp: 30,
+    baseXp: 30, actionType: "metric",
     variables: { distance: [3, 5, 8] },
   },
   {
     id: "tpl_mobility",
     titleTemplate: "{duration} Min. Mobility",
-    descTemplate: "Dehnen, Mobilisieren, Faszienarbeit.",
-    type: "daily", domain: "cardio",
+    descTemplate:  "Dehnen, Mobilisieren, Gelenke lockern.",
+    type: "daily", domain: "body",
     paths: ["runner", "fighter"],
-    stats: {}, baseXp: 22,
+    baseXp: 22, actionType: "metric",
     variables: { duration: [10, 15, 20] },
   },
+  {
+    id: "tpl_ernaehrung",
+    titleTemplate: "Proteinreiche Mahlzeit planen und essen",
+    descTemplate:  "Mind. 30g Protein, selbst zubereitet.",
+    type: "daily", domain: "recovery",
+    paths: ["fighter", "guardian"],
+    baseXp: 20, actionType: "action",
+    variables: {},
+  },
 
-  // ── Gesundheit / Routine ──
+  // ════════════════════════════════════════════════════════
+  // SOCIAL / APPEARANCE
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_social_gespraech",
+    titleTemplate: "Bewusstes Gespräch führen",
+    descTemplate:  "5 Min. echtes Gespräch – aktiv zuhören, nachfragen.",
+    type: "daily", domain: "social",
+    paths: ["charmer", "explorer"],
+    baseXp: 22, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_social_kontakt",
+    titleTemplate: "Aktiv jemanden kontaktieren",
+    descTemplate:  "Nicht warten bis jemand schreibt – selbst Initiative ergreifen.",
+    type: "daily", domain: "social",
+    paths: ["charmer"],
+    baseXp: 18, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_appearance",
+    titleTemplate: "Pflege-Routine vollständig",
+    descTemplate:  "Haut, Haare, Körper – alles bewusst und vollständig.",
+    type: "daily", domain: "appearance",
+    paths: ["charmer"],
+    baseXp: 15, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_kommunikation",
+    titleTemplate: "{duration} Min. Kommunikation üben",
+    descTemplate:  "Reden, Präsentieren, Small Talk – bewusst trainieren.",
+    type: "daily", domain: "social",
+    paths: ["charmer", "strategist"],
+    baseXp: 25, actionType: "action",
+    variables: { duration: [10, 15, 25] },
+  },
+
+  // ════════════════════════════════════════════════════════
+  // DISCIPLINE / LIFE
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_wochenplanung",
+    titleTemplate: "Wochenplan erstellen",
+    descTemplate:  "Nächste Woche planen: Uni, Sport, Soziales, Kreatives.",
+    type: "weekly", domain: "discipline",
+    paths: ["strategist", "guardian"],
+    baseXp: 50, actionType: "reflection",
+    variables: {},
+  },
+  {
+    id: "tpl_tagesplanung",
+    titleTemplate: "Tagesplan für heute aufschreiben",
+    descTemplate:  "3–5 konkrete Aufgaben. Prioritäten setzen.",
+    type: "daily", domain: "discipline",
+    paths: ["strategist"],
+    baseXp: 15, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_journaling",
+    titleTemplate: "{duration} Min. Journaling",
+    descTemplate:  "Was lief heute? Was lernst du? Was planst du?",
+    type: "daily", domain: "discipline",
+    paths: ["monk", "scholar"],
+    baseXp: 20, actionType: "reflection",
+    variables: { duration: [5, 10, 20] },
+  },
+  {
+    id: "tpl_ordnung",
+    titleTemplate: "Arbeitsplatz/Zimmer aufräumen",
+    descTemplate:  "5 Minuten systematisch aufräumen und organisieren.",
+    type: "daily", domain: "home",
+    paths: ["guardian"],
+    baseXp: 15, actionType: "action",
+    variables: {},
+  },
+
+  // ════════════════════════════════════════════════════════
+  // FINANCE / CAREER
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_budget",
+    titleTemplate: "Budget aktualisieren",
+    descTemplate:  "Einnahmen und Ausgaben eintragen – Überblick behalten.",
+    type: "daily", domain: "finance",
+    paths: ["merchant"],
+    baseXp: 20, actionType: "metric",
+    variables: {},
+  },
+  {
+    id: "tpl_karriere",
+    titleTemplate: "Karriere-Aufgabe erledigen",
+    descTemplate:  "Bewerbung, LinkedIn, Netzwerk oder Skill-Aufbau.",
+    type: "daily", domain: "career",
+    paths: ["merchant", "strategist"],
+    baseXp: 30, actionType: "project",
+    variables: {},
+  },
+  {
+    id: "tpl_finanzen_recherche",
+    titleTemplate: "{duration} Min. Finanzen / Investitionen lesen",
+    descTemplate:  "Verstehen wie Geld arbeitet.",
+    type: "daily", domain: "finance",
+    paths: ["merchant", "scholar"],
+    baseXp: 25, actionType: "action",
+    variables: { duration: [15, 20, 30] },
+  },
+
+  // ════════════════════════════════════════════════════════
+  // RECOVERY / MINDFULNESS
+  // ════════════════════════════════════════════════════════
   {
     id: "tpl_spaziergang",
     titleTemplate: "{duration} Min. Spaziergang ohne Handy",
-    descTemplate: "Draußen, keine Ablenkung, Gedanken sacken lassen.",
-    type: "daily", domain: "health",
-    paths: ["runner"],
-    stats: {}, baseXp: 20,
+    descTemplate:  "Draußen, keine Ablenkung, Gedanken sacken lassen.",
+    type: "daily", domain: "recovery",
+    paths: ["runner", "monk", "explorer"],
+    baseXp: 20, actionType: "recovery",
     variables: { duration: [20, 30, 45] },
   },
   {
-    id: "tpl_kochen",
-    titleTemplate: "{topic} kochen",
-    descTemplate: "Selbst zubereitet, frische Zutaten.",
-    type: "daily", domain: "skill_practical",
-    paths: ["artisan"],
-    stats: {}, baseXp: 25,
-    variables: { topic: "interest_kitchen" },
+    id: "tpl_meditation",
+    titleTemplate: "{duration} Min. Meditation / Atemübung",
+    descTemplate:  "Augen zu, atmen, Gedanken ziehen lassen.",
+    type: "daily", domain: "recovery",
+    paths: ["monk"],
+    baseXp: 22, actionType: "recovery",
+    variables: { duration: [5, 10, 20] },
+  },
+  {
+    id: "tpl_schlaf_routine",
+    titleTemplate: "Schlafroutine einhalten",
+    descTemplate:  "Handy weg, entspannt ins Bett.",
+    type: "daily", domain: "recovery",
+    paths: ["monk", "guardian"],
+    baseXp: 18, actionType: "recovery",
+    variables: {},
+  },
+
+  // ════════════════════════════════════════════════════════
+  // ADVENTURE / GROWTH
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_komfortzone",
+    titleTemplate: "Komfortzone verlassen: neue Erfahrung machen",
+    descTemplate:  "Etwas tun das dir Unbehagen bereitet – bewusst.",
+    type: "daily", domain: "adventure",
+    paths: ["explorer", "charmer"],
+    baseXp: 35, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_outdoor",
+    titleTemplate: "{duration} Min. Draußen / Natur",
+    descTemplate:  "Raus aus vier Wänden. Frische Luft, neuer Ort.",
+    type: "daily", domain: "adventure",
+    paths: ["explorer", "runner"],
+    baseXp: 22, actionType: "action",
+    variables: { duration: [30, 60, 90] },
   },
 ];
 
-// Interessen-Mapping: interest-ID → Anzeige-Topic für Templates
+// ── Legacy-Compat: INTEREST_TOPICS wird noch von altem Code genutzt ──
 export const INTEREST_TOPICS = {
-  // mind
   physik:        { group: "interest_mind",     label: "Physik" },
   mathe:         { group: "interest_mind",     label: "Mathe" },
-  // tech
   elektronik:    { group: "interest_tech",     label: "Elektronik" },
   programmieren: { group: "interest_tech",     label: "Programmieren" },
-  // creative
   zeichnen:      { group: "interest_creative", label: "Zeichnen" },
   musik:         { group: "interest_creative", label: "Musik" },
-  // kitchen
   kochen:        { group: "interest_kitchen",  label: "ein neues Gericht" },
-  // fitness → keine topic-Variable nötig (fitness/mobility direkt)
   fitness:       { group: "interest_fitness",  label: "Fitness" },
   mobility:      { group: "interest_fitness",  label: "Mobility" },
 };

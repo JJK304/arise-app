@@ -2,8 +2,9 @@
 // CHALLENGES DATABASE
 // daily/weekly → XP only (statPts:0)
 // milestones   → XP + statPts — echter Selbsttest mit klarer Frage
-// Gym: Körpergewicht (KG) als Maßstab für Kraft-Gates
+// Prompt 10: Erweitert durch challengesExtra.js
 // ============================================================
+import { EXTRA_DAILIES, EXTRA_WEEKLIES, EXTRA_MILESTONES } from "./challengesExtra.js";
 
 export const CHALLENGES_DB = {
 
@@ -96,7 +97,7 @@ export const CHALLENGES_DB = {
       {id:"d_m5",  title:"5km laufen",                     desc:"Selbsttest: 5km am Stück ohne Stopp.",                               xp:630,  stat:"AGI", statPts:12, type:"milestone", cat:"cardio"},
       {id:"d_m6",  title:"5km unter 30 Minuten",           desc:"Selbsttest: Pace unter 6:00/km auf 5km.",                            xp:760,  stat:"AGI", statPts:14, type:"milestone", cat:"cardio"},
       {id:"d_m7",  title:"Eigenes Programm (30+ Zeilen)",  desc:"Ein Programm das wirklich etwas tut. Eigene Logik, kein Kopieren.",  xp:530,  stat:"INT", statPts:10, type:"milestone", cat:"skill_tech"},
-      {id:"d_m8",  title:"Physik-Prüfung bestanden",       desc:"Eine Klausur oder Prüfung eigenständig bestanden.",                 xp:860,  stat:"INT", statPts:17, type:"milestone", cat:"uni"},
+      {id:"d_m8",  title:"Physik-Prüfung bestanden",       desc:"Eine Klausur oder Prüfung eigenständig bestanden.",                 xp:750,  stat:"INT", statPts:17, type:"milestone", cat:"uni"},
       {id:"d_m9",  title:"3 Gerichte ohne Rezept",         desc:"Selbsttest: 3 Gerichte die du jederzeit aus dem Kopf kochst.",      xp:430,  stat:"CRE", statPts:8,  type:"milestone", cat:"skill_practical"},
       {id:"d_m10", title:"Instrument: Lied A-Z spielen",   desc:"Selbsttest: Ein vollständiges Lied – erkennbar und flüssig.",       xp:490,  stat:"CRE", statPts:9,  type:"milestone", cat:"skill_creative"},
       {id:"d_m11", title:"Zeichnen: Person skizzieren",    desc:"Selbsttest: Zeichne eine Person – ist sie als Mensch erkennbar?",  xp:390,  stat:"CRE", statPts:7,  type:"milestone", cat:"skill_creative"},
@@ -366,4 +367,30 @@ export const CHALLENGES_DB = {
     ],
   },
 };
+
+// ── Extra-Content einmergen (Prompt 10) ──────────────────────
+// Fügt breiten Domain-Content zu E- und D-Rank hinzu.
+// Neue Kategorien: recovery, social, home, finance, adventure.
+
+const allExtraDailies = [
+  ...(EXTRA_DAILIES.discipline || []),
+  ...(EXTRA_DAILIES.recovery   || []),
+  ...(EXTRA_DAILIES.social     || []),
+  ...(EXTRA_DAILIES.home       || []),
+  ...(EXTRA_DAILIES.finance    || []),
+  ...(EXTRA_DAILIES.adventure  || []),
+];
+
+// E-Rank: alle Extra-Dailies + neue Weeklies + neue Milestones
+CHALLENGES_DB.E.daily     = [...CHALLENGES_DB.E.daily,     ...allExtraDailies];
+CHALLENGES_DB.E.weekly    = [...CHALLENGES_DB.E.weekly,    ...(EXTRA_WEEKLIES.E || [])];
+CHALLENGES_DB.E.milestones= [...CHALLENGES_DB.E.milestones,...(EXTRA_MILESTONES.E || [])];
+
+// D-Rank: neue Weeklies + Milestones
+CHALLENGES_DB.D.weekly    = [...CHALLENGES_DB.D.weekly,    ...(EXTRA_WEEKLIES.D || [])];
+CHALLENGES_DB.D.milestones= [...CHALLENGES_DB.D.milestones,...(EXTRA_MILESTONES.D || [])];
+
+// C-Rank: neue Milestones
+CHALLENGES_DB.C.milestones= [...(CHALLENGES_DB.C.milestones||[]),...(EXTRA_MILESTONES.C || [])];
+
 

@@ -10,17 +10,43 @@ import { PATHS, getAffinityGain, suggestPaths, canUnlockShadow } from "./data/pa
 import {
   INTERESTS_OPTIONS, QUEST_LENGTH_OPTIONS,
   ACTIVE_PATHS_OPTIONS, BALANCE_AREAS_OPTIONS,
+  DIFFICULTY_OPTIONS,
 } from "./data/preferences.js";
-import { GATES, isGateCompleted, getGateStepsDone, getRecommendedGates } from "./data/gates.js";
+import { INTEREST_GROUPS, INTERESTS, normalizeInterests } from "./data/interests.js";
+import { DOMAINS } from "./data/domains.js";
+import { GOAL_TEMPLATES } from "./data/goalTypes.js";
+import { GATES, isGateCompleted, getGateStepsDone, getRecommendedGates, isGateUnlocked } from "./data/gates.js";
 import { getRecoveryQuests, getRecoveryHint, RECOVERY_QUESTS } from "./data/recoveryQuests.js";
-import { TITLES, checkTitleUnlocks } from "./data/titles.js";
+import { TITLES, TITLE_MAP, checkTitleUnlocks, normalizeTitles } from "./data/titles.js";
 
 // Lib
 import { getGlobalLevel, getRankFromGlobal, getTodayStr, getWeekStr } from "./lib/helpers.js";
+import { getTodayKey, getTodayWeekKey, getYesterdayKey } from "./lib/dates.js";
+import {
+  isDailyDone, isWeeklyDone, canComplete, markCompleted,
+  pruneCompletionStatus,
+} from "./lib/history.js";
 import { useCountUp } from "./lib/useCountUp.js";
 import { migrateState, makeHistoryEntry } from "./lib/migration.js";
-import { generatePersonalizedQuests } from "./lib/questGenerator.js";
+import { generatePersonalizedQuests, generateStarterQuests, getNextBestQuests } from "./lib/questGenerator.js";
+import { applyQuestCompletion, applyGateCompletion, canCompleteQuest } from "./lib/questCompletion.js";
+import { rotateQuestPool, canCompleteCustomQuest, calculateCustomQuestXpBounds } from "./lib/questRotation.js";
+import { createWeeklyReview, hasReviewThisWeek, getCurrentWeekReview, getWeekQuestStats, addWeeklyReview } from "./lib/weeklyReview.js";
+import { updateXpHistory } from "./lib/rewards.js";
+import { PreferencesSection } from "./features/settings/PreferencesSection.jsx";
+import { SystemAnalysisCard } from "./features/profile/SystemAnalysisCard.jsx";
+import { ProgressLogModal } from "./features/quests/ProgressLogModal.jsx";
+import { DEMO_PROFILES } from "./data/demoProfiles.js";
 import { analyzeSystem } from "./lib/systemAnalysis.js";
+import {
+  createGoal, applyQuestToAllGoals, getNewlyCompletedGoals,
+  canClaimGoalReward, calculateGoalReward, markGoalRewardClaimed,
+  goalProgressPct, goalStatusLabel, getActiveGoals, getMatchingGoals,
+} from "./lib/goals.js";
+import {
+  createProgressLog, canLogWithBonus, addProgressLog,
+  getRecentLogs, getLogFields, METRIC_LABELS,
+} from "./lib/progressLogs.js";
 
 // Storage
 import { saveData, loadData, LS } from "./storage/db.js";
@@ -61,10 +87,25 @@ export default function AriseApp() {
   const [showSplash, setShowSplash] = useState(true);
   const [hapticEnabled, setHapticEnabled] = useState(() => { try { return JSON.parse(localStorage.getItem("arise_haptic") ?? "true"); } catch { return true; } });
   const [collapsedSections, setCollapsedSections] = useState({});
-  const [customForm, setCustomForm] = useState({ title:"",desc:"",xp:"20",cat:"discipline" });
+  const [customForm, setCustomForm] = useState({
+    title:"", desc:"", xp:"35",
+    type:"daily", domain:"discipline", path:"",
+    difficulty:"normal", tags:""
+  });
   const [newAchievements, setNewAchievements] = useState([]);
   const [newTitles, setNewTitles] = useState([]);
-  const [questFeedback, setQuestFeedback] = useState(null); // { xp, statKey, statPts, pathGains, newTitles }
+  const [questFeedback, setQuestFeedback] = useState(null);
+  // Goal UI state
+  const [showGoalForm, setShowGoalForm] = useState(false);
+  const [goalForm, setGoalForm] = useState({ templateId:"learning_goal", title:"", targetValue:"", deadline:"" });
+  // Progress Log UI state
+  const [pendingLogQuest, setPendingLogQuest] = useState(null);
+  const [logForm, setLogForm]   = useState({ notes:"", metrics:{} });
+  // Weekly Review state
+  const [reviewForm, setReviewForm] = useState({ wentWell:"", wasHard:"", learned:"", nextFocus:"" });
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  // Demo profiles
+  const [showDemo, setShowDemo] = useState(false);
   const notifRef = useRef(null);
   const achievRef = useRef(null);
   const feedbackRef = useRef(null);
@@ -104,33 +145,54 @@ export default function AriseApp() {
 
   const toggleSection = (key) => setCollapsedSections(p => ({...p, [key]: !p[key]}));
 
-  // Daily/Weekly reset + streak update
+  // Daily/Weekly reset + streak update + completionStatus pruning
   useEffect(() => {
     if(!state) return;
-    const today = getTodayStr(), week = getWeekStr();
-    let u = {...state, stats:{...state.stats}}, changed = false;
-    // Daily reset
-    if(state.lastDailyReset !== today) {
-      const ids = Object.values(CHALLENGES_DB).flatMap(r=>r.daily.map(c=>c.id));
-      u.completedChallenges = (state.completedChallenges||[]).filter(id=>!ids.includes(id));
-      // Streak logic
-      const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
-      const yStr = yesterday.toDateString();
-      if(state.lastActiveDay === yStr) {
-        u.currentStreak = (state.currentStreak||0) + 1;
-        u.longestStreak = Math.max(u.currentStreak, state.longestStreak||0);
-      } else if(state.lastActiveDay !== today) {
+    const today = getTodayKey();
+    const week  = getTodayWeekKey();
+    let u = { ...state, stats: { ...state.stats } };
+    let changed = false;
+
+    // ── Daily Reset ──
+    if (state.lastDailyReset !== today) {
+      // Legacy: completedChallenges-Filter für old Daily-IDs (Backward-Compat)
+      const dailyIds = Object.values(CHALLENGES_DB).flatMap(r => r.daily.map(c => c.id));
+      u.completedChallenges = (state.completedChallenges || []).filter(id => !dailyIds.includes(id));
+
+      // Streak-Logik: gestern aktiv? → Streak weiter. Nicht gestern? → Streak bricht.
+      const yesterday = getYesterdayKey();
+      if (state.lastActiveDay === yesterday) {
+        u.currentStreak = (state.currentStreak || 0) + 1;
+        u.longestStreak = Math.max(u.currentStreak, state.longestStreak || 0);
+      } else if (state.lastActiveDay !== today) {
         u.currentStreak = 0;
       }
-      u.lastDailyReset = today; changed = true;
+      u.lastDailyReset = today;
+      changed = true;
     }
-    if(state.lastWeeklyReset !== week) {
-      const ids = Object.values(CHALLENGES_DB).flatMap(r=>r.weekly.map(c=>c.id));
-      u.completedChallenges = (u.completedChallenges||state.completedChallenges).filter(id=>!ids.includes(id));
-      u.lastWeeklyReset = week; changed = true;
+
+    // ── Weekly Reset ──
+    if (state.lastWeeklyReset !== week) {
+      // Legacy: completedChallenges-Filter für old Weekly-IDs (Backward-Compat)
+      const weeklyIds = Object.values(CHALLENGES_DB).flatMap(r => r.weekly.map(c => c.id));
+      u.completedChallenges = (u.completedChallenges || state.completedChallenges || [])
+        .filter(id => !weeklyIds.includes(id));
+      u.lastWeeklyReset = week;
+      changed = true;
     }
-    if(changed) { setState(u); saveData("arise_v3", u); }
-  }, [state?.rank, state?.lastDailyReset]);
+
+    // ── completionStatus pruning (täglich bereinigen) ──
+    // Entfernt alte Daily/Weekly-Einträge um State-Größe zu kontrollieren.
+    if (changed || !state.completionStatus) {
+      const pruned = pruneCompletionStatus(state.completionStatus);
+      if (JSON.stringify(pruned) !== JSON.stringify(state.completionStatus)) {
+        u.completionStatus = pruned;
+        changed = true;
+      }
+    }
+
+    if (changed) { setState(u); saveData("arise_v3", u); }
+  }, [state?.rank, state?.lastDailyReset, state?.lastWeeklyReset]);
 
   // Check achievements
   const checkAchievements = useCallback((s, body) => {
@@ -156,111 +218,106 @@ export default function AriseApp() {
     if(!nameInput.trim()) return;
     const s = migrateState({
       ...defaultState(nameInput.trim()),
-      lastDailyReset:  getTodayStr(),
-      lastWeeklyReset: getWeekStr(),
+      lastDailyReset:  getTodayKey(),
+      lastWeeklyReset: getTodayWeekKey(),
     });
     setState(s); saveData("arise_v3", s);
   };
 
+  const completionOptions = {
+    XP_PER_LEVEL_FN:  XP_PER_LEVEL,
+    TOTAL_LEVELS,
+    getRankFromGlobal,
+    getGlobalLevel,
+  };
+
   const handleComplete = (challenge) => {
-    // ── Duplicate-XP-Schutz ──
-    // Milestones: dürfen grundsätzlich nie doppelt abgeschlossen werden
-    // Daily/Weekly: werden durch den Reset-Mechanismus gesteuert,
-    //   aber wir prüfen trotzdem ob die ID schon in completedChallenges ist
-    const alreadyDone = (state.completedChallenges || []).includes(challenge.id);
+    const { newState, feedback, alreadyDone } = applyQuestCompletion(state, challenge, completionOptions);
     if (alreadyDone) {
       showNotif("Quest bereits erledigt", "#64748b");
       return;
     }
 
-    let s = { ...state, stats:{...state.stats}, completedChallenges:[...(state.completedChallenges||[])] };
-    s.completedChallenges.push(challenge.id);
-    s.xp = (s.xp||0) + challenge.xp;
-    s.totalXP = (s.totalXP||0) + challenge.xp;
-    s.lastActiveDay = getTodayStr();
-    if(s.lastDailyReset === getTodayStr()) {
-      s.currentStreak = Math.max(s.currentStreak||0, 1);
-    }
-    // XP history (weekly buckets)
-    const wk = getWeekStr();
-    const hist = [...(s.xpHistory||[])];
-    const last = hist[hist.length-1];
-    if(last && last.w === wk) last.v += challenge.xp;
-    else hist.push({ w:wk, v:challenge.xp, l:new Date().toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"}) });
-    s.xpHistory = hist.slice(-24);
-
-    // ── Quest History Eintrag ──
-    const histEntry = makeHistoryEntry(challenge);
-    s.questHistory = [...(s.questHistory || []), histEntry].slice(-500); // max 500 Einträge
-
-    // ── Path Affinity aktualisieren ──
-    const gains = getAffinityGain(challenge);
-    if (Object.keys(gains).length > 0) {
-      s.player = { ...s.player, affinities: { ...s.player.affinities } };
-      for (const [pathId, pts] of Object.entries(gains)) {
-        s.player.affinities[pathId] = (s.player.affinities[pathId] || 0) + pts;
+    // Notifications
+    if (feedback.levelUps?.length > 0) {
+      for (const lu of feedback.levelUps) {
+        setLevelUpAnim({ rank: lu.rank, level: lu.level, rankUp: lu.rankUp });
+        setTimeout(() => setLevelUpAnim(null), 2800);
+        if (lu.rankUp) showNotif(`⚡ RANK UP! ${RANK_COLORS[lu.rank].label.toUpperCase()}`, RANK_COLORS[lu.rank].primary);
+        else showNotif(`↑ LEVEL UP! ${lu.rank}-Rank Lv.${lu.level}`, "#00ffff");
       }
     }
 
-    // Stat-Punkte NUR bei Meilensteinen
-    if(challenge.type === "milestone" && challenge.statPts > 0) {
-      const sk = challenge.subStat || challenge.stat;
-      s.stats[sk] = (s.stats[sk]||0) + challenge.statPts;
-      if(challenge.subStat) s.stats.CHA = (s.stats.CHA||0) + Math.max(1,Math.floor(challenge.statPts/5));
-      showNotif(`★ STAT UP! +${challenge.statPts} ${sk}`, "#f59e0b");
+    if (challenge.type === "milestone" && feedback.statPts > 0) {
+      showNotif(`★ STAT UP! +${feedback.statPts} ${feedback.statKey}`, "#f59e0b");
+    } else {
+      showNotif(`+${feedback.xp} XP`, "#3b82f6");
     }
 
-    // Level up
-    let xpNeeded = XP_PER_LEVEL(s.rank, s.level);
-    while(s.xp >= xpNeeded) {
-      s.xp -= xpNeeded;
-      const gl = getGlobalLevel(s.rank, s.level);
-      if(gl < TOTAL_LEVELS) {
-        const next = getRankFromGlobal(gl+1);
-        const rankUp = next.rank !== s.rank;
-        s.rank = next.rank; s.level = next.level;
-        setLevelUpAnim({ rank:s.rank, level:s.level, rankUp });
-        setTimeout(()=>setLevelUpAnim(null), 2800);
-        if(rankUp) showNotif(`⚡ RANK UP! ${RANK_COLORS[s.rank].label.toUpperCase()}`, RANK_COLORS[s.rank].primary);
-        else showNotif(`↑ LEVEL UP! ${s.rank}-Rank Lv.${s.level}`, "#00ffff");
-        xpNeeded = XP_PER_LEVEL(s.rank, s.level);
-      } else break;
+    for (const gn of (feedback.goalNotifications || [])) {
+      setTimeout(() => showNotif(`🏆 ZIEL ERREICHT! +${gn.xp} XP`, "#f59e0b"), 600);
     }
-    if(challenge.type !== "milestone") showNotif(`+${challenge.xp} XP`, "#3b82f6");
-    haptic(challenge.type==="milestone"?"heavy":"medium");
 
-    // ── Titel-Check ──
-    const newlyUnlocked = checkTitleUnlocks(s, s.questHistory || []);
-    if (newlyUnlocked.length > 0) {
-      const titles = s.player?.titles || [];
-      const merged = [...new Set([...titles, ...newlyUnlocked])];
-      s.player = {
-        ...s.player,
-        titles: merged,
-        // Ersten Titel auto-setzen wenn noch keiner aktiv
-        activeTitle: s.player.activeTitle || newlyUnlocked[0],
-      };
-      setNewTitles(TITLES.filter(t => newlyUnlocked.includes(t.id)));
+    if (feedback.newTitles?.length > 0) {
+      setNewTitles(TITLES.filter(t => feedback.newTitles.includes(t.id)));
       clearTimeout(feedbackRef.current);
       feedbackRef.current = setTimeout(() => setNewTitles([]), 4500);
     }
 
-    // ── Quest-Feedback-Moment ──
-    const feedbackGains = getAffinityGain(challenge);
-    const statKey = challenge.type === "milestone" && challenge.statPts > 0
-      ? (challenge.subStat || challenge.stat) : null;
     setQuestFeedback({
-      xp:        challenge.xp,
-      statKey,
-      statPts:   challenge.statPts || 0,
-      pathGains: feedbackGains,
-      newTitles: newlyUnlocked,
+      xp:       feedback.xp,
+      statKey:  feedback.statKey,
+      statPts:  feedback.statPts,
+      pathGains:feedback.pathGains,
+      newTitles:feedback.newTitles,
     });
     clearTimeout(feedbackRef.current);
     feedbackRef.current = setTimeout(() => setQuestFeedback(null), 3000);
 
+    haptic(challenge.type === "milestone" ? "heavy" : "medium");
+    setState(newState); saveData("arise_v3", newState);
+    setTimeout(() => checkAchievements(newState, bodyEntries), 100);
+
+    // Optional Progress Log
+    if (challenge.type !== "milestone" && challenge.type !== "custom") {
+      setPendingLogQuest(challenge);
+      setLogForm({ notes: "", metrics: {} });
+    }
+  };
+
+
+  const saveProgressLog = (quest, formData) => {
+    if (!quest) return;
+    // Anti-spam: XP-Bonus nur wenn noch kein Log heute für diese Quest
+    const withBonus = canLogWithBonus(state.progressLogs, quest.id);
+    // Passende Goals aus State finden
+    const matchingGoal = (state.goals || []).find(g =>
+      g.status === "active" && (g.domain === quest.domain || g.path === quest.path)
+    );
+    const log = createProgressLog({
+      questId:  quest.id,
+      goalId:   matchingGoal?.id || null,
+      quest,
+      metrics:  formData.metrics || {},
+      notes:    formData.notes   || "",
+    });
+    let s = { ...state, progressLogs: addProgressLog(state.progressLogs, log) };
+    // XP-Bonus nur einmal pro Quest/Tag
+    if (withBonus && log.xpBonus > 0) {
+      s.xp      = (s.xp      || 0) + log.xpBonus;
+      s.totalXP = (s.totalXP || 0) + log.xpBonus;
+      showNotif(`📝 Log gespeichert +${log.xpBonus} XP`, "#8b5cf6");
+    } else {
+      showNotif("📝 Log gespeichert", "#8b5cf6");
+    }
+    setPendingLogQuest(null);
+    setLogForm({ notes: "", metrics: {} });
     setState(s); saveData("arise_v3", s);
-    setTimeout(() => checkAchievements(s, bodyEntries), 100);
+  };
+
+  const dismissLog = () => {
+    setPendingLogQuest(null);
+    setLogForm({ notes: "", metrics: {} });
   };
 
   const saveBodyEntry = () => {
@@ -272,12 +329,61 @@ export default function AriseApp() {
     if(state) setTimeout(() => checkAchievements(state, updated), 100);
   };
 
+  const loadDemoProfile = (profileId) => {
+    const profile = DEMO_PROFILES.find(p => p.id === profileId);
+    if (!profile) return;
+    const playerName = state?.name || "Hunter";
+    const newState = profile.buildState(playerName);
+    setState(newState);
+    saveData("arise_v3", newState);
+    showNotif(`${profile.icon} Profil geladen: ${profile.label}`, profile.color);
+  };
+
+  const saveWeeklyReview = (reflection) => {
+    if (hasReviewThisWeek(state.weeklyReviews)) {
+      showNotif("Review dieser Woche bereits gespeichert", "#64748b");
+      return;
+    }
+    const review = createWeeklyReview(state, reflection);
+    // XP-Bonus vergeben
+    let s = {
+      ...state,
+      weeklyReviews: addWeeklyReview(state.weeklyReviews, review),
+      xp:      (state.xp      || 0) + review.xpBonus,
+      totalXP: (state.totalXP || 0) + review.xpBonus,
+    };
+    s.xpHistory = updateXpHistory(s.xpHistory, review.xpBonus, getTodayWeekKey());
+    setState(s); saveData("arise_v3", s);
+    setReviewForm({ wentWell:"", wasHard:"", learned:"", nextFocus:"" });
+    setShowReviewForm(false);
+    showNotif(`📋 Wochenreview gespeichert! +${review.xpBonus} XP`, "#8b5cf6");
+  };
+
   const addCustomQuest = () => {
     if(!customForm.title.trim()) return;
-    const quest = { id:`custom_${Date.now()}`, title:customForm.title.trim(), desc:customForm.desc.trim()||"Eigene Quest", xp:Math.max(1,parseInt(customForm.xp)||20), stat:"END", statPts:0, type:"custom", cat:customForm.cat };
+    const questType = customForm.type || "daily";
+    const bounds = calculateCustomQuestXpBounds({ type: questType, difficulty: customForm.difficulty });
+    const rawXp   = parseInt(customForm.xp) || bounds.suggested;
+    const safeXp  = Math.max(bounds.min, Math.min(bounds.max, rawXp));
+    const quest = {
+      id:         `custom_${Date.now()}`,
+      title:      customForm.title.trim(),
+      desc:       customForm.desc.trim() || "Eigene Quest",
+      xp:         safeXp,
+      stat:       "END", statPts: 0,
+      type:       questType,
+      actionType: "action",
+      cat:        customForm.domain,   // legacy compat
+      domain:     customForm.domain,
+      path:       customForm.path     || null,
+      difficulty: customForm.difficulty || "normal",
+      tags:       customForm.tags.split(",").map(t=>t.trim()).filter(Boolean),
+      personalized: false,
+      source:     "custom",
+    };
     const s = { ...state, customQuests:[...(state.customQuests||[]), quest] };
     setState(s); saveData("arise_v3", s);
-    setCustomForm({ title:"",desc:"",xp:"20",cat:"discipline" });
+    setCustomForm({ title:"",desc:"",xp:"35",type:"daily",domain:"discipline",path:"",difficulty:"normal",tags:"" });
     setShowCustomForm(false);
     showNotif("✦ Quest hinzugefügt", "#06b6d4");
   };
@@ -372,69 +478,24 @@ export default function AriseApp() {
   };
 
   const handleGateClaim = (gate) => {
-    const prev = state.gateProgress?.[gate.id] || {};
-    if (prev.completed) return; // Kein doppelter Reward
-    const gate_def = GATES.find(g => g.id === gate.id);
-    if (!gate_def) return;
+    const { newState, feedback, alreadyDone } = applyGateCompletion(state, gate, completionOptions);
+    if (alreadyDone) return;
 
-    let s = { ...state, gateProgress: { ...state.gateProgress } };
-
-    // Gate als abgeschlossen markieren
-    s.gateProgress[gate.id] = { ...prev, completed: true, rewardClaimed: true };
-
-    // XP vergeben
-    s.xp      = (s.xp      || 0) + gate_def.reward.xp;
-    s.totalXP = (s.totalXP || 0) + gate_def.reward.xp;
-    s.lastActiveDay = getTodayStr();
-
-    // XP-History updaten
-    const wk = getWeekStr();
-    const hist = [...(s.xpHistory || [])];
-    const last = hist[hist.length - 1];
-    if (last && last.w === wk) last.v += gate_def.reward.xp;
-    else hist.push({ w:wk, v:gate_def.reward.xp, l:new Date().toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"}) });
-    s.xpHistory = hist.slice(-24);
-
-    // Affinity vergeben
-    s.player = { ...s.player, affinities: { ...s.player.affinities } };
-    for (const [pathId, pts] of Object.entries(gate_def.reward.affinity || {})) {
-      s.player.affinities[pathId] = (s.player.affinities[pathId] || 0) + pts;
-    }
-
-    // Titel vergeben (nicht doppelt)
-    if (gate_def.reward.title) {
-      const titles = s.player.titles || [];
-      if (!titles.includes(gate_def.reward.title)) {
-        s.player = { ...s.player, titles: [...titles, gate_def.reward.title] };
-        // Ersten Titel automatisch als aktiv setzen
-        if (!s.player.activeTitle) {
-          s.player = { ...s.player, activeTitle: gate_def.reward.title };
-        }
+    if (feedback.levelUps?.length > 0) {
+      for (const lu of feedback.levelUps) {
+        setLevelUpAnim({ rank: lu.rank, level: lu.level, rankUp: lu.rankUp });
+        setTimeout(() => setLevelUpAnim(null), 2800);
+        if (lu.rankUp) showNotif(`⚡ RANK UP! ${RANK_COLORS[lu.rank].label.toUpperCase()}`, RANK_COLORS[lu.rank].primary);
+        else showNotif(`↑ LEVEL UP! ${lu.rank}-Rank Lv.${lu.level}`, "#00ffff");
       }
     }
 
-    // Level-up prüfen
-    let xpNeeded = XP_PER_LEVEL(s.rank, s.level);
-    while (s.xp >= xpNeeded) {
-      s.xp -= xpNeeded;
-      const gl = getGlobalLevel(s.rank, s.level);
-      if (gl < TOTAL_LEVELS) {
-        const next = getRankFromGlobal(gl + 1);
-        const rankUp = next.rank !== s.rank;
-        s.rank = next.rank; s.level = next.level;
-        setLevelUpAnim({ rank: s.rank, level: s.level, rankUp });
-        setTimeout(() => setLevelUpAnim(null), 2800);
-        if (rankUp) showNotif(`⚡ RANK UP! ${RANK_COLORS[s.rank].label.toUpperCase()}`, RANK_COLORS[s.rank].primary);
-        else showNotif(`↑ LEVEL UP! ${s.rank}-Rank Lv.${s.level}`, "#00ffff");
-        xpNeeded = XP_PER_LEVEL(s.rank, s.level);
-      } else break;
-    }
-
-    setState(s); saveData("arise_v3", s);
+    setState(newState); saveData("arise_v3", newState);
     haptic("heavy");
-    showNotif(`◈ GATE CLEARED! +${gate_def.reward.xp} XP`, gate_def.color || "#f59e0b");
-    setTimeout(() => checkAchievements(s, bodyEntries), 100);
+    showNotif(`◈ GATE CLEARED! +${feedback.xp} XP`, gate.color || "#f59e0b");
+    setTimeout(() => checkAchievements(newState, bodyEntries), 100);
   };
+
 
   // ── SETUP SCREEN ──
   if(!state) return (
@@ -461,15 +522,41 @@ export default function AriseApp() {
   const currentDB = CHALLENGES_DB[state.rank]||{daily:[],weekly:[],milestones:[]};
   const allMilestones = Object.entries(CHALLENGES_DB).filter(([r])=>RANKS.indexOf(r)<=RANKS.indexOf(state.rank)).flatMap(([,v])=>v.milestones);
   const customQuests = state.customQuests||[];
-  const todayDone = currentDB.daily.filter(c=>state.completedChallenges?.includes(c.id)).length;
-  const totalMilestonesDone = Object.values(CHALLENGES_DB).flatMap(r=>r.milestones).filter(c=>state.completedChallenges?.includes(c.id)).length;
+  const todayDone = currentDB.daily.filter(c=>isQuestDone(c)).length;
+  const totalMilestonesDone = Object.values(CHALLENGES_DB).flatMap(r=>r.milestones).filter(c=>isQuestDone(c)).length;
   const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements||[]).includes(a.id));
 
   // Personalisierte Quests aus Interessen generieren
-  const personalizedQuests = generatePersonalizedQuests(state.player?.preferences);
+  const prefs = state.player?.preferences || {};
+  const hasInterests = (prefs.interests?.length || 0) > 0 || (prefs.activePaths?.length || 0) > 0;
+  const questContext = {
+    goals:            state.goals       || [],
+    questHistory:     state.questHistory || [],
+    affinities:       state.player?.affinities || {},
+    currentStreak:    state.currentStreak || 0,
+    neglectedDomains: [], // Wird nach sysAnalysis befüllt (unten)
+  };
+  const personalizedQuests = hasInterests
+    ? generatePersonalizedQuests(
+        { ...prefs, mainPath: state.player?.mainPath, secondaryPath: state.player?.secondaryPath },
+        questContext
+      )
+    : generateStarterQuests(prefs.preferredQuestLength || "medium");
 
-  // System-Analyse aus Quest-Verlauf
-  const sysAnalysis = analyzeSystem(state.questHistory, state.player?.affinities);
+  // System-Analyse aus Quest-Verlauf + vollständigem Kontext
+  const sysAnalysis = analyzeSystem(
+    state.questHistory,
+    state.player?.affinities,
+    state.player?.preferences,
+    {
+      goals:         state.goals         || [],
+      weeklyReviews: state.weeklyReviews || [],
+      rank:          state.rank          || "E",
+      level:         state.level         || 1,
+      currentStreak: state.currentStreak || 0,
+      gateProgress:  state.gateProgress  || {},
+    }
+  );
 
   // Gate-Daten
   const gateProgress      = state.gateProgress || {};
@@ -477,18 +564,64 @@ export default function AriseApp() {
 
   // Recovery-Quests
   const completedTodayIds = (state.completedChallenges || []);
+
+  // Unified done-check: uses completionStatus (new) + completedChallenges (legacy fallback)
+  const isQuestDone = (quest) => {
+    if (!quest) return false;
+    const cs = state.completionStatus || {};
+    const qh = state.questHistory || [];
+    // New system
+    if (!canComplete(cs, qh, quest)) return true;
+    // Legacy fallback (for old states before completionStatus)
+    return (state.completedChallenges || []).includes(quest.id);
+  };
   const balanceAreas      = state.player?.preferences?.balanceAreas || [];
   const recoveryQuests    = getRecoveryQuests(sysAnalysis, completedTodayIds, state.currentStreak || 0, balanceAreas);
   const recoveryHint      = getRecoveryHint(sysAnalysis, completedTodayIds, state.currentStreak || 0);
 
-  let displayChallenges = [...currentDB.daily, ...currentDB.weekly, ...allMilestones, ...customQuests, ...personalizedQuests, ...recoveryQuests];
-  if(showTodayOnly) displayChallenges = displayChallenges.filter(c=>c.type==="daily"&&!state.completedChallenges?.includes(c.id));
+  // ── Quest Rotation: stabile dayKey-/weekKey-gebundene Auswahl ──
+  const rotationContext = {
+    interests:        prefs.interests     || [],
+    activePaths:      prefs.activePaths   || [],
+    activeGoals:      (state.goals || []).filter(g => g.status === "active"),
+    neglectedDomains: sysAnalysis.neglectedDomains?.map(n => n.domain) || [],
+  };
+  const rotated = rotateQuestPool({
+    daily:        currentDB.daily,
+    weekly:       currentDB.weekly,
+    personalized: personalizedQuests,
+    recovery:     recoveryQuests,
+  }, rotationContext);
+
+  // Rotate daily/weekly from DB — custom + milestones always shown fully
+  const rotatedDaily   = rotated.daily;
+  const rotatedWeekly  = rotated.weekly;
+
+  let displayChallenges = [
+    ...rotatedDaily,
+    ...rotatedWeekly,
+    ...allMilestones,
+    ...customQuests,
+    ...rotated.personalized,
+    ...rotated.recovery,
+  ];
+  if(showTodayOnly) displayChallenges = displayChallenges.filter(c=>c.type==="daily"&&!isQuestDone(c));
   if(filterType!=="all") displayChallenges = displayChallenges.filter(c=>c.type===filterType);
-  if(filterType==="personalized") displayChallenges = personalizedQuests;
-  if(filterType==="recovery")     displayChallenges = recoveryQuests;
-  if(filterCat!=="all")  displayChallenges = displayChallenges.filter(c=>c.cat===filterCat);
+  if(filterType==="personalized") displayChallenges = rotated.personalized;
+  if(filterType==="recovery")     displayChallenges = rotated.recovery;
+  if(filterType==="goal-linked")  {
+    const activeGoalIds  = new Set((state.goals||[]).filter(g=>g.status==="active").map(g=>g.id));
+    const activeGoalDomains = new Set((state.goals||[]).filter(g=>g.status==="active").map(g=>g.domain).filter(Boolean));
+    const activeGoalPaths   = new Set((state.goals||[]).filter(g=>g.status==="active").map(g=>g.path).filter(Boolean));
+    displayChallenges = displayChallenges.filter(c =>
+      (c.goalId && activeGoalIds.has(c.goalId)) ||
+      (c.domain && activeGoalDomains.has(c.domain)) ||
+      (c.path   && activeGoalPaths.has(c.path))
+    );
+  }
+  if(filterCat!=="all") displayChallenges = displayChallenges.filter(c=>c.cat===filterCat||c.domain===filterCat);
   if(sortBy==="xp") displayChallenges = [...displayChallenges].sort((a,b)=>b.xp-a.xp);
-  const availableCats=[...new Set([...currentDB.daily,...currentDB.weekly,...allMilestones,...customQuests,...personalizedQuests,...recoveryQuests].map(c=>c.cat))];
+  const availableCats=[...new Set([...rotatedDaily,...rotatedWeekly,...allMilestones,...customQuests,...rotated.personalized,...rotated.recovery].map(c=>c.cat||c.domain).filter(Boolean))];
 
   // Body chart data
   const bodyChartData = bodyEntries.slice().reverse().map(e=>({ v:parseFloat(e[bodyMetric])||0, l:e.date?.split(".").slice(0,2).join(".") })).filter(d=>d.v>0);
@@ -498,15 +631,20 @@ export default function AriseApp() {
   const navItems = [
     {id:"profile",icon:"◈",label:"Status"},
     {id:"quests", icon:"◉",label:"Quests"},
-    {id:"body",   icon:"◆",label:"Körper"},
-    {id:"stats",  icon:"▲",label:"Stats"},
+    {id:"goals",  icon:"🎯",label:"Ziele"},
+    {id:"review", icon:"📋",label:"Review"},
     {id:"more",   icon:"⊕",label:"System"},
   ];
 
   // Build stat history from completed milestones
   const buildStatHistory = (statKey) => {
     const allM = Object.values(CHALLENGES_DB).flatMap(r=>r.milestones);
-    const relevant = allM.filter(m=>(m.subStat||m.stat)===statKey && state.completedChallenges?.includes(m.id));
+    // Use questHistory for milestones (more reliable than completedChallenges)
+    const completedMilestoneIds = new Set([
+      ...(state.completedChallenges || []),
+      ...(state.questHistory || []).filter(h => h.type === "milestone").map(h => h.id),
+    ]);
+    const relevant = allM.filter(m=>(m.subStat||m.stat)===statKey && completedMilestoneIds.has(m.id));
     // Sort by rank order as proxy for time (we don't store completion timestamps)
     relevant.sort((a,b)=>{
       const ra=Object.entries(CHALLENGES_DB).find(([,v])=>v.milestones.includes(a))?.[0]||"E";
@@ -600,6 +738,16 @@ export default function AriseApp() {
         </div>
       )}
 
+      {/* ── PROGRESS LOG MODAL ── */}
+      <ProgressLogModal
+        quest={pendingLogQuest}
+        logForm={logForm}
+        setLogForm={setLogForm}
+        onSave={saveProgressLog}
+        onDismiss={dismissLog}
+        progressLogs={state.progressLogs || []}
+      />
+
       {/* Stat Detail Modal */}
       {selectedStat && (() => {
         const sc = [...STATS_CONFIG, ...Object.entries(SUB_STATS).map(([k,v])=>({key:k,...v}))].find(s=>s.key===selectedStat);
@@ -671,10 +819,12 @@ export default function AriseApp() {
             <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"0.95rem",fontWeight:900,color:"#e2e8f0",letterSpacing:"0.06em" }}>{state.name}</div>
             {/* Active Title badge */}
             {state.player?.activeTitle && (() => {
-              const t = TITLES.find(tt => tt.title === state.player.activeTitle) || { color:"#f59e0b", icon:"★" };
+              const titleId = state.player.activeTitle;
+              const t = TITLE_MAP[titleId] || TITLES.find(tt => tt.title === titleId) || { color:"#f59e0b", icon:"★", title: titleId };
+              const label = t.title || titleId;
               return (
                 <div style={{ fontSize:"0.58rem",color:t.color,marginTop:2,fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.06em" }}>
-                  {t.icon} {state.player.activeTitle}
+                  {t.icon} {label}
                 </div>
               );
             })()}
@@ -705,11 +855,13 @@ export default function AriseApp() {
             <div style={{ width:`${xpPct}%`,height:"100%",background:`linear-gradient(90deg,${rc.primary}44,${rc.primary})`,boxShadow:`0 0 8px ${rc.primary}88`,borderRadius:4,transition:"width 0.8s ease" }}/>
           </div>
           <div style={{ fontSize:"0.56rem",color:"#334155",marginTop:3,transition:"all 0.3s" }}>
-            {view==="quests" && `Heute: ${todayDone}/${currentDB.daily.length} tägl. erledigt · ${totalMilestonesDone} Meilensteine`}
+            {view==="quests"  && `Heute: ${todayDone}/${rotatedDaily.length} tägl. · ${totalMilestonesDone} Meilensteine`}
             {view==="profile" && `Global Lv.${globalLvl}/${TOTAL_LEVELS} · ${(state.totalXP||0).toLocaleString()} XP gesamt`}
-            {view==="body" && (bodyEntries.length > 0 ? `Letzter Check-In: ${bodyEntries[0].date}` : "Noch kein Check-In — trag deinen ersten ein")}
-            {view==="stats" && `${Object.values(state.stats||{}).reduce((a,b)=>a+b,0)} Stat-Punkte insgesamt`}
-            {view==="more" && `${unlockedAchievements.length}/${ACHIEVEMENTS.length} Achievements · System v2`}
+            {view==="goals"   && `${(state.goals||[]).filter(g=>g.status==="active").length} aktiv · ${(state.goals||[]).filter(g=>g.status==="completed").length} abgeschlossen`}
+            {view==="review"  && `${(state.weeklyReviews||[]).length} Reviews gespeichert · ${getWeekQuestStats(state.questHistory).count} Quests diese Woche`}
+            {view==="body"    && (bodyEntries.length > 0 ? `Letzter Check-In: ${bodyEntries[0].date}` : "Noch kein Check-In")}
+            {view==="stats"   && `${Object.values(state.stats||{}).reduce((a,b)=>a+b,0)} Stat-Punkte insgesamt`}
+            {view==="more"    && `${unlockedAchievements.length}/${ACHIEVEMENTS.length} Achievements · System v3`}
           </div>
         </div>
       </div>
@@ -721,7 +873,7 @@ export default function AriseApp() {
           const dx=e.changedTouches[0].clientX-(e.currentTarget._touchX||0);
           const dy=e.changedTouches[0].clientY-(e.currentTarget._touchY||0);
           if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.5) {
-            const tabs=["profile","quests","body","stats","more"];
+            const tabs=["profile","quests","goals","review","more"];
             const ci=tabs.indexOf(view);
             if(dx<0 && ci<tabs.length-1) { setView(tabs[ci+1]); haptic("light"); }
             else if(dx>0 && ci>0) { setView(tabs[ci-1]); haptic("light"); }
@@ -894,20 +1046,25 @@ export default function AriseApp() {
             {(state.player?.titles || []).length > 0 && (() => {
               const playerTitles = state.player.titles || [];
               const activeTitle  = state.player.activeTitle;
+              // Normalisiere Legacy-Titel-Strings auf IDs
+              const normalizedTitles = playerTitles.map(t =>
+                TITLE_MAP[t] ? t : (TITLES.find(ti => ti.title === t)?.id || t)
+              );
               return (
                 <div style={{ marginBottom:14 }}>
                   <div style={{ fontSize:"0.54rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:8 }}>TITEL ({playerTitles.length})</div>
                   <div style={{ display:"flex",flexWrap:"wrap",gap:6 }}>
-                    {playerTitles.map(titleStr => {
-                      const t = TITLES.find(tt => tt.title === titleStr) || { color:"#f59e0b",icon:"★",title:titleStr };
-                      const isActive = activeTitle === titleStr;
+                    {normalizedTitles.map(titleId => {
+                      const t = TITLE_MAP[titleId] || TITLES.find(tt => tt.title === titleId) || { color:"#f59e0b",icon:"★",title:titleId };
+                      const label = t.title || titleId;
+                      const isActive = activeTitle === titleId;
                       return (
-                        <button key={titleStr} onClick={()=>{
-                          const s2 = { ...state, player: { ...state.player, activeTitle: titleStr }};
+                        <button key={titleId} onClick={()=>{
+                          const s2 = { ...state, player: { ...state.player, activeTitle: titleId }};
                           setState(s2); saveData("arise_v3", s2);
-                          showNotif(`${t.icon} Aktiver Titel: ${titleStr}`, t.color);
+                          showNotif(`${t.icon} Aktiver Titel: ${label}`, t.color);
                         }} style={{ background:isActive?`${t.color}22`:"rgba(255,255,255,0.03)",border:`1px solid ${isActive?t.color+"55":"#1a1a2e"}`,color:isActive?t.color:"#4a5568",borderRadius:20,padding:"4px 11px",fontSize:"0.66rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.04em",display:"flex",alignItems:"center",gap:4,transition:"all 0.15s" }}>
-                          <span style={{ fontSize:"0.75rem" }}>{t.icon}</span>{titleStr}
+                          <span style={{ fontSize:"0.75rem" }}>{t.icon}</span>{label}
                           {isActive && <span style={{ fontSize:"0.55rem",color:t.color }}>✓</span>}
                         </button>
                       );
@@ -931,82 +1088,16 @@ export default function AriseApp() {
                 </div>
               </div>
             )}
-
             {/* ── SYSTEM ANALYSIS ── */}
-            {(() => {
-              const affinities      = state.player?.affinities || {};
-              const mainPath        = state.player?.mainPath;
-              const secPath         = state.player?.secondaryPath;
-              const shadowUnlockable= canUnlockShadow(affinities);
-              const showSuggestion  = sysAnalysis.suggestedMainPath && (!mainPath || !secPath);
-              const msg             = sysAnalysis.suggestedMessage;
+            <SystemAnalysisCard
+              state={state}
+              sysAnalysis={sysAnalysis}
+              rc={rc}
+              saveData={saveData}
+              setState={setState}
+              showNotif={showNotif}
+            />
 
-              return (
-                <div style={{ marginBottom:8 }}>
-                  <div style={{ background:"rgba(0,255,255,0.04)",border:"1px solid #00ffff1e",borderRadius:10,padding:"13px" }}>
-                    <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#00ffff66",marginBottom:6 }}>SYSTEM ANALYSIS</div>
-
-                    <div style={{ fontSize:"0.76rem",color:"#64748b",lineHeight:1.55,marginBottom:sysAnalysis.dominantPaths.length>0?8:0 }}>
-                      {msg || "Schließe weitere Quests ab, damit dein System deinen Pfad erkennt."}
-                    </div>
-
-                    {sysAnalysis.dominantPaths.length > 0 && (
-                      <div style={{ display:"flex",gap:5,flexWrap:"wrap",marginBottom:sysAnalysis.balanceHints.length>0||showSuggestion?8:0 }}>
-                        {sysAnalysis.dominantPaths.map(pathId => {
-                          const p = PATHS[pathId];
-                          const cnt = sysAnalysis.pathCounts[pathId] || 0;
-                          return (
-                            <span key={pathId} style={{ background:`${p?.color}14`,border:`1px solid ${p?.color}2a`,color:p?.color,borderRadius:20,padding:"3px 9px",fontSize:"0.6rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
-                              {p?.icon} {p?.name} ×{cnt}
-                            </span>
-                          );
-                        })}
-                      </div>
-                    )}
-
-                    {sysAnalysis.balanceHints.length > 0 && (
-                      <div style={{ display:"flex",flexDirection:"column",gap:3,marginBottom:showSuggestion?8:0 }}>
-                        {sysAnalysis.balanceHints.map((hint,i) => (
-                          <div key={i} style={{ fontSize:"0.64rem",color:"#475569",display:"flex",alignItems:"center",gap:5 }}>
-                            <span>{hint.icon}</span><span>{hint.text}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {showSuggestion && (
-                      <div style={{ display:"flex",gap:6,flexWrap:"wrap",marginTop:8 }}>
-                        {!mainPath && sysAnalysis.suggestedMainPath && (
-                          <button onClick={()=>{
-                            const s2 = { ...state, player:{ ...state.player, mainPath: sysAnalysis.suggestedMainPath }};
-                            setState(s2); saveData("arise_v3", s2);
-                            showNotif(`◈ Main Path: ${PATHS[sysAnalysis.suggestedMainPath]?.name}`, PATHS[sysAnalysis.suggestedMainPath]?.color);
-                          }} style={{ background:`${PATHS[sysAnalysis.suggestedMainPath]?.color}16`,border:`1px solid ${PATHS[sysAnalysis.suggestedMainPath]?.color}44`,color:PATHS[sysAnalysis.suggestedMainPath]?.color,borderRadius:7,padding:"7px 12px",fontSize:"0.67rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.05em" }}>
-                            Als Main Path übernehmen
-                          </button>
-                        )}
-                        {!secPath && sysAnalysis.suggestedSecondaryPath && (
-                          <button onClick={()=>{
-                            const s2 = { ...state, player:{ ...state.player, secondaryPath: sysAnalysis.suggestedSecondaryPath }};
-                            setState(s2); saveData("arise_v3", s2);
-                            showNotif(`◈ Secondary Path: ${PATHS[sysAnalysis.suggestedSecondaryPath]?.name}`, PATHS[sysAnalysis.suggestedSecondaryPath]?.color);
-                          }} style={{ background:`${PATHS[sysAnalysis.suggestedSecondaryPath]?.color}12`,border:`1px solid ${PATHS[sysAnalysis.suggestedSecondaryPath]?.color}33`,color:PATHS[sysAnalysis.suggestedSecondaryPath]?.color,borderRadius:7,padding:"7px 12px",fontSize:"0.67rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.05em" }}>
-                            Als Secondary Path
-                          </button>
-                        )}
-                      </div>
-                    )}
-
-                    {shadowUnlockable && (
-                      <div style={{ marginTop:10,display:"flex",alignItems:"center",gap:7 }}>
-                        <span style={{ fontSize:"1rem" }}>🌑</span>
-                        <div style={{ fontSize:"0.67rem",color:"#00ffff55",lineHeight:1.4 }}>Shadow Monarch Path verfügbar — meistere alle Pfade.</div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })()}
 
           </div>
         )}
@@ -1016,17 +1107,23 @@ export default function AriseApp() {
           <div>
             {/* Quest Progress Widget */}
             {(() => {
-              const totalDaily = currentDB.daily.length;
-              const doneDaily  = currentDB.daily.filter(c => state.completedChallenges?.includes(c.id)).length;
-              const totalWeekly = currentDB.weekly.length;
-              const doneWeekly  = currentDB.weekly.filter(c => state.completedChallenges?.includes(c.id)).length;
+              const totalDaily  = rotatedDaily.length;
+              const doneDaily   = rotatedDaily.filter(c => isQuestDone(c)).length;
+              const totalWeekly = rotatedWeekly.length;
+              const doneWeekly  = rotatedWeekly.filter(c => isQuestDone(c)).length;
+              const activeGoalCount = (state.goals||[]).filter(g=>g.status==="active").length;
+              const completedGoalCount = (state.goals||[]).filter(g=>g.status==="completed").length;
+              const totalGoalCount = (state.goals||[]).length;
               const pctD = totalDaily  > 0 ? Math.round((doneDaily  / totalDaily)  * 100) : 0;
               const pctW = totalWeekly > 0 ? Math.round((doneWeekly / totalWeekly) * 100) : 0;
+              const pctG = totalGoalCount > 0 ? Math.round((completedGoalCount / totalGoalCount) * 100) : 0;
+              const cols = activeGoalCount > 0 ? "1fr 1fr 1fr" : "1fr 1fr";
               return (
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:7, marginBottom:12 }}>
+                <div style={{ display:"grid", gridTemplateColumns:cols, gap:7, marginBottom:12 }}>
                   {[
-                    { label:"Daily",    done:doneDaily,  total:totalDaily,  pct:pctD, color:"#3b82f6" },
-                    { label:"Weekly",   done:doneWeekly, total:totalWeekly, pct:pctW, color:"#8b5cf6" },
+                    { label:"Daily",  done:doneDaily,  total:totalDaily,  pct:pctD, color:"#3b82f6" },
+                    { label:"Weekly", done:doneWeekly, total:totalWeekly, pct:pctW, color:"#8b5cf6" },
+                    ...(activeGoalCount > 0 ? [{ label:"Ziele", done:completedGoalCount, total:totalGoalCount, pct:pctG, color:"#f59e0b" }] : []),
                   ].map(item => (
                     <div key={item.label} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:9,padding:"9px 11px" }}>
                       <div style={{ display:"flex",justifyContent:"space-between",marginBottom:5 }}>
@@ -1034,14 +1131,13 @@ export default function AriseApp() {
                         <span style={{ fontSize:"0.68rem",color:item.pct===100?"#22c55e":item.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{item.done}/{item.total}</span>
                       </div>
                       <div style={{ background:"rgba(255,255,255,0.05)",borderRadius:3,height:3,overflow:"hidden" }}>
-                        <div style={{ width:`${item.pct}%`,height:"100%",background:item.pct===100?"#22c55e":`linear-gradient(90deg,${item.color}66,${item.color})`,borderRadius:3,transition:"width 0.5s ease",boxShadow:item.pct>0?`0 0 5px ${item.color}66`:"none" }}/>
+                        <div style={{ width:`${item.pct}%`,height:"100%",background:item.pct===100?"#22c55e":`linear-gradient(90deg,${item.color}66,${item.color})`,borderRadius:3,transition:"width 0.5s ease" }}/>
                       </div>
                     </div>
                   ))}
                 </div>
               );
             })()}
-
             {/* Recovery Hint Banner */}
             {recoveryHint && (
               <div onClick={()=>setFilterType("recovery")} style={{ background:recoveryHint.urgent?"rgba(34,197,94,0.08)":"rgba(100,116,139,0.08)", border:`1px solid ${recoveryHint.urgent?"#22c55e33":"#33415533"}`, borderRadius:10, padding:"10px 13px", marginBottom:10, display:"flex", alignItems:"center", gap:8, cursor:"pointer", transition:"all 0.2s" }}>
@@ -1090,7 +1186,7 @@ export default function AriseApp() {
 
             {/* Type filter */}
             <div style={{ display:"flex",gap:5,marginBottom:8,overflowX:"auto",paddingBottom:2 }}>
-              {["all","daily","weekly","milestone","gate","recovery","personalized","custom"].map(f=>(
+              {["all","daily","weekly","milestone","gate","recovery","personalized","custom","goal-linked"].map(f=>(
                 <button key={f} onClick={()=>setFilterType(f)} style={{ background:filterType===f?`${rc.primary}18`:"transparent",border:`1px solid ${filterType===f?rc.primary+"44":"#111"}`,color:filterType===f?rc.primary:"#222",borderRadius:7,padding:"5px 11px",fontSize:"0.64rem",letterSpacing:"0.08em",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,textTransform:"uppercase",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s" }}>
                   {f==="all"?"Alle":f==="daily"?"Daily":f==="weekly"?"Weekly":f==="milestone"?"Meilst.":f==="gate"?"◈ Gates":f==="recovery"?"💚 Recovery":f==="personalized"?"★ Für mich":"Eigene"}
                 </button>
@@ -1113,6 +1209,7 @@ export default function AriseApp() {
                   const stepsDone = getGateStepsDone(gate.id, gateProgress);
                   const completed = isGateCompleted(gate.id, gateProgress);
                   const isRec     = recommendedGates.some(g => g.id === gate.id);
+                  const unlocked  = isGateUnlocked(gate, gateProgress);
                   return (
                     <GateCard
                       key={gate.id}
@@ -1120,6 +1217,7 @@ export default function AriseApp() {
                       stepsDone={stepsDone}
                       completed={completed}
                       recommended={isRec}
+                      locked={!unlocked}
                       onToggleStep={handleGateStepToggle}
                       onClaim={handleGateClaim}
                     />
@@ -1130,13 +1228,13 @@ export default function AriseApp() {
               <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
                 {displayChallenges.length===0 && <div style={{ color:"#1e293b",textAlign:"center",padding:"40px 0",fontSize:"0.85rem" }}>{showTodayOnly?"Alle heutigen Quests erledigt! ✓":"Keine Quests für diesen Filter."}</div>}
                 {[...displayChallenges].sort((a,b)=>{
-                  const da=state.completedChallenges?.includes(a.id)?1:0;
-                  const db=state.completedChallenges?.includes(b.id)?1:0;
+                  const da=isQuestDone(a)?1:0;
+                  const db=isQuestDone(b)?1:0;
                   return da-db;
                 }).map(c=>(
                   <div key={c.id} style={{ position:"relative" }}>
-                    <ChallengeCard challenge={c} done={state.completedChallenges?.includes(c.id)} onComplete={handleComplete} rankColor={rc.primary}/>
-                    {c.type==="custom" && !state.completedChallenges?.includes(c.id) && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#334155",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
+                    <ChallengeCard challenge={c} done={isQuestDone(c)} onComplete={handleComplete} rankColor={rc.primary} goals={state.goals||[]}/>
+                    {c.type==="custom" && !isQuestDone(c) && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#334155",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
                   </div>
                 ))}
               </div>
@@ -1178,7 +1276,7 @@ export default function AriseApp() {
                     { key:"recovery", label:"SYSTEM RECOVERY", icon:"💚", items:recoveryQuests, color:"#22c55e", recommended:true },
                   ] : []),
                 ].filter(s=>s.items.length>0).map(section=>{
-                  const done=section.items.filter(c=>state.completedChallenges?.includes(c.id)).length;
+                  const done=section.items.filter(c=>isQuestDone(c)).length;
                   const total=section.items.length;
                   const collapsed=collapsedSections[section.key];
                   const allDone=done===total;
@@ -1203,13 +1301,13 @@ export default function AriseApp() {
                       {!collapsed && (
                         <div style={{ display:"flex",flexDirection:"column",gap:7,animation:"sectionOpen 0.2s ease" }}>
                           {[...section.items].sort((a,b)=>{
-                            const da=state.completedChallenges?.includes(a.id)?1:0;
-                            const db=state.completedChallenges?.includes(b.id)?1:0;
+                            const da=isQuestDone(a)?1:0;
+                            const db=isQuestDone(b)?1:0;
                             return da-db;
                           }).map(c=>(
                             <div key={c.id} style={{ position:"relative",transition:"order 0.4s ease" }}>
-                              <ChallengeCard challenge={c} done={state.completedChallenges?.includes(c.id)} onComplete={handleComplete} rankColor={rc.primary} recommended={section.recommended && !state.completedChallenges?.includes(c.id)}/>
-                              {c.type==="custom" && !state.completedChallenges?.includes(c.id) && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#334155",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
+                              <ChallengeCard challenge={c} done={isQuestDone(c)} onComplete={handleComplete} rankColor={rc.primary} recommended={section.recommended && !isQuestDone(c)} goals={state.goals||[]}/>
+                              {c.type==="custom" && !isQuestDone(c) && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#334155",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
                             </div>
                           ))}
                         </div>
@@ -1221,6 +1319,245 @@ export default function AriseApp() {
             )}
           </div>
         )}
+
+
+        {/* ── GOALS ── */}
+        {view==="goals" && (() => {
+          const goals = state.goals || [];
+          const activeGoals = goals.filter(g => g.status === "active");
+          const doneGoals   = goals.filter(g => g.status === "completed");
+
+          const addGoal = () => {
+            const tmpl = GOAL_TEMPLATES.find(t => t.id === goalForm.templateId) || GOAL_TEMPLATES[0];
+            const newGoal = createGoal({
+              templateId:  goalForm.templateId,
+              title:       goalForm.title.trim() || tmpl.exampleTitle,
+              targetValue: goalForm.targetValue  || tmpl.targetValue,
+              deadline:    goalForm.deadline     || null,
+            });
+            const s = { ...state, goals: [...goals, newGoal] };
+            setState(s); saveData("arise_v3", s);
+            setGoalForm({ templateId:"learning_goal", title:"", targetValue:"", deadline:"" });
+            setShowGoalForm(false);
+            showNotif("🎯 Ziel erstellt", "#22c55e");
+          };
+
+          const updateGoalStatus = (goalId, status) => {
+            const s = { ...state, goals: goals.map(g => g.id === goalId ? { ...g, status } : g) };
+            setState(s); saveData("arise_v3", s);
+          };
+
+          const deleteGoal = (goalId) => {
+            const s = { ...state, goals: goals.filter(g => g.id !== goalId) };
+            setState(s); saveData("arise_v3", s);
+          };
+
+          const GoalCard = ({ goal }) => {
+            const pct     = goalProgressPct(goal);
+            const lbl     = goalStatusLabel(goal);
+            const tmpl    = GOAL_TEMPLATES.find(t => t.id === goal.templateId);
+            const pathObj = goal.path ? PATHS[goal.path] : null;
+            const domainObj= goal.domain ? DOMAINS[goal.domain] : null;
+            const done    = goal.status === "completed";
+            const color   = done ? "#22c55e" : rc.primary;
+
+            // Last 2 logs for this goal
+            const goalLogs = (state.progressLogs||[]).filter(l => l.goalId === goal.id || l.domain === goal.domain).slice(-2).reverse();
+            // Next recommended quest for this goal
+            const nextQuest = displayChallenges.find(c =>
+              !isQuestDone(c) && (c.goalId === goal.id || c.domain === goal.domain || c.path === goal.path)
+            );
+
+            return (
+              <div style={{ background:"rgba(255,255,255,0.02)",border:`1px solid ${done?"#22c55e22":"#0d0d1a"}`,borderRadius:12,padding:"14px",marginBottom:10 }}>
+                {/* Header */}
+                <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8 }}>
+                  <div style={{ display:"flex",gap:8,alignItems:"center" }}>
+                    <span style={{ fontSize:"1.2rem" }}>{goal.icon || tmpl?.icon || "⭐"}</span>
+                    <div>
+                      <div style={{ fontSize:"0.82rem",color:done?"#22c55e":"#e2e8f0",fontWeight:700,fontFamily:"'Rajdhani',sans-serif" }}>{goal.title}</div>
+                      <div style={{ display:"flex",gap:6,alignItems:"center",marginTop:2,flexWrap:"wrap" }}>
+                        <span style={{ fontSize:"0.58rem",color:"#334155" }}>{goal.currentValue}/{goal.targetValue} {goal.unit}</span>
+                        {domainObj && <span style={{ fontSize:"0.54rem",color:domainObj.color }}>{domainObj.icon} {domainObj.label}</span>}
+                        {pathObj   && <span style={{ fontSize:"0.54rem",color:pathObj.color }}>{pathObj.icon} {pathObj.name}</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <span style={{ fontSize:"0.6rem",color:done?"#22c55e":"#64748b",whiteSpace:"nowrap" }}>{lbl}</span>
+                </div>
+
+                {/* Progress Bar */}
+                <div style={{ background:"rgba(255,255,255,0.05)",borderRadius:4,height:5,marginBottom:goal.status==="active"?8:0,overflow:"hidden" }}>
+                  <div style={{ width:`${pct}%`,height:"100%",background:`linear-gradient(90deg,${color}66,${color})`,borderRadius:4,transition:"width 0.5s ease" }}/>
+                </div>
+
+                {/* Next Quest Recommendation */}
+                {!done && goal.status === "active" && nextQuest && (
+                  <div style={{ background:"rgba(255,255,255,0.02)",border:`1px solid ${rc.primary}22`,borderRadius:8,padding:"8px 10px",marginBottom:8,display:"flex",justifyContent:"space-between",alignItems:"center",gap:8 }}>
+                    <div style={{ flex:1,minWidth:0 }}>
+                      <div style={{ fontSize:"0.56rem",color:`${rc.primary}77`,marginBottom:2 }}>NÄCHSTE QUEST</div>
+                      <div style={{ fontSize:"0.7rem",color:"#94a3b8",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>
+                        {nextQuest.title}
+                      </div>
+                    </div>
+                    <button onClick={()=>setView("quests")}
+                      style={{ background:`${rc.primary}14`,border:`1px solid ${rc.primary}33`,color:rc.primary,borderRadius:6,padding:"4px 9px",fontSize:"0.62rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,whiteSpace:"nowrap",flexShrink:0 }}>
+                      → QUESTS
+                    </button>
+                  </div>
+                )}
+
+                {/* Last Logs */}
+                {goalLogs.length > 0 && !done && (
+                  <div style={{ marginBottom:8 }}>
+                    {goalLogs.map(log => (
+                      <div key={log.id} style={{ fontSize:"0.62rem",color:"#334155",borderLeft:"2px solid #8b5cf622",paddingLeft:7,marginBottom:4,lineHeight:1.4 }}>
+                        <span style={{ color:"#8b5cf655" }}>{new Date(log.createdAt).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})}: </span>
+                        {log.notes ? log.notes.slice(0,60) + (log.notes.length>60?"…":"") : Object.entries(log.metrics||{}).slice(0,2).map(([k,v])=>`${METRIC_LABELS[k]?.icon||""} ${v}`).join(" · ")}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Actions */}
+                {!done && goal.status === "active" && (
+                  <div style={{ display:"flex",gap:6 }}>
+                    <button onClick={()=>updateGoalStatus(goal.id,"paused")}
+                      style={{ flex:1,background:"transparent",border:"1px solid #1a1a2e",color:"#334155",borderRadius:7,padding:"5px",fontSize:"0.62rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
+                      ⏸ PAUSE
+                    </button>
+                    <button onClick={()=>deleteGoal(goal.id)}
+                      style={{ background:"transparent",border:"1px solid #ef444422",color:"#ef444466",borderRadius:7,padding:"5px 8px",fontSize:"0.62rem",cursor:"pointer" }}>
+                      ✕
+                    </button>
+                  </div>
+                )}
+                {goal.status === "paused" && (
+                  <div style={{ display:"flex",gap:6 }}>
+                    <button onClick={()=>updateGoalStatus(goal.id,"active")}
+                      style={{ flex:1,background:`${rc.primary}12`,border:`1px solid ${rc.primary}33`,color:rc.primary,borderRadius:7,padding:"5px",fontSize:"0.62rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
+                      ▶ FORTSETZEN
+                    </button>
+                    <button onClick={()=>deleteGoal(goal.id)}
+                      style={{ background:"transparent",border:"1px solid #ef444422",color:"#ef444466",borderRadius:7,padding:"5px 8px",fontSize:"0.62rem",cursor:"pointer" }}>
+                      ✕
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          };
+
+          return (
+            <div>
+              <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
+                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b" }}>AKTIVE ZIELE ({activeGoals.length})</div>
+                <button onClick={()=>setShowGoalForm(v=>!v)}
+                  style={{ background:`${rc.primary}18`,border:`1px solid ${rc.primary}44`,color:rc.primary,borderRadius:8,padding:"5px 12px",fontSize:"0.68rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
+                  {showGoalForm ? "✕ ABBRECHEN" : "+ NEUES ZIEL"}
+                </button>
+              </div>
+
+              {showGoalForm && (
+                <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #1a1a2e",borderRadius:12,padding:"14px",marginBottom:14 }}>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#334155",marginBottom:10 }}>ZIEL ERSTELLEN</div>
+                  <div style={{ marginBottom:10 }}>
+                    <div style={{ fontSize:"0.56rem",color:"#64748b",marginBottom:6 }}>Vorlage</div>
+                    <div style={{ display:"flex",flexWrap:"wrap",gap:5 }}>
+                      {GOAL_TEMPLATES.map(t => {
+                        const active = goalForm.templateId === t.id;
+                        return (
+                          <button key={t.id} onClick={()=>setGoalForm(f=>({...f, templateId:t.id}))}
+                            style={{ background:active?`${rc.primary}18`:"rgba(255,255,255,0.02)",border:`1px solid ${active?rc.primary+"44":"#1a1a2e"}`,color:active?rc.primary:"#334155",borderRadius:20,padding:"4px 10px",fontSize:"0.64rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,display:"flex",alignItems:"center",gap:3 }}>
+                            {t.icon} {t.title}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div style={{ marginBottom:8 }}>
+                    <div style={{ fontSize:"0.56rem",color:"#64748b",marginBottom:5 }}>Titel (optional)</div>
+                    <input value={goalForm.title} onChange={e=>setGoalForm(f=>({...f,title:e.target.value}))}
+                      placeholder={GOAL_TEMPLATES.find(t=>t.id===goalForm.templateId)?.exampleTitle || "Ziel..."}
+                      style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid #1a1a2e",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}
+                    />
+                  </div>
+                  <div style={{ display:"flex",gap:8,marginBottom:10 }}>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:"0.56rem",color:"#64748b",marginBottom:5 }}>Zielwert</div>
+                      <input type="number" min="1" value={goalForm.targetValue}
+                        onChange={e=>setGoalForm(f=>({...f,targetValue:e.target.value}))}
+                        placeholder={String(GOAL_TEMPLATES.find(t=>t.id===goalForm.templateId)?.targetValue || 10)}
+                        style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid #1a1a2e",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}
+                      />
+                    </div>
+                    <div style={{ flex:1 }}>
+                      <div style={{ fontSize:"0.56rem",color:"#64748b",marginBottom:5 }}>Deadline (optional)</div>
+                      <input type="date" value={goalForm.deadline} onChange={e=>setGoalForm(f=>({...f,deadline:e.target.value}))}
+                        style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid #1a1a2e",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:"0.75rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",colorScheme:"dark" }}
+                      />
+                    </div>
+                  </div>
+                  <button onClick={addGoal}
+                    style={{ width:"100%",background:`${rc.primary}18`,border:`1px solid ${rc.primary}44`,color:rc.primary,borderRadius:9,padding:"11px",fontSize:"0.78rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.08em" }}>
+                    🎯 ZIEL STARTEN
+                  </button>
+                </div>
+              )}
+
+              {activeGoals.length === 0 && !showGoalForm && (
+                <div style={{ textAlign:"center",padding:"40px 20px",color:"#334155" }}>
+                  <div style={{ fontSize:"2rem",marginBottom:10 }}>🎯</div>
+                  <div style={{ fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,marginBottom:6 }}>Keine aktiven Ziele</div>
+                  <div style={{ fontSize:"0.68rem",lineHeight:1.5 }}>Erstelle ein Ziel — dann zahlen deine Quests direkt darauf ein.</div>
+                </div>
+              )}
+
+              {activeGoals.map(g => <GoalCard key={g.id} goal={g} />)}
+
+              {goals.filter(g=>g.status==="paused").length > 0 && (
+                <div style={{ marginTop:16 }}>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:8 }}>PAUSIERT</div>
+                  {goals.filter(g=>g.status==="paused").map(g => <GoalCard key={g.id} goal={g} />)}
+                </div>
+              )}
+
+              {doneGoals.length > 0 && (
+                <div style={{ marginTop:16 }}>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:8 }}>ABGESCHLOSSEN ({doneGoals.length})</div>
+                  {doneGoals.map(g => <GoalCard key={g.id} goal={g} />)}
+                </div>
+              )}
+              {/* Recent Logs Preview in Goals tab */}
+              {(state.progressLogs || []).length > 0 && (
+                <div style={{ marginTop:20 }}>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:10 }}>LETZTE LOGS ({(state.progressLogs||[]).length})</div>
+                  {getRecentLogs(state.progressLogs, 5).map(log => (
+                    <div key={log.id} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:9,padding:"10px 12px",marginBottom:7,display:"flex",gap:10,alignItems:"flex-start" }}>
+                      <div style={{ flex:1 }}>
+                        <div style={{ fontSize:"0.72rem",color:"#94a3b8",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{log.title}</div>
+                        {log.notes && <div style={{ fontSize:"0.64rem",color:"#334155",marginTop:3,lineHeight:1.4 }}>{log.notes.slice(0,80)}{log.notes.length>80?"…":""}</div>}
+                        {Object.keys(log.metrics||{}).length > 0 && (
+                          <div style={{ display:"flex",gap:8,marginTop:4,flexWrap:"wrap" }}>
+                            {Object.entries(log.metrics).map(([k,v]) => (
+                              <span key={k} style={{ fontSize:"0.58rem",color:"#8b5cf6",background:"rgba(139,92,246,0.08)",borderRadius:4,padding:"2px 6px" }}>
+                                {METRIC_LABELS[k]?.icon} {v} {k==="duration"?"min":k==="understanding"||k==="mood"||k==="energy"||k==="stress"||k==="sleepQuality"?"/5":""}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      <div style={{ fontSize:"0.56rem",color:"#1e293b",whiteSpace:"nowrap" }}>
+                        {new Date(log.createdAt).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+            </div>
+          );
+        })()}
 
         {/* ── BODY ── */}
         {view==="body" && (
@@ -1340,6 +1677,186 @@ export default function AriseApp() {
           </div>
         )}
 
+
+        {/* ── WEEKLY REVIEW ── */}
+        {view==="review" && (() => {
+          const weekStats     = getWeekQuestStats(state.questHistory);
+          const existingReview= getCurrentWeekReview(state.weeklyReviews);
+          const alreadyDone   = hasReviewThisWeek(state.weeklyReviews);
+          const allReviews    = [...(state.weeklyReviews||[])].reverse();
+          const activeGoals   = (state.goals||[]).filter(g=>g.status==="active");
+
+          const DomainPill = ({domain, count}) => {
+            const { DOMAINS } = require("./data/domains.js");
+            const d = DOMAINS[domain] || { label: domain, icon:"◈", color:"#64748b" };
+            return (
+              <span style={{ background:`${d.color}15`,border:`1px solid ${d.color}33`,color:d.color,borderRadius:20,padding:"3px 9px",fontSize:"0.62rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,display:"inline-flex",alignItems:"center",gap:4 }}>
+                {d.icon} {d.label} <span style={{opacity:0.6}}>×{count}</span>
+              </span>
+            );
+          };
+
+          return (
+            <div>
+              {/* Header */}
+              <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
+                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b" }}>WOCHENREVIEW</div>
+                {!alreadyDone && (
+                  <button onClick={()=>setShowReviewForm(v=>!v)}
+                    style={{ background:"rgba(139,92,246,0.12)",border:"1px solid #8b5cf644",color:"#8b5cf6",borderRadius:8,padding:"5px 12px",fontSize:"0.68rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
+                    {showReviewForm ? "✕ ABBRECHEN" : "📋 REVIEW SCHREIBEN"}
+                  </button>
+                )}
+                {alreadyDone && (
+                  <span style={{ fontSize:"0.62rem",color:"#22c55e",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>✓ Diese Woche erledigt</span>
+                )}
+              </div>
+
+              {/* Diese Woche Stats — immer sichtbar */}
+              <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:12,padding:"14px",marginBottom:12 }}>
+                <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#334155",marginBottom:10 }}>DIESE WOCHE</div>
+                <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:12 }}>
+                  <div style={{ background:"rgba(255,255,255,0.03)",borderRadius:8,padding:"10px",textAlign:"center" }}>
+                    <div style={{ fontSize:"1.4rem",fontWeight:900,fontFamily:"'Orbitron',sans-serif",color:rc.primary,lineHeight:1 }}>{weekStats.count}</div>
+                    <div style={{ fontSize:"0.56rem",color:"#334155",marginTop:3 }}>Quests</div>
+                  </div>
+                  <div style={{ background:"rgba(255,255,255,0.03)",borderRadius:8,padding:"10px",textAlign:"center" }}>
+                    <div style={{ fontSize:"1.4rem",fontWeight:900,fontFamily:"'Orbitron',sans-serif",color:"#22c55e",lineHeight:1 }}>{weekStats.totalXp}</div>
+                    <div style={{ fontSize:"0.56rem",color:"#334155",marginTop:3 }}>XP</div>
+                  </div>
+                </div>
+
+                {/* Top Domains */}
+                {weekStats.topDomains.length > 0 && (
+                  <div style={{ marginBottom:10 }}>
+                    <div style={{ fontSize:"0.52rem",color:"#1e293b",marginBottom:6 }}>TOP DOMAINS</div>
+                    <div style={{ display:"flex",flexWrap:"wrap",gap:5 }}>
+                      {weekStats.topDomains.map(({domain,count}) => (
+                        <DomainPill key={domain} domain={domain} count={count}/>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Top Paths */}
+                {weekStats.topPaths.length > 0 && (
+                  <div style={{ marginBottom:8 }}>
+                    <div style={{ fontSize:"0.52rem",color:"#1e293b",marginBottom:6 }}>AKTIVE PFADE</div>
+                    <div style={{ display:"flex",flexWrap:"wrap",gap:5 }}>
+                      {weekStats.topPaths.map(({path,count}) => {
+                        const p = PATHS[path];
+                        if (!p) return null;
+                        return (
+                          <span key={path} style={{ background:`${p.color}15`,border:`1px solid ${p.color}33`,color:p.color,borderRadius:20,padding:"3px 9px",fontSize:"0.62rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,display:"inline-flex",alignItems:"center",gap:3 }}>
+                            {p.icon} {p.name} <span style={{opacity:0.6}}>×{count}</span>
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {weekStats.count === 0 && (
+                  <div style={{ color:"#1e293b",fontSize:"0.72rem",textAlign:"center" }}>Noch keine Quests diese Woche.</div>
+                )}
+              </div>
+
+              {/* Aktive Ziele Vorschau */}
+              {activeGoals.length > 0 && (
+                <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:12,padding:"14px",marginBottom:12 }}>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#334155",marginBottom:10 }}>AKTIVE ZIELE</div>
+                  {activeGoals.slice(0,3).map(g => {
+                    const pct = Math.min(Math.round((g.currentValue/g.targetValue)*100),100);
+                    return (
+                      <div key={g.id} style={{ marginBottom:8 }}>
+                        <div style={{ display:"flex",justifyContent:"space-between",marginBottom:3 }}>
+                          <span style={{ fontSize:"0.7rem",color:"#94a3b8",fontFamily:"'Rajdhani',sans-serif" }}>{g.icon} {g.title}</span>
+                          <span style={{ fontSize:"0.62rem",color:"#334155" }}>{pct}%</span>
+                        </div>
+                        <div style={{ background:"rgba(255,255,255,0.05)",borderRadius:3,height:3,overflow:"hidden" }}>
+                          <div style={{ width:`${pct}%`,height:"100%",background:`linear-gradient(90deg,${rc.primary}66,${rc.primary})`,borderRadius:3 }}/>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Review Form */}
+              {showReviewForm && !alreadyDone && (
+                <div style={{ background:"rgba(139,92,246,0.04)",border:"1px solid #8b5cf622",borderRadius:12,padding:"14px",marginBottom:12 }}>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#8b5cf6",marginBottom:12 }}>REFLEXION (optional)</div>
+
+                  {[
+                    { key:"wentWell",  label:"Was lief diese Woche gut?",               placeholder:"Erfolge, Highlights, Fortschritte..." },
+                    { key:"wasHard",   label:"Was war schwer oder hat nicht geklappt?",  placeholder:"Herausforderungen, Blockaden..." },
+                    { key:"learned",   label:"Was habe ich gelernt oder erkannt?",       placeholder:"Erkenntnisse, Einsichten..." },
+                    { key:"nextFocus", label:"Mein Fokus für nächste Woche:",            placeholder:"Hauptziel, wichtigste Aufgabe..." },
+                  ].map(field => (
+                    <div key={field.key} style={{ marginBottom:10 }}>
+                      <div style={{ fontSize:"0.56rem",color:"#64748b",marginBottom:4 }}>{field.label}</div>
+                      <textarea
+                        value={reviewForm[field.key]}
+                        onChange={e=>setReviewForm(f=>({...f,[field.key]:e.target.value}))}
+                        placeholder={field.placeholder}
+                        rows={2}
+                        style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid #1a1a2e",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:"0.78rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",resize:"vertical",lineHeight:1.5 }}
+                      />
+                    </div>
+                  ))}
+
+                  <div style={{ fontSize:"0.56rem",color:"#334155",marginBottom:10 }}>
+                    Bonus: +{80 + (reviewForm.wentWell||reviewForm.wasHard||reviewForm.learned||reviewForm.nextFocus ? 20 : 0)} XP
+                  </div>
+
+                  <div style={{ display:"flex",gap:7 }}>
+                    <button onClick={()=>saveWeeklyReview(reviewForm)}
+                      style={{ flex:1,background:"rgba(139,92,246,0.15)",border:"1px solid #8b5cf644",color:"#8b5cf6",borderRadius:9,padding:"11px",fontSize:"0.78rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.06em" }}>
+                      📋 REVIEW SPEICHERN
+                    </button>
+                    <button onClick={()=>{ saveWeeklyReview({}); }}
+                      style={{ background:"transparent",border:"1px solid #1a1a2e",color:"#334155",borderRadius:9,padding:"11px 14px",fontSize:"0.78rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
+                      OHNE NOTIZ
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Vergangene Reviews */}
+              {allReviews.length > 0 && (
+                <div style={{ marginTop:8 }}>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#1e293b",marginBottom:10 }}>VERGANGENE REVIEWS ({allReviews.length})</div>
+                  {allReviews.slice(0,5).map(review => (
+                    <div key={review.id} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:10,padding:"12px",marginBottom:8 }}>
+                      <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6 }}>
+                        <div style={{ fontSize:"0.7rem",color:"#94a3b8",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>KW {review.weekKey?.replace(/.*-W/,"")}</div>
+                        <div style={{ display:"flex",gap:8 }}>
+                          <span style={{ fontSize:"0.6rem",color:"#22c55e" }}>✓ {review.completedQuestsCount} Quests</span>
+                          <span style={{ fontSize:"0.6rem",color:"#f59e0b" }}>+{review.xpThisWeek||0} XP</span>
+                        </div>
+                      </div>
+                      {review.reflection?.nextFocus && (
+                        <div style={{ fontSize:"0.66rem",color:"#4a5568",lineHeight:1.4 }}>
+                          <span style={{ color:"#8b5cf666" }}>Fokus: </span>
+                          {review.reflection.nextFocus.slice(0,80)}{review.reflection.nextFocus.length>80?"…":""}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {allReviews.length === 0 && !showReviewForm && (
+                <div style={{ textAlign:"center",padding:"30px 20px",color:"#334155" }}>
+                  <div style={{ fontSize:"2rem",marginBottom:10 }}>📋</div>
+                  <div style={{ fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,marginBottom:6 }}>Noch kein Review</div>
+                  <div style={{ fontSize:"0.68rem",lineHeight:1.5 }}>Erstelle wöchentlich ein kurzes Review um Fortschritt zu reflektieren.</div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+
         {/* ── MEHR ── */}
         {view==="more" && (
           <div>
@@ -1363,120 +1880,14 @@ export default function AriseApp() {
             </div>
 
             {/* ── PERSONALISIERUNG ── */}
-            {(() => {
-              const prefs = state.player?.preferences || {};
-              const interests   = prefs.interests   || [];
-              const activePaths = prefs.activePaths || [];
-              const balanceAreas= prefs.balanceAreas|| [];
-              const questLength = prefs.preferredQuestLength || "medium";
-
-              const SectionToggle = ({ id, label, icon }) => (
-                <button
-                  onClick={()=>toggleSection("prefs_"+id)}
-                  style={{ width:"100%",background:"transparent",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:8,padding:"2px 0",marginBottom:collapsedSections["prefs_"+id]===false?8:0 }}
-                >
-                  <span style={{ color:rc.primary,fontSize:"0.7rem" }}>{icon}</span>
-                  <span style={{ fontFamily:"'Rajdhani',sans-serif",fontWeight:700,fontSize:"0.65rem",letterSpacing:"0.2em",color:rc.primary }}>{label}</span>
-                  <div style={{ flex:1,height:1,background:`${rc.primary}22`,borderRadius:1 }}/>
-                  <span style={{ fontSize:"0.6rem",color:"#1e293b",transform:collapsedSections["prefs_"+id]===false?"rotate(0deg)":"rotate(-90deg)",transition:"transform 0.2s",display:"inline-block" }}>▾</span>
-                </button>
-              );
-
-              const ChipGrid = ({ options, selected, onToggle, color }) => (
-                <div style={{ display:"flex",flexWrap:"wrap",gap:6,marginBottom:4 }}>
-                  {options.map(opt => {
-                    const active = selected.includes(opt.id);
-                    return (
-                      <button key={opt.id} onClick={()=>onToggle(opt.id)}
-                        style={{ background:active?`${color}22`:"rgba(255,255,255,0.03)",border:`1px solid ${active?color+"55":"#1a1a2e"}`,color:active?color:"#334155",borderRadius:20,padding:"5px 11px",fontSize:"0.68rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.04em",transition:"all 0.15s",display:"flex",alignItems:"center",gap:4 }}>
-                        <span style={{ fontSize:"0.8rem" }}>{opt.icon}</span>{opt.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              );
-
-              return (
-                <div style={{ marginBottom:18 }}>
-                  <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:11 }}>SYSTEM KONFIGURATION</div>
-
-                  {/* Interessen */}
-                  <div style={{ marginBottom:10 }}>
-                    <SectionToggle id="interests" label="INTERESSEN" icon="◈"/>
-                    {collapsedSections["prefs_interests"]===false && (
-                      <div style={{ animation:"sectionOpen 0.2s ease" }}>
-                        <ChipGrid
-                          options={INTERESTS_OPTIONS}
-                          selected={interests}
-                          onToggle={v=>toggleArrayPref("interests",v)}
-                          color={rc.primary}
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Fokuspfade */}
-                  <div style={{ marginBottom:10 }}>
-                    <SectionToggle id="paths" label="FOKUSPFADE" icon="◉"/>
-                    {collapsedSections["prefs_paths"]===false && (
-                      <div style={{ animation:"sectionOpen 0.2s ease" }}>
-                        <ChipGrid
-                          options={ACTIVE_PATHS_OPTIONS}
-                          selected={activePaths}
-                          onToggle={v=>toggleArrayPref("activePaths",v)}
-                          color="#8b5cf6"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Balance-Bereiche */}
-                  <div style={{ marginBottom:10 }}>
-                    <SectionToggle id="balance" label="BALANCE-BEREICHE" icon="▲"/>
-                    {collapsedSections["prefs_balance"]===false && (
-                      <div style={{ animation:"sectionOpen 0.2s ease" }}>
-                        <ChipGrid
-                          options={BALANCE_AREAS_OPTIONS}
-                          selected={balanceAreas}
-                          onToggle={v=>toggleArrayPref("balanceAreas",v)}
-                          color="#22c55e"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Quest-Länge */}
-                  <div style={{ marginBottom:14 }}>
-                    <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#334155",marginBottom:8 }}>BEVORZUGTE QUEST-LÄNGE</div>
-                    <div style={{ display:"flex",gap:7 }}>
-                      {QUEST_LENGTH_OPTIONS.map(opt => {
-                        const active = questLength === opt.id;
-                        return (
-                          <button key={opt.id} onClick={()=>savePreferences({preferredQuestLength:opt.id})}
-                            style={{ flex:1,background:active?`${rc.primary}18`:"rgba(255,255,255,0.02)",border:`1px solid ${active?rc.primary+"55":"#0d0d1a"}`,color:active?rc.primary:"#334155",borderRadius:9,padding:"10px 6px",textAlign:"center",cursor:"pointer",transition:"all 0.15s" }}>
-                            <div style={{ fontSize:"1rem",marginBottom:3 }}>{opt.icon}</div>
-                            <div style={{ fontSize:"0.72rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif",letterSpacing:"0.04em",color:active?rc.primary:"#94a3b8" }}>{opt.label}</div>
-                            <div style={{ fontSize:"0.56rem",color:"#1e293b",marginTop:2 }}>{opt.desc}</div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Ziele — Freitext */}
-                  <div style={{ marginBottom:4 }}>
-                    <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#334155",marginBottom:6 }}>ZIELE (optional)</div>
-                    <textarea
-                      value={(prefs.goals||[]).join("\n")}
-                      onChange={e=>savePreferences({goals:e.target.value.split("\n").filter(Boolean)})}
-                      placeholder={"Deine Ziele, eines pro Zeile...\nz.B. Physik Klausur bestehen\nKörper transformieren"}
-                      rows={3}
-                      style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid #1a1a2e",borderRadius:9,padding:"10px 12px",color:"#e2e8f0",fontSize:"0.78rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",resize:"vertical",lineHeight:1.6 }}
-                    />
-                  </div>
-                </div>
-              );
-            })()}
+            <PreferencesSection
+              preferences={state.player?.preferences}
+              rankColor={rc.primary}
+              toggleArrayPref={toggleArrayPref}
+              savePreferences={savePreferences}
+              toggleSection={toggleSection}
+              collapsedSections={collapsedSections}
+            />
 
             {/* Einstellungen — collapsible submenu */}
             <div style={{ marginBottom:8 }}>
@@ -1499,6 +1910,37 @@ export default function AriseApp() {
                     <button onClick={()=>toggleHaptic(!hapticEnabled)} style={{ position:"relative",width:44,height:24,borderRadius:12,background:hapticEnabled?`${rc.primary}44`:"rgba(255,255,255,0.06)",border:`1px solid ${hapticEnabled?rc.primary+"66":"#1a1a2e"}`,cursor:"pointer",transition:"all 0.3s",padding:0,flexShrink:0 }}>
                       <div style={{ position:"absolute",top:2,left:hapticEnabled?22:2,width:18,height:18,borderRadius:"50%",background:hapticEnabled?rc.primary:"#334155",transition:"all 0.25s ease",boxShadow:hapticEnabled?`0 0 6px ${rc.primary}`:"none" }}/>
                     </button>
+                  </div>
+
+                  {/* Demo Presets */}
+                  <div style={{ marginBottom:8 }}>
+                    <button onClick={()=>setShowDemo(v=>!v)}
+                      style={{ width:"100%",background:"rgba(139,92,246,0.06)",border:"1px solid #8b5cf622",color:"#8b5cf666",borderRadius:9,padding:"10px 13px",fontSize:"0.72rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer",letterSpacing:"0.06em",display:"flex",alignItems:"center",justifyContent:"space-between" }}>
+                      <span>🧪 TEST-PROFILE (Szenarien)</span>
+                      <span style={{ fontSize:"0.6rem" }}>{showDemo?"▲":"▼"}</span>
+                    </button>
+                    {showDemo && (
+                      <div style={{ background:"rgba(0,0,0,0.3)",border:"1px solid #8b5cf622",borderRadius:"0 0 9px 9px",padding:"10px" }}>
+                        <div style={{ fontSize:"0.58rem",color:"#4a5568",marginBottom:10,lineHeight:1.5 }}>
+                          ⚠️ Lädt ein vorgefertigtes Testprofil. Aktueller Fortschritt wird überschrieben.
+                        </div>
+                        <div style={{ display:"flex",flexDirection:"column",gap:6 }}>
+                          {DEMO_PROFILES.map(profile => (
+                            <button key={profile.id} onClick={()=>loadDemoProfile(profile.id)}
+                              style={{ background:`${profile.color}08`,border:`1px solid ${profile.color}22`,borderRadius:9,padding:"10px 12px",cursor:"pointer",textAlign:"left",transition:"all 0.15s" }}>
+                              <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:4 }}>
+                                <span style={{ fontSize:"1rem" }}>{profile.icon}</span>
+                                <span style={{ fontSize:"0.75rem",color:profile.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{profile.label}</span>
+                              </div>
+                              <div style={{ fontSize:"0.62rem",color:"#334155",lineHeight:1.4,marginLeft:24 }}>{profile.desc}</div>
+                              <div style={{ fontSize:"0.58rem",color:"#1e293b",marginTop:5,marginLeft:24 }}>
+                                <span style={{ color:`${profile.color}66` }}>Paths: </span>{profile.expectedPaths.join(", ")}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Backup */}

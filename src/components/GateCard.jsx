@@ -1,15 +1,42 @@
 import { PATHS } from "../data/paths.js";
 
 // ============================================================
-// GATE CARD
-// Zeigt einen Gate Quest mit Steps, Fortschritt und Reward.
+// GATE CARD — Prompt 11 Update: locked state, tier badge
 // ============================================================
-export const GateCard = ({ gate, stepsDone, completed, onToggleStep, onClaim, recommended }) => {
+export const GateCard = ({ gate, stepsDone, completed, onToggleStep, onClaim, recommended, locked }) => {
   const totalSteps = gate.steps.length;
   const doneCnt    = stepsDone.length;
   const allDone    = doneCnt === totalSteps;
   const pct        = totalSteps > 0 ? (doneCnt / totalSteps) * 100 : 0;
   const pathInfo   = PATHS[gate.path];
+
+  // Locked: Gate II/III noch nicht erreichbar
+  if (locked) {
+    const prevGateLabel = gate.unlockCondition
+      ? gate.unlockCondition.replace(/_/g," ").replace(/gate /i,"Gate ").replace(/(\w+)/g, w => w.charAt(0).toUpperCase()+w.slice(1))
+      : null;
+    return (
+      <div style={{
+        background: "rgba(255,255,255,0.01)",
+        border: "1px solid #0d0d1a",
+        borderRadius: 12, padding: "11px 14px",
+        opacity: 0.4, position: "relative", overflow: "hidden",
+      }}>
+        <div style={{ display:"flex",alignItems:"center",gap:8 }}>
+          <span style={{ fontSize:"0.9rem",filter:"grayscale(1)" }}>{gate.icon}</span>
+          <div style={{ flex:1 }}>
+            <div style={{ fontSize:"0.7rem",color:"#334155",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{gate.title}</div>
+            {prevGateLabel && (
+              <div style={{ fontSize:"0.58rem",color:"#1e293b",marginTop:2 }}>🔒 Erfordert: {prevGateLabel}</div>
+            )}
+          </div>
+          <span style={{ fontSize:"0.6rem",color:"#1e293b",background:"#0d0d1a",borderRadius:4,padding:"2px 6px" }}>
+            TIER {gate.tier}
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{
@@ -44,6 +71,11 @@ export const GateCard = ({ gate, stepsDone, completed, onToggleStep, onClaim, re
         <div style={{ flex:1 }}>
           <div style={{ display:"flex",alignItems:"center",gap:6,marginBottom:2 }}>
             <span style={{ fontSize:"0.56rem",letterSpacing:"0.12em",color:gate.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>◈ GATE QUEST</span>
+            {gate.tier && (
+              <span style={{ background:`${gate.color}15`,border:`1px solid ${gate.color}33`,color:gate.color,borderRadius:4,padding:"1px 5px",fontSize:"0.52rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif" }}>
+                TIER {gate.tier}
+              </span>
+            )}
             {pathInfo && (
               <>
                 <span style={{ color:"#333",fontSize:"0.56rem" }}>·</span>
