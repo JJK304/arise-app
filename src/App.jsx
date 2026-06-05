@@ -579,16 +579,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
   // Recovery-Quests
   const completedTodayIds = (state.completedChallenges || []);
 
-  // Unified done-check: uses completionStatus (new) + completedChallenges (legacy fallback)
-  const isQuestDone = (quest) => {
-    if (!quest) return false;
-    const cs = state.completionStatus || {};
-    const qh = state.questHistory || [];
-    // New system
-    if (!canComplete(cs, qh, quest)) return true;
-    // Legacy fallback (for old states before completionStatus)
-    return (state.completedChallenges || []).includes(quest.id);
-  };
+
   const balanceAreas      = state.player?.preferences?.balanceAreas || [];
   const recoveryQuests    = getRecoveryQuests(sysAnalysis, completedTodayIds, state.currentStreak || 0, balanceAreas);
   const recoveryHint      = getRecoveryHint(sysAnalysis, completedTodayIds, state.currentStreak || 0);
