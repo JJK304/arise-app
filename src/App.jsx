@@ -521,10 +521,24 @@ export default function AriseApp() {
   const globalLvl = getGlobalLevel(state.rank, state.level);
   const currentDB = CHALLENGES_DB[state.rank]||{daily:[],weekly:[],milestones:[]};
   const allMilestones = Object.entries(CHALLENGES_DB).filter(([r])=>RANKS.indexOf(r)<=RANKS.indexOf(state.rank)).flatMap(([,v])=>v.milestones);
-  const customQuests = state.customQuests||[];
-  const todayDone = currentDB.daily.filter(c=>isQuestDone(c)).length;
-  const totalMilestonesDone = Object.values(CHALLENGES_DB).flatMap(r=>r.milestones).filter(c=>isQuestDone(c)).length;
-  const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements||[]).includes(a.id));
+const customQuests = state.customQuests||[];
+
+// Unified done-check: uses completionStatus (new) + completedChallenges (legacy fallback)
+const isQuestDone = (quest) => {
+  if (!quest) return false;
+  const cs = state.completionStatus || {};
+  const qh = state.questHistory || [];
+
+  // New system
+  if (!canComplete(cs, qh, quest)) return true;
+
+  // Legacy fallback
+  return (state.completedChallenges || []).includes(quest.id);
+};
+
+const todayDone = currentDB.daily.filter(c=>isQuestDone(c)).length;
+const totalMilestonesDone = Object.values(CHALLENGES_DB).flatMap(r=>r.milestones).filter(c=>isQuestDone(c)).length;
+const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements||[]).includes(a.id));
 
   // Personalisierte Quests aus Interessen generieren
   const prefs = state.player?.preferences || {};
