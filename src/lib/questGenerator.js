@@ -27,12 +27,17 @@ const LENGTH_SCALE = { short: 0.7, medium: 1.0, long: 1.35 };
 const DIFF_SCALE   = { easy: 0.75, normal: 1.0, hard: 1.3 };
 
 // ── Domain-Gruppe → Template-Variable ──────────────────────
+// Mappt Interest-Gruppen auf die Variable, die QUEST_TEMPLATES nutzen.
+// Gruppen ohne eigenen Eintrag werden über generische Templates abgedeckt.
 const GROUP_TO_VAR = {
   mind:        "interest_mind",
   tech:        "interest_tech",
   creative:    "interest_creative",
   craft:       "interest_kitchen",
   body:        "interest_fitness",
+  // Alle anderen Gruppen: generisches Fallback über domain-Matching
+  // (social, career, discipline, recovery, adventure, service, leadership,
+  //  finance, home, appearance — werden über topic-freie Templates abgedeckt)
 };
 
 // ── Gewichtungen (Summe = 1.0) ──────────────────────────────
@@ -378,13 +383,32 @@ export function generatePersonalizedQuests(preferences, context = {}, maxQuests 
         candidates.push({ quest: q, goalLinked: true });
       }
 
-      // Also add as standalone
-      if (!activeGoals.length || template.paths.some(p => pathSet.has(p)) || effectiveNeglected.includes(template.domain)) {
+      // Also add as standalone — generisch oder wenn Signal/Interest/Neglect passt
+      const interestMatchesDomain = interests.some(id => {
+        const info = INTERESTS[id];
+        return info && (info.domain === template.domain || info.relatedPaths?.some(p => template.paths.includes(p)));
+      });
+      const signalMatchesDomain = Object.keys(signalScores).some(p =>
+        signalScores[p] > 0 && template.paths.includes(p)
+      );
+      const shouldAddStandalone =
+        !activeGoals.length ||
+        template.paths.some(p => pathSet.has(p)) ||
+        effectiveNeglected.includes(template.domain) ||
+        interestMatchesDomain ||
+        signalMatchesDomain;
+
+      if (shouldAddStandalone) {
+        const matchedPath = template.paths.find(p => pathSet.has(p) || signalScores[p] > 0);
+        const pathName = matchedPath ? (PATHS[matchedPath]?.name || matchedPath) : null;
         const q = buildQuest({
           template, topicLabel: null, interestId: null,
           domain: template.domain, interestPaths: [], pathSet,
           preferredLength, difficulty,
-          reason: template.paths.some(p => pathSet.has(p)) ? `dein ${PATHS[template.paths[0]]?.name || ""} Path wächst` : "System Balance",
+          reason: pathSet.has(matchedPath) ? `dein ${pathName} Path wächst`
+               : signalMatchesDomain       ? `${pathName || "System"} Signal aktiv`
+               : effectiveNeglected.includes(template.domain) ? `Balance empfohlen: ${template.domain}`
+               : "System Balance",
         });
         q._templateRef = template;
         candidates.push({ quest: q, goalLinked: false });
@@ -621,7 +645,7 @@ export function generateStarterQuests(preferredLength = "medium") {
     {
       id: "starter_move",
       title: "Body Activation",
-      desc:  "Bewege dich 20 Minuten bewusst — Laufen, Gym, Dehnen, Spazieren. Alles zählt.",
+      desc:  "Bewege dich 20 Minuten bewusst — Spazieren, Dehnen, Sport, Tanzen. Was auch immer du wählst.",
       xp: Math.round(22 * xpScale), stat: "VIT", statPts: 0,
       type: "daily", actionType: "action",
       cat: "cardio", domain: "body",
@@ -690,8 +714,14 @@ export function generateStarterQuests(preferredLength = "medium") {
     },
   ];
 
-  // Wähle 5 der 8 täglichen Starter-Quests — immer die ersten 5 (stabil)
-  const selectedDaily = dailyPool.slice(0, 5);
+  // Wähle 5 der täglichen Starter-Quests — tagesbasierte Rotation für Variety
+  // Rotiert täglich, bleibt aber den ganzen Tag stabil (dayKey-gebunden)
+  const _dayOffset = Math.floor(Date.now() / 86400000) % dailyPool.length;
+  const _rotatedPool = [...dailyPool.slice(_dayOffset), ...dailyPool.slice(0, _dayOffset)];
+  // Immer: Focus + Move als Ankerpunkte (Index 0+1), dann 3 rotierende
+  const _anchors  = [dailyPool[0], dailyPool[1]];           // System Focus, Body Activation
+  const _rotating = _rotatedPool.filter(q => q.id !== "starter_focus" && q.id !== "starter_move");
+  const selectedDaily = [..._anchors, ..._rotating.slice(0, 3)];
 
   const weeklyPool = [
     {
@@ -707,7 +737,7 @@ export function generateStarterQuests(preferredLength = "medium") {
     {
       id: "starter_w_body",
       title: "Body Foundation",
-      desc:  "Schließe diese Woche 2 Bewegungs-Sessions ab — Gym, Laufen oder aktive Bewegung.",
+      desc:  "Schließe diese Woche 2 Bewegungs-Sessions ab — Spazieren, Sport, Dehnen oder aktive Bewegung.",
       xp: Math.round(120 * xpScale), stat: "VIT", statPts: 0,
       type: "weekly", actionType: "action",
       cat: "body", domain: "body",
@@ -736,8 +766,10 @@ export function generateStarterQuests(preferredLength = "medium") {
     },
   ];
 
-  // Zeige 2 wöchentliche Starter-Quests
-  const selectedWeekly = weeklyPool.slice(0, 2);
+  // Zeige 3 wöchentliche Starter-Quests — alle 4 rotieren wochenweise
+  const _weekOffset = Math.floor(Date.now() / (86400000 * 7)) % weeklyPool.length;
+  const _weekRotated = [...weeklyPool.slice(_weekOffset), ...weeklyPool.slice(0, _weekOffset)];
+  const selectedWeekly = _weekRotated.slice(0, 3);
 
   return [...selectedDaily, ...selectedWeekly];
 }

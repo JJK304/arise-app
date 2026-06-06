@@ -688,6 +688,243 @@ export const QUEST_TEMPLATES = [
     baseXp: 45, actionType: "reflection",
     variables: {},
   },
+
+  // ════════════════════════════════════════════════════════
+  // TECH / ENGINEERING (Etappe 5)
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_tech_build",
+    titleTemplate: "{duration} Min. an {topic}-Projekt bauen",
+    descTemplate:  "Etwas konkret umsetzen — Code, Schaltung, Prototyp. Kein Tutorial kopieren.",
+    type: "daily", domain: "craft",
+    paths: ["engineer", "artisan"],
+    baseXp: 42, actionType: "action",
+    variables: { duration: [30, 45, 60], topic: "interest_tech" },
+  },
+  {
+    id: "tpl_tech_debug",
+    titleTemplate: "{topic}-Problem analysieren und lösen",
+    descTemplate:  "Einen Fehler oder eine Blockade eigenständig durcharbeiten.",
+    type: "daily", domain: "craft",
+    paths: ["engineer"],
+    baseXp: 38, actionType: "action",
+    variables: { topic: "interest_tech" },
+  },
+  {
+    id: "tpl_tech_doc",
+    titleTemplate: "{topic}-Projekt dokumentieren",
+    descTemplate:  "Was gebaut wurde, warum, wie. Dokumentation macht Projekte nutzbar.",
+    type: "daily", domain: "craft",
+    paths: ["engineer", "scholar"],
+    baseXp: 30, actionType: "reflection",
+    variables: { topic: "interest_tech" },
+  },
+  {
+    id: "tpl_tech_learn",
+    titleTemplate: "{duration} Min. {topic}-Konzept durcharbeiten",
+    descTemplate:  "Nicht nur lesen — verstehen, skizzieren, ausprobieren.",
+    type: "daily", domain: "craft",
+    paths: ["engineer", "scholar"],
+    baseXp: 35, actionType: "action",
+    variables: { duration: [25, 40, 60], topic: "interest_tech" },
+  },
+  {
+    id: "tpl_tech_weekly_project",
+    titleTemplate: "{topic}-Projekt-Meilenstein erreichen",
+    descTemplate:  "Diese Woche einen messbaren Fortschritt an einem Technik-Projekt erzielen.",
+    type: "weekly", domain: "craft",
+    paths: ["engineer", "creator"],
+    baseXp: 120, actionType: "project",
+    variables: { topic: "interest_tech" },
+  },
+
+  // ════════════════════════════════════════════════════════
+  // SERVICE / LEADERSHIP (Etappe 5)
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_service_help",
+    titleTemplate: "Jemandem aktiv helfen",
+    descTemplate:  "Nicht auf Anfrage warten — heute aktiv Unterstützung anbieten oder geben.",
+    type: "daily", domain: "social",
+    paths: ["healer", "guardian"],
+    baseXp: 28, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_service_listen",
+    titleTemplate: "Aktiv zuhören ohne zu urteilen",
+    descTemplate:  "Jemanden wirklich ausreden lassen und verstehen was er meint. Kein Ratschlag wenn nicht gewünscht.",
+    type: "daily", domain: "social",
+    paths: ["healer", "charmer"],
+    baseXp: 25, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_service_mentoring",
+    titleTemplate: "Wissen oder Erfahrung weitergeben",
+    descTemplate:  "Etwas das du kannst oder weißt, bewusst mit jemandem teilen.",
+    type: "daily", domain: "social",
+    paths: ["leader", "healer", "scholar"],
+    baseXp: 32, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_leadership_decide",
+    titleTemplate: "Eine offene Entscheidung treffen",
+    descTemplate:  "Eine Entscheidung die du hinausgezögert hast — heute treffen, begründen, umsetzen.",
+    type: "daily", domain: "discipline",
+    paths: ["leader", "strategist"],
+    baseXp: 35, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_leadership_organize",
+    titleTemplate: "Etwas für andere organisieren",
+    descTemplate:  "Verantwortung für eine Gruppe oder Person übernehmen — koordinieren, planen, ermöglichen.",
+    type: "daily", domain: "social",
+    paths: ["leader", "guardian"],
+    baseXp: 30, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_service_weekly",
+    titleTemplate: "Diese Woche 3× aktiv unterstützen",
+    descTemplate:  "An 3 verschiedenen Tagen bewusst für jemanden da sein — helfen, zuhören, ermöglichen.",
+    type: "weekly", domain: "social",
+    paths: ["healer", "leader"],
+    baseXp: 105, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_leadership_weekly",
+    titleTemplate: "Diese Woche Verantwortung übernehmen",
+    descTemplate:  "Mindestens eine Situation diese Woche aktiv leiten, organisieren oder entscheiden.",
+    type: "weekly", domain: "discipline",
+    paths: ["leader", "strategist"],
+    baseXp: 110, actionType: "action",
+    variables: {},
+  },
+
+  // ════════════════════════════════════════════════════════
+  // APPEARANCE / STYLE — Etappe 7 (von 1 auf 5 Templates)
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_appearance_style",
+    titleTemplate: "Style-Entscheidung bewusst treffen",
+    descTemplate:  "Outfit, Frisur, Gepflegtheit — heute eine bewusste Entscheidung darüber treffen.",
+    type: "daily", domain: "appearance",
+    paths: ["charmer"],
+    baseXp: 22, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_appearance_grooming",
+    titleTemplate: "Pflegeprotokoll vollständig durchführen",
+    descTemplate:  "Vollständige Routine — Gesicht, Körper, Haare. Kein Überspringen.",
+    type: "daily", domain: "appearance",
+    paths: ["charmer", "healer"],
+    baseXp: 18, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_appearance_review",
+    titleTemplate: "Online-Profil oder Außenwirkung prüfen",
+    descTemplate:  "Wie wirke ich auf andere? Profil, Foto, Auftreten — bewusst reviewen.",
+    type: "weekly", domain: "appearance",
+    paths: ["charmer", "creator"],
+    baseXp: 75, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_appearance_upgrade",
+    titleTemplate: "Style-Upgrade: Einen Bereich verbessern",
+    descTemplate:  "Kleidung, Pflege, Haltung — einen konkreten Aspekt diese Woche verbessern.",
+    type: "weekly", domain: "appearance",
+    paths: ["charmer"],
+    baseXp: 85, actionType: "action",
+    variables: {},
+  },
+
+  // ════════════════════════════════════════════════════════
+  // HOME / HAUSHALT — Etappe 7 (von 1 auf 5 Templates)
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_home_order",
+    titleTemplate: "Bereich aufräumen und organisieren",
+    descTemplate:  "10 Minuten reichen. Einen Bereich wählen und vollständig in Ordnung bringen.",
+    type: "daily", domain: "home",
+    paths: ["guardian", "monk"],
+    baseXp: 18, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_home_system",
+    titleTemplate: "Alltags-System verbessern",
+    descTemplate:  "Haushalt, Einkauf, Ablage, Digitalordnung — ein System optimieren.",
+    type: "weekly", domain: "home",
+    paths: ["guardian", "strategist"],
+    baseXp: 90, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_home_task",
+    titleTemplate: "Haushalts-Aufgabe vollständig erledigen",
+    descTemplate:  "Einkaufen, Kochen, Putzen, Bürokratie — eine Aufgabe komplett abschließen.",
+    type: "daily", domain: "home",
+    paths: ["guardian"],
+    baseXp: 20, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_home_weekly_reset",
+    titleTemplate: "Wöchentlicher Wohnungs-Reset",
+    descTemplate:  "Alles in Ordnung bringen. Wäsche, Küche, Arbeitsplatz — vollständiger Reset.",
+    type: "weekly", domain: "home",
+    paths: ["guardian", "monk"],
+    baseXp: 100, actionType: "action",
+    variables: {},
+  },
+
+  // ════════════════════════════════════════════════════════
+  // ADVENTURE / EXPLORER — Etappe 7 (von 2 auf 6 Templates)
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_adventure_new",
+    titleTemplate: "Heute etwas zum ersten Mal tun",
+    descTemplate:  "Egal wie klein. Eine neue Aktivität, Route, Person, Essen — irgendetwas neues.",
+    type: "daily", domain: "adventure",
+    paths: ["explorer", "charmer"],
+    baseXp: 28, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_adventure_comfort",
+    titleTemplate: "Komfortzone verlassen",
+    descTemplate:  "Eine Situation die du normalerweise vermeidest — heute anpacken.",
+    type: "daily", domain: "adventure",
+    paths: ["explorer", "fighter"],
+    baseXp: 35, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_adventure_plan",
+    titleTemplate: "Abenteuer oder Ausflug planen",
+    descTemplate:  "Einen Ausflug, eine Reise oder ein neues Erlebnis konkret planen.",
+    type: "weekly", domain: "adventure",
+    paths: ["explorer"],
+    baseXp: 80, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_adventure_explore",
+    titleTemplate: "Neuen Ort oder Bereich erkunden",
+    descTemplate:  "Diese Woche einen Ort aufsuchen den du noch nicht oder lange nicht warst.",
+    type: "weekly", domain: "adventure",
+    paths: ["explorer", "runner"],
+    baseXp: 95, actionType: "action",
+    variables: {},
+  },
+
 ];
 
 // ── Legacy-Compat: INTEREST_TOPICS wird noch von altem Code genutzt ──

@@ -310,38 +310,57 @@ export default function AriseApp() {
     // Build signal hint for feedback display
     let signalHint = null;
     try {
+      const pathGainKeys = Object.keys(feedback.pathGains || {}).filter(k => k !== "shadow");
+      const topGainPath  = pathGainKeys.sort((a,b) => (feedback.pathGains[b]||0)-(feedback.pathGains[a]||0))[0];
       const challengePath = challenge.path;
-      if (challengePath && challengePath !== "shadow") {
-        const pathGainKeys = Object.keys(feedback.pathGains || {}).filter(k => k !== "shadow");
-        const topGainPath  = pathGainKeys.sort((a,b) => (feedback.pathGains[b]||0)-(feedback.pathGains[a]||0))[0];
-        const displayPath  = topGainPath || challengePath;
-        if (displayPath && PATHS[displayPath]) {
-          const affinityNow = (newState.player?.affinities?.[displayPath] || 0);
-          if (affinityNow > 0 && affinityNow % 5 === 0) {
-            signalHint = `${PATHS[displayPath].name} Signal +${affinityNow}`;
-          } else if (challenge.source === "starter" || !challenge.personalized) {
-            // no hint for generic starters
-          } else {
-            signalHint = `${PATHS[displayPath].icon} ${PATHS[displayPath].name} Signal aktiv`;
-          }
+      const displayPath   = topGainPath || challengePath;
+
+      if (displayPath && PATHS[displayPath] && displayPath !== "shadow") {
+        const affinityNow = (newState.player?.affinities?.[displayPath] || 0);
+        const pathName    = PATHS[displayPath].name;
+        const pathIcon    = PATHS[displayPath].icon;
+        if (affinityNow >= 5 && affinityNow % 5 === 0) {
+          // Milestone affinity — show for everyone
+          signalHint = `${pathIcon} ${pathName} Signal +${affinityNow}`;
+        } else if (challenge.personalized && challenge.source !== "starter") {
+          // Personalized quest — always show path signal
+          signalHint = `${pathIcon} ${pathName} Signal aktiv`;
+        } else if (affinityNow > 0) {
+          // Starter / generic — show subtle signal detected message
+          signalHint = `${pathIcon} ${pathName} Signal detected`;
         }
       }
-      if (!signalHint && challenge.interestId) {
-        signalHint = `Interesse '${challenge.interestId}' Signal`;
+      // Interest signal for personalized quests
+      if (!signalHint && challenge.interestId && INTERESTS?.[challenge.interestId]) {
+        const interest = INTERESTS[challenge.interestId];
+        signalHint = `◈ ${interest.label} Signal`;
+      }
+    } catch(_) {}
+
+    // Goal progress hint
+    let goalProgressHint = null;
+    try {
+      if (feedback.goalNotifications?.length > 0) {
+        const gn = feedback.goalNotifications[0];
+        if (gn.title) goalProgressHint = `Objective Progress: ${gn.title.slice(0,30)}`;
       }
     } catch(_) {}
 
     setQuestFeedback({
-      xp:         feedback.xp,
-      statKey:    feedback.statKey,
-      statPts:    feedback.statPts,
-      pathGains:  feedback.pathGains,
-      newTitles:  feedback.newTitles,
+      title:          challenge.title || null,
+      xp:             feedback.xp,
+      statKey:        feedback.statKey,
+      statPts:        feedback.statPts,
+      pathGains:      feedback.pathGains,
+      newTitles:      feedback.newTitles,
       signalHint,
-      type:       challenge.type || "daily",
+      goalProgressHint,
+      type:           challenge.type || "daily",
     });
     clearTimeout(feedbackRef.current);
-    feedbackRef.current = setTimeout(() => setQuestFeedback(null), 3000);
+    // Milestones show longer (4.5s), others 3s
+    const displayMs = challenge.type === "milestone" ? 4500 : 3000;
+    feedbackRef.current = setTimeout(() => setQuestFeedback(null), displayMs);
 
     haptic(challenge.type === "milestone" ? "heavy" : "medium");
     setState(newState); saveData("arise_v3", newState);
@@ -824,6 +843,13 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               )}
             </div>
 
+            {/* Quest title */}
+            {questFeedback.title && (
+              <div style={{ fontSize:"0.7rem",color:"#cbd5e1",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.02em",lineHeight:1.2,marginBottom:2 }}>
+                {questFeedback.title.length > 32 ? questFeedback.title.slice(0,32)+"…" : questFeedback.title}
+              </div>
+            )}
+
             {/* XP — prominent */}
             <div style={{ display:"flex",alignItems:"baseline",gap:6 }}>
               <span style={{ color:"#22c55e",fontSize:"1.2rem",fontFamily:"'Orbitron',sans-serif",fontWeight:900,lineHeight:1 }}>
@@ -874,6 +900,13 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             {questFeedback.signalHint && (
               <div style={{ fontSize:"0.58rem",color:"#00ffff66",fontFamily:"'Rajdhani',sans-serif",letterSpacing:"0.04em",borderTop:"1px solid rgba(255,255,255,0.04)",paddingTop:3,marginTop:1 }}>
                 ◈ {questFeedback.signalHint}
+              </div>
+            )}
+
+            {/* Goal progress hint */}
+            {questFeedback.goalProgressHint && (
+              <div style={{ fontSize:"0.58rem",color:"#a78bfa88",fontFamily:"'Rajdhani',sans-serif",letterSpacing:"0.04em" }}>
+                ◇ {questFeedback.goalProgressHint}
               </div>
             )}
 
@@ -1425,8 +1458,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 )}
 
                 {[
-                  { key:"daily",     label:"DAILY SYSTEM QUESTS",   icon:"◎", items:currentDB.daily,   color:"#3b82f6", recommended:false },
-                  { key:"weekly",    label:"WEEKLY ORDERS",           icon:"◇", items:currentDB.weekly,  color:"#8b5cf6", recommended:false },
+                  { key:"daily",     label:"DAILY SYSTEM QUESTS",   icon:"◎", items:rotatedDaily,   color:"#3b82f6", recommended:false },
+                  { key:"weekly",    label:"WEEKLY ORDERS",           icon:"◇", items:rotatedWeekly,  color:"#8b5cf6", recommended:false },
                   { key:"milestone", label:"AWAKENING MILESTONES",    icon:"◆", items:allMilestones,     color:"#f59e0b", recommended:false },
                   { key:"custom",    label:"CUSTOM ORDERS",           icon:"✦", items:customQuests,      color:"#06b6d4", recommended:false },
                   ...(personalizedQuests.length > 0 ? [
@@ -2001,7 +2034,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                       {review.reflection?.nextFocus && (
                         <div style={{ fontSize:"0.66rem",color:"#94a3b8",lineHeight:1.4 }}>
                           <span style={{ color:"#8b5cf666" }}>Fokus: </span>
-                          {review.reflection.nextFocus.slice(0,80)}{review.reflection.nextFocus.length>80?"…":""}
+                          {(review.reflection?.nextFocus||"").slice(0,80)}{(review.reflection?.nextFocus||"").length>80?"…":""}
                         </div>
                       )}
                     </div>

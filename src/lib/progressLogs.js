@@ -52,7 +52,8 @@ export function createProgressLog({ questId, goalId, gateId, quest, metrics, not
  */
 function sanitizeMetrics(raw) {
   const allowed = ["duration","reps","weight","sets","distance","tasksCompleted",
-                   "understanding","mood","energy","stress","sleepQuality","progressPercent"];
+                   "understanding","mood","energy","stress","sleepQuality","progressPercent",
+                   "confidence"];
   const out = {};
   for (const key of allowed) {
     const v = raw[key];
@@ -183,12 +184,13 @@ export function getLogFields(quest) {
     };
   }
 
-  // Social / Charmer / Leader
+  // Social / Charmer / Leader / Service
   if (domain === "social" || domain === "appearance" ||
-      ["charmer","leader"].includes(path)) {
+      domain === "leadership" || domain === "service" ||
+      ["charmer","leader","healer"].includes(path)) {
     return {
-      metrics: ["duration","energy"],
-      notesLabel: "Situation, Reaktion, Reflexion?",
+      metrics: ["duration","energy","confidence"],
+      notesLabel: "Situation, Reaktion, Reflexion? Nächster Schritt?",
       notesRequired: aType === "reflection",
     };
   }

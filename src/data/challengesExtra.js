@@ -44,7 +44,7 @@ export const EXTRA_DAILIES = {
 
   // ── Home / Household ──
   home: [
-    { id:"xd_home_1", title:"Küche nach dem Kochen sauber machen",     desc:"Teller, Pfanne, Herd — direkt. Kein Aufschub.",                  xp:13, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"home" },
+    { id:"xd_home_1", title:"Küchenbereich sauber halten",             desc:"Nach der Benutzung direkt aufräumen. Kein Aufschub.",                  xp:13, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"home" },
     { id:"xd_home_2", title:"Wäsche waschen oder aufhängen",           desc:"Kleine Haushalts-Task direkt erledigen.",                         xp:14, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"home" },
     { id:"xd_home_3", title:"Wohnung in 10 Min. aufräumen",            desc:"Timer stellen. Alles auf seinen Platz.",                          xp:14, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"home" },
   ],
@@ -60,7 +60,7 @@ export const EXTRA_DAILIES = {
   adventure: [
     { id:"xd_adv_1",  title:"Heute etwas zum ersten Mal tun",          desc:"Egal wie klein — irgendetwas neues ausprobieren.",                xp:22, stat:"AGI", statPts:0, type:"daily", cat:"discipline", domain:"adventure" },
     { id:"xd_adv_2",  title:"Komfortzone: jemanden Fremdes ansprechen", desc:"Einmal aktiv Kontakt zu jemandem herstellen den du nicht kennst.", xp:30, stat:"CHA", statPts:0, type:"daily", cat:"social", domain:"social" },
-    { id:"xd_adv_3",  title:"Neue Route / neuer Weg heute",            desc:"Auf dem Weg zur Uni, zum Gym oder einkaufen eine neue Strecke.",  xp:14, stat:"AGI", statPts:0, type:"daily", cat:"cardio", domain:"adventure" },
+    { id:"xd_adv_3",  title:"Neue Route / neuer Weg heute",            desc:"Heute einen anderen Weg nehmen als gewohnt — andere Route, anderer Ort.",  xp:14, stat:"AGI", statPts:0, type:"daily", cat:"cardio", domain:"adventure" },
   ],
 };
 
@@ -132,5 +132,67 @@ export const EXTRA_MILESTONES = {
     { id:"xm_c_goal1",   title:"Erstes Ziel vollständig abgeschlossen", desc:"Ein Goal von 0 auf 100% — vollständig durchgezogen.",            xp:900, stat:"END", statPts:12, type:"milestone", cat:"discipline",    domain:"discipline" },
     { id:"xm_c_gate1",   title:"Drei Gates abgeschlossen",             desc:"Drei Prüfungen gemeistert. Du bist kein Anfänger mehr.",          xp:800, stat:"END", statPts:10, type:"milestone", cat:"discipline",    domain:"discipline" },
     { id:"xm_c_logs1",   title:"50 Progress Logs gespeichert",         desc:"50 dokumentierte Momente. Wachstum ist sichtbar.",                xp:600, stat:"INT", statPts:7,  type:"milestone", cat:"discipline",    domain:"discipline" },
+  ],
+};
+
+// ── D-Rank Extra Dailies — Etappe 7: fehlende Domains ───────
+// finance, career, adventure, home, service/leadership
+
+export const EXTRA_DAILIES_D = {
+
+  // ── Finance / Career ──
+  finance: [
+    { id:"xd_d_fin_1", title:"Ausgaben-Tracker: Heute alles notieren",  desc:"Was hast du ausgegeben? Wirklich alles — auch Kleinigkeiten.",        xp:20, stat:"INT", statPts:0, type:"daily", cat:"discipline", domain:"finance" },
+    { id:"xd_d_fin_2", title:"Einen Vertrag oder Abo prüfen",           desc:"Brauchst du das noch? Ist es das wert? Entscheidung treffen.",          xp:22, stat:"INT", statPts:0, type:"daily", cat:"discipline", domain:"finance" },
+    { id:"xd_d_fin_3", title:"Karriere-Task: Heute voranbringen",       desc:"Bewerbung, Skill, Netzwerk, Projekt — einen konkreten Schritt.",         xp:30, stat:"INT", statPts:0, type:"daily", cat:"discipline", domain:"career" },
+    { id:"xd_d_fin_4", title:"Finanzwissen: 15 Min. lernen",            desc:"Investieren, Steuern, Budgeting — ein Konzept verstehen.",               xp:25, stat:"INT", statPts:0, type:"daily", cat:"mind",       domain:"finance" },
+  ],
+
+  // ── Adventure / Growth ──
+  adventure: [
+    { id:"xd_d_adv_1", title:"Komfortzone: Heute etwas Ungewohntes tun", desc:"Klein ist OK — Hauptsache du hast kurz gezögert und es trotzdem getan.", xp:28, stat:"AGI", statPts:0, type:"daily", cat:"discipline", domain:"adventure" },
+    { id:"xd_d_adv_2", title:"Neue Perspektive: Fremdes Thema 15 Min.", desc:"Etwas das du normalerweise ignorierst. Neugier trainieren.",              xp:22, stat:"INT", statPts:0, type:"daily", cat:"mind",       domain:"adventure" },
+    { id:"xd_d_adv_3", title:"Initiative: Jemanden für etwas vorschlagen", desc:"Einen Ausflug, ein Gespräch, eine Aktivität — du bringst die Idee.",    xp:25, stat:"CHA", statPts:0, type:"daily", cat:"social",     domain:"adventure" },
+  ],
+
+  // ── Home / Haushalt ──
+  home: [
+    { id:"xd_d_home_1", title:"Haushalt-Task: Vollständig erledigen",  desc:"Einkaufen, Putzen, Wäsche, Kochen — eine Aufgabe ganz zu Ende.",          xp:20, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"home" },
+    { id:"xd_d_home_2", title:"Bereich organisieren (15 Min.)",         desc:"Schrank, Schublade, Kabel, Dokumente — irgendetwas in Ordnung bringen.",   xp:22, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"home" },
+    { id:"xd_d_home_3", title:"Bürokratie-Task: Nicht aufschieben",     desc:"Brief, Formular, E-Mail, Antrag — heute erledigen, nicht morgen.",         xp:25, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"home" },
+  ],
+
+  // ── Service / Leadership ──
+  service: [
+    { id:"xd_d_serv_1", title:"Jemandem aktiv helfen — ohne Gegenleistung", desc:"Nicht weil du musst. Einfach weil du es kannst.",                     xp:25, stat:"CHA", statPts:0, type:"daily", cat:"social",     domain:"social" },
+    { id:"xd_d_serv_2", title:"Aktiv zuhören: Gespräch ohne eigene Agenda", desc:"Das nächste Gespräch: zuhören, nicht schnell antworten.",              xp:22, stat:"SOC", statPts:0, type:"daily", cat:"social",     domain:"social" },
+    { id:"xd_d_serv_3", title:"Wissen oder Tipp weitergeben",            desc:"Irgendetwas das du weißt — jemandem nützlich machen.",                    xp:28, stat:"CHA", statPts:0, type:"daily", cat:"social",     domain:"social" },
+    { id:"xd_d_lead_1", title:"Entscheidung treffen: Kein weiteres Aufschieben", desc:"Eine offene Entscheidung — heute treffen und kommunizieren.",      xp:30, stat:"INT", statPts:0, type:"daily", cat:"discipline", domain:"discipline" },
+    { id:"xd_d_lead_2", title:"Für andere planen oder koordinieren",     desc:"Irgendetwas organisieren das anderen nützt.",                             xp:28, stat:"CHA", statPts:0, type:"daily", cat:"social",     domain:"social" },
+  ],
+};
+
+// ── C/B-Rank Extra Weeklies — Etappe 7 ───────────────────────
+// Deckt finance, adventure, service/leadership für höhere Ranks ab
+
+export const EXTRA_WEEKLIES_C = [
+  { id:"xw_c_fin_1",  title:"Budget der Woche analysieren",             desc:"Wo geht das Geld hin? Muster erkennen und einen Bereich optimieren.",    xp:160, stat:"INT", statPts:0, type:"weekly", cat:"discipline", domain:"finance" },
+  { id:"xw_c_adv_1",  title:"Diese Woche etwas Neues ausprobieren",    desc:"Aktivität, Ort, Kontakt, Thema — etwas das du noch nie gemacht hast.",    xp:180, stat:"AGI", statPts:0, type:"weekly", cat:"discipline", domain:"adventure" },
+  { id:"xw_c_serv_1", title:"Diese Woche 3× aktiv helfen",             desc:"Drei Momente in denen du jemandem wirklich nützlich warst.",               xp:170, stat:"CHA", statPts:0, type:"weekly", cat:"social",     domain:"social" },
+  { id:"xw_c_lead_1", title:"Diese Woche Verantwortung übernehmen",    desc:"Mindestens eine Situation aktiv leiten, organisieren oder entscheiden.",    xp:185, stat:"CHA", statPts:0, type:"weekly", cat:"discipline", domain:"discipline" },
+];
+
+// ── C/B-Rank Extra Milestones — Etappe 7 ─────────────────────
+export const EXTRA_MILESTONES_CB = {
+  C: [
+    { id:"xm_c_fin1",  title:"4 Wochen Budget konsequent geführt",      desc:"Einnahmen vs. Ausgaben 4 Wochen aufgeschrieben und analysiert.",           xp:700, stat:"INT", statPts:8,  type:"milestone", cat:"discipline", domain:"finance" },
+    { id:"xm_c_adv1",  title:"10 neue Aktivitäten oder Orte erlebt",    desc:"10 Momente außerhalb der gewohnten Routine. Breite schlägt Tiefe.",        xp:650, stat:"AGI", statPts:7,  type:"milestone", cat:"discipline", domain:"adventure" },
+    { id:"xm_c_serv1", title:"20 Mal jemandem aktiv geholfen",          desc:"20 bewusste Momente des Gebens — dokumentiert.",                           xp:600, stat:"CHA", statPts:7,  type:"milestone", cat:"social",     domain:"social" },
+    { id:"xm_c_lead1", title:"Erste echte Leadership-Situation gemeistert", desc:"Entscheidung für andere, Konflikt gelöst, Gruppe geführt — wirklich.",  xp:750, stat:"CHA", statPts:9,  type:"milestone", cat:"social",     domain:"social" },
+  ],
+  B: [
+    { id:"xm_b_fin1",  title:"Finanzsystem aufgebaut + 3 Monate gehalten", desc:"Budget + Sparziel + Tracking — dauerhaft funktionierend.",               xp:900, stat:"INT", statPts:11, type:"milestone", cat:"discipline", domain:"finance" },
+    { id:"xm_b_adv1",  title:"Mehrtägiges Abenteuer absolviert",         desc:"Reise, Outdoor-Event, Fremdes Land — etwas das echten Mut brauchte.",      xp:1000,stat:"AGI", statPts:12, type:"milestone", cat:"discipline", domain:"adventure" },
+    { id:"xm_b_lead1", title:"Team oder Projekt über 4+ Wochen geführt", desc:"Nicht nur Ideen — wirklich Verantwortung getragen.",                       xp:950, stat:"CHA", statPts:11, type:"milestone", cat:"social",     domain:"social" },
   ],
 };

@@ -57,6 +57,8 @@ const PATH_QUEST_TYPE = {
   creator:    "creative",
   monk:       "recovery",
   explorer:   "adventure",
+  leader:     "social",
+  healer:     "recovery",
 };
 
 // Rank-Phasen für Empfehlungen

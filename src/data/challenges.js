@@ -4,42 +4,42 @@
 // milestones   → XP + statPts — echter Selbsttest mit klarer Frage
 // Prompt 10: Erweitert durch challengesExtra.js
 // ============================================================
-import { EXTRA_DAILIES, EXTRA_WEEKLIES, EXTRA_MILESTONES } from "./challengesExtra.js";
+import { EXTRA_DAILIES, EXTRA_WEEKLIES, EXTRA_MILESTONES,
+         EXTRA_DAILIES_D, EXTRA_WEEKLIES_C, EXTRA_MILESTONES_CB } from "./challengesExtra.js";
 
 export const CHALLENGES_DB = {
 
   // ══════════════════════════════════════════════════════════
   // E-RANK — Novice. Erste Schritte. Grundlagen legen.
   // ══════════════════════════════════════════════════════════
+  // ── E-RANK: Neutrale System-Quests. Kein Thema bevorzugt. ──
+  // Jede Richtung ist offen. Spezialisierung entsteht erst durch Signale.
   E:{
     daily:[
-      {id:"e_d1",  title:"Gym: Einheit absolviert",        desc:"Ins Gym gegangen und trainiert – egal was, egal wie lang.",          xp:25, stat:"STR", statPts:0, type:"daily", cat:"strength"},
-      {id:"e_d2",  title:"10 Liegestütze",                 desc:"10 saubere Liegestütze. Brust zum Boden, Körper gerade.",            xp:18, stat:"STR", statPts:0, type:"daily", cat:"strength"},
-      {id:"e_d3",  title:"20 Kniebeugen (tiefe Hocke)",    desc:"Oberschenkel parallel zum Boden – echte Tiefe zählt.",              xp:16, stat:"STR", statPts:0, type:"daily", cat:"strength"},
-      {id:"e_d4",  title:"15 Min. Spazieren / Joggen",     desc:"Raus. Bewegen. Luft schnappen. Fang einfach an.",                    xp:15, stat:"AGI", statPts:0, type:"daily", cat:"cardio"},
-      {id:"e_d5",  title:"5 Min. Dehnen",                  desc:"Hüfte, Oberschenkel, Schultern – täglich dehnen baut Mobilität.",   xp:12, stat:"AGI", statPts:0, type:"daily", cat:"cardio"},
-      {id:"e_d6",  title:"10 Min. Wissen aufnehmen",        desc:"Lesen, Podcast, Video – etwas lernen das dich interessiert.",       xp:20, stat:"INT", statPts:0, type:"daily", cat:"mind"},
-      {id:"e_d7",  title:"Eine Aufgabe vollständig lösen",  desc:"Eine konkrete Aufgabe von Anfang bis Ende abschließen – kein Abbrechen.", xp:22, stat:"INT", statPts:0, type:"daily", cat:"discipline"},
-      {id:"e_d8",  title:"10 Min. Skill üben",             desc:"Eine Fähigkeit 10 Minuten üben – was auch immer du gerade entwickelst.", xp:18, stat:"INT", statPts:0, type:"daily", cat:"mind"},
-      {id:"e_d9",  title:"Instrument 5 Min. anfassen",     desc:"Gitarre, Klavier, was auch immer – 5 Minuten spielen oder üben.",   xp:14, stat:"CRE", statPts:0, type:"daily", cat:"skill_creative"},
-      {id:"e_d10", title:"5 Min. Zeichnen",                desc:"Skizziere irgendwas. Kein Anspruch. Einfach machen.",                xp:13, stat:"CRE", statPts:0, type:"daily", cat:"skill_creative"},
-      {id:"e_d11", title:"Etwas selbst kochen",            desc:"Keine Fertigmahlzeit. Irgendetwas selbst zubereiten.",               xp:18, stat:"CRA", statPts:0, type:"daily", cat:"skill_practical"},
-      {id:"e_d12", title:"1,5L Wasser trinken",            desc:"Mindestens 1,5 Liter Wasser. Hydration ist unterschätzt.",           xp:12, stat:"VIT", statPts:0, type:"daily", cat:"health"},
-      {id:"e_d13", title:"Kein Fast Food heute",           desc:"Einen Tag ohne Fast Food oder Junk.",                                 xp:15, stat:"VIT", statPts:0, type:"daily", cat:"health"},
-      {id:"e_d14", title:"Vor 23:30 Uhr schlafen",         desc:"Schlaf ist Muskelaufbau, Lernen, Regeneration.",                     xp:15, stat:"VIT", statPts:0, type:"daily", cat:"health"},
-      {id:"e_d15", title:"Handy 30 Min. weglegen",         desc:"30 Minuten ohne Smartphone. Tu stattdessen etwas Produktives.",      xp:18, stat:"END", statPts:0, type:"daily", cat:"discipline"},
-      {id:"e_d16", title:"To-Do-Liste schreiben",          desc:"3 konkrete Dinge aufschreiben die du heute erledigst.",               xp:12, stat:"END", statPts:0, type:"daily", cat:"discipline"},
-      {id:"e_d17", title:"Einem Freund aktiv schreiben",   desc:"Kontakt aufnehmen – nicht warten bis jemand schreibt.",              xp:15, stat:"CHA", statPts:0, type:"daily", cat:"social"},
-      {id:"e_d18", title:"Basis-Hygiene vollständig",      desc:"Zähne 2x, Gesicht waschen, Deo – täglich, konsequent.",              xp:10, stat:"CHA", statPts:0, type:"daily", cat:"appearance"},
+      {id:"e_d1",  title:"System Focus",        desc:"Arbeite 15 Minuten konzentriert an etwas Wichtigem — kein Handy, keine Ablenkung.",              xp:25, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"discipline"},
+      {id:"e_d2",  title:"Body Activation",     desc:"Bewege dich 20 Minuten bewusst — was auch immer du wählst. Alles zählt.",                         xp:22, stat:"VIT", statPts:0, type:"daily", cat:"health",      domain:"body"},
+      {id:"e_d3",  title:"Skill Spark",         desc:"Übe 10 Minuten eine Fähigkeit die dir wichtig ist — irgendetwas das dich weiterbringt.",           xp:20, stat:"INT", statPts:0, type:"daily", cat:"mind",       domain:"mind"},
+      {id:"e_d4",  title:"Environment Reset",   desc:"Bringe einen Bereich 10 Minuten in Ordnung — Schreibtisch, Zimmer oder digitale Ablage.",          xp:18, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"home"},
+      {id:"e_d5",  title:"Objective Step",      desc:"Mache einen kleinen, konkreten Fortschritt an einem deiner Ziele — kein Aufschieben.",             xp:22, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"discipline"},
+      {id:"e_d6",  title:"Recovery Protocol",   desc:"Plane oder mache 10 Minuten bewusste Regeneration — Pause, Atemübung, Spaziergang.",               xp:15, stat:"VIT", statPts:0, type:"daily", cat:"recovery",   domain:"recovery"},
+      {id:"e_d7",  title:"Reflection Log",      desc:"Notiere kurz was du heute verbessert hast oder morgen besser machen willst.",                      xp:15, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"discipline", actionType:"reflection"},
+      {id:"e_d8",  title:"Discipline Check",    desc:"Schließe eine bewusst aufgeschobene Kleinaufgabe heute noch ab.",                                   xp:20, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"discipline"},
+      {id:"e_d9",  title:"Social Signal",       desc:"Mache einen kleinen, bewussten sozialen Schritt — schreiben, ansprechen, erscheinen.",              xp:15, stat:"CHA", statPts:0, type:"daily", cat:"social",     domain:"social"},
+      {id:"e_d10", title:"Planning Pulse",      desc:"Plane deinen nächsten sinnvollen Schritt — konkret, machbar, aufgeschrieben.",                      xp:12, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"discipline"},
+      {id:"e_d11", title:"Awareness Check",     desc:"30 Minuten bewusst auf Ablenkungen verzichten — Fokus behalten, Präsenz üben.",                    xp:18, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"discipline"},
+      {id:"e_d12", title:"Vitality Base",       desc:"Sorge heute bewusst für deinen Körper — Hydration, Ruhe, Bewegung, Ernährung.",                     xp:12, stat:"VIT", statPts:0, type:"daily", cat:"health",     domain:"recovery"},
+      {id:"e_d13", title:"Rest Signal",         desc:"Schlafe heute zu einer sinnvollen Zeit — Erholung ist Teil des Systems.",                           xp:15, stat:"VIT", statPts:0, type:"daily", cat:"health",     domain:"recovery"},
+      {id:"e_d14", title:"Connection Step",     desc:"Nimm bewusst Kontakt zu jemandem auf — nicht warten, aktiv handeln.",                               xp:15, stat:"CHA", statPts:0, type:"daily", cat:"social",     domain:"social"},
+      {id:"e_d15", title:"Output Moment",       desc:"Erschaffe heute etwas — egal wie klein: schreiben, bauen, skizzieren, dokumentieren.",              xp:18, stat:"CRE", statPts:0, type:"daily", cat:"skill_creative", domain:"creativity"},
     ],
     weekly:[
-      {id:"e_w1", title:"3x Gym / Sport diese Woche",      desc:"3 Einheiten – Gym, Laufen, Calisthenics, alles zählt.",              xp:130, stat:"END", statPts:0, type:"weekly", cat:"strength"},
-      {id:"e_w2", title:"Ernährungstagebuch 5 Tage",       desc:"5 Tage aufschreiben was du isst. Bewusstsein ist der erste Schritt.", xp:95,  stat:"VIT", statPts:0, type:"weekly", cat:"health"},
-      {id:"e_w3", title:"Einen Freund real treffen",       desc:"Nicht nur chatten – echte Zeit miteinander.",                        xp:105, stat:"CHA", statPts:0, type:"weekly", cat:"social"},
-      {id:"e_w4", title:"Ein Tutorial fertig machen",      desc:"Kochen, Code, Musik, Elektronik – etwas praktisch abschließen.",    xp:95,  stat:"CRA", statPts:0, type:"weekly", cat:"skill_practical"},
-      {id:"e_w5", title:"Kleiderschrank aussortieren",     desc:"Wirf aus was du nicht trägst. Stil beginnt mit Klarheit.",           xp:75,  stat:"CHA", statPts:0, type:"weekly", cat:"appearance"},
-      {id:"e_w6", title:"Wochenplan schreiben",            desc:"Nächste Woche planen: Uni, Sport, Soziales, Kreatives.",             xp:85,  stat:"END", statPts:0, type:"weekly", cat:"discipline"},
-      {id:"e_w7", title:"Neues Rezept kochen",             desc:"Ein komplett neues Gericht von Anfang bis Ende.",                    xp:90,  stat:"CRA", statPts:0, type:"weekly", cat:"skill_practical"},
+      {id:"e_w1", title:"Weekly Focus Order",   desc:"Schließe diese Woche 3 Fokus-Sessions ab — je mindestens 15 Minuten ohne Ablenkung.",              xp:130, stat:"END", statPts:0, type:"weekly", cat:"discipline", domain:"discipline"},
+      {id:"e_w2", title:"Body Foundation",      desc:"Bewege dich diese Woche an mindestens 2 Tagen bewusst — Dauer und Art sind dir überlassen.",        xp:120, stat:"VIT", statPts:0, type:"weekly", cat:"health",      domain:"body"},
+      {id:"e_w3", title:"Objective Progress",   desc:"Mache diese Woche einen sichtbaren Fortschritt an einem aktiven Ziel.",                             xp:110, stat:"END", statPts:0, type:"weekly", cat:"discipline", domain:"discipline"},
+      {id:"e_w4", title:"System Review",        desc:"Führe ein kurzes Wochenreview durch — was lief gut, was möchte ich verbessern?",                    xp:90,  stat:"END", statPts:0, type:"weekly", cat:"discipline", domain:"discipline", actionType:"reflection"},
+      {id:"e_w5", title:"Environment Upgrade",  desc:"Verbessere oder organisiere diese Woche einen Bereich deines Umfelds oder deiner Routinen.",         xp:80,  stat:"END", statPts:0, type:"weekly", cat:"discipline", domain:"home"},
+      {id:"e_w6", title:"Skill Foundation",     desc:"Übe eine Fähigkeit an mindestens 2 Tagen diese Woche — was auch immer dich interessiert.",           xp:105, stat:"INT", statPts:0, type:"weekly", cat:"mind",       domain:"mind"},
+      {id:"e_w7", title:"Social Contact",       desc:"Pflege oder starte diese Woche einen sinnvollen sozialen Kontakt.",                                  xp:95,  stat:"CHA", statPts:0, type:"weekly", cat:"social",     domain:"social"},
     ],
     milestones:[
       {id:"e_m1",  title:"20 Liegestütze am Stück",        desc:"Selbsttest: Mach sie jetzt. 20 saubere Liegestütze ohne Pause.",     xp:300,  stat:"STR", statPts:5,  type:"milestone", cat:"strength"},
@@ -386,11 +386,22 @@ CHALLENGES_DB.E.daily     = [...CHALLENGES_DB.E.daily,     ...allExtraDailies];
 CHALLENGES_DB.E.weekly    = [...CHALLENGES_DB.E.weekly,    ...(EXTRA_WEEKLIES.E || [])];
 CHALLENGES_DB.E.milestones= [...CHALLENGES_DB.E.milestones,...(EXTRA_MILESTONES.E || [])];
 
-// D-Rank: neue Weeklies + Milestones
+// D-Rank: neue Weeklies + Milestones + breite Domain-Extras (Etappe 7)
+const allExtraDailiesD = [
+  ...(EXTRA_DAILIES_D?.finance   || []),
+  ...(EXTRA_DAILIES_D?.adventure || []),
+  ...(EXTRA_DAILIES_D?.home      || []),
+  ...(EXTRA_DAILIES_D?.service   || []),
+];
+CHALLENGES_DB.D.daily     = [...CHALLENGES_DB.D.daily,     ...allExtraDailiesD];
 CHALLENGES_DB.D.weekly    = [...CHALLENGES_DB.D.weekly,    ...(EXTRA_WEEKLIES.D || [])];
 CHALLENGES_DB.D.milestones= [...CHALLENGES_DB.D.milestones,...(EXTRA_MILESTONES.D || [])];
 
-// C-Rank: neue Milestones
-CHALLENGES_DB.C.milestones= [...(CHALLENGES_DB.C.milestones||[]),...(EXTRA_MILESTONES.C || [])];
+// C-Rank: neue Milestones + Weeklies + extra domain content (Etappe 7)
+CHALLENGES_DB.C.milestones= [...(CHALLENGES_DB.C.milestones||[]),...(EXTRA_MILESTONES.C || []),...(EXTRA_MILESTONES_CB?.C || [])];
+CHALLENGES_DB.C.weekly    = [...(CHALLENGES_DB.C.weekly||[]),...(EXTRA_WEEKLIES_C || [])];
+// B-Rank: extra milestones
+CHALLENGES_DB.B = CHALLENGES_DB.B || { daily:[], weekly:[], milestones:[] };
+CHALLENGES_DB.B.milestones= [...(CHALLENGES_DB.B.milestones||[]),...(EXTRA_MILESTONES_CB?.B || [])];
 
 

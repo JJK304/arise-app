@@ -1149,7 +1149,215 @@ export const GATES = [
     reward: { xp: 480, affinity: { guardian: 8 }, title: "structure_held", titleLabel: "Structure Held" },
   },
 
-    // ════════════════════════════════════════════════════════
+  
+  // ════════════════════════════════════════════════════════
+  // DISCOVERY GATES — Etappe 6 Ergänzung
+  // Adventure + Service Discovery
+  // ════════════════════════════════════════════════════════
+  {
+    id: "gate_discovery_adventure", tier: 1,
+    title: "Adventure Gate I — First Step Outside",
+    path: "explorer", domain: "adventure", icon: "🌍", color: "#f59e0b",
+    discovery: true,
+    steps: [
+      "Eine Aktivität außerhalb der gewohnten Routine ausprobieren",
+      "Erfahrung kurz reflektieren: Was war neu? Was hat überrascht?",
+    ],
+    reward: { xp: 200, affinity: { explorer: 5 }, title: "first_step", titleLabel: "First Step" },
+  },
+  {
+    id: "gate_discovery_service", tier: 1,
+    title: "Service Gate I — First Support",
+    path: "healer", domain: "social", icon: "🤲", color: "#22c55e",
+    discovery: true,
+    steps: [
+      "Jemandem heute aktiv und ohne Erwartung helfen",
+      "Kurz reflektieren: Wie hat es sich angefühlt?",
+    ],
+    reward: { xp: 180, affinity: { healer: 5, leader: 3 }, title: "first_support", titleLabel: "First Support" },
+  },
+
+  // ════════════════════════════════════════════════════════
+  // TRIALS — Etappe 6: Fehlende Tier II + III ergänzen
+  // Runner, Strategist, Guardian, Artisan, Charmer,
+  // Explorer, Healer, Leader, Monk
+  // ════════════════════════════════════════════════════════
+
+  // ── Runner Trial II + III ──────────────────────────────
+  {
+    id: "trial_runner_2", tier: 2, trial: true,
+    title: "Runner Trial II — Endurance Push",
+    path: "runner", domain: "body", icon: "⚡", color: "#f59e0b",
+    unlockCondition: "trial_runner_1",
+    steps: [
+      "5 Lauf-Sessions in 2 Wochen abschließen",
+      "Längste Strecke oder beste Zeit dokumentieren",
+      "Pace oder Distanz gegenüber Trial I messbar verbessert",
+      "Reflexion: Was limitiert mich noch — Technik, Ausdauer, Mental?",
+    ],
+    reward: { xp: 850, affinity: { runner: 12 }, title: "endurance_push", titleLabel: "Endurance Push" },
+  },
+  {
+    id: "trial_runner_3", tier: 3, trial: true,
+    title: "Runner Trial III — The Long Run",
+    path: "runner", domain: "body", icon: "⚡", color: "#f59e0b",
+    unlockCondition: "trial_runner_2",
+    steps: [
+      "10km oder persönliche Bestdistanz am Stück abschließen",
+      "Training über 4+ Wochen konsistent dokumentiert",
+      "Recovery-Protokoll nach langen Einheiten etabliert",
+      "Nächstes messbares Ziel definieren und Plan aufschreiben",
+    ],
+    reward: { xp: 1400, affinity: { runner: 18 }, title: "long_run_proven", titleLabel: "Long Run Proven" },
+  },
+
+  // ── Strategist Trial II + III ──────────────────────────
+  {
+    id: "trial_strategist_2", tier: 2, trial: true,
+    title: "Strategist Trial II — Systems Thinking",
+    path: "strategist", domain: "discipline", icon: "♟️", color: "#0ea5e9",
+    unlockCondition: "trial_strategist_1",
+    steps: [
+      "Persönliches Produktivitätssystem aufbauen und 2 Wochen testen",
+      "3 übergeordnete Ziele mit Meilensteinen definieren",
+      "Wochenreviews für 4 Wochen konsequent durchführen",
+      "Engpässe im eigenen System identifizieren und eliminieren",
+    ],
+    reward: { xp: 900, affinity: { strategist: 12 }, title: "systems_thinker", titleLabel: "Systems Thinker" },
+  },
+  {
+    id: "trial_strategist_3", tier: 3, trial: true,
+    title: "Strategist Trial III — Execute & Adapt",
+    path: "strategist", domain: "discipline", icon: "♟️", color: "#0ea5e9",
+    unlockCondition: "trial_strategist_2",
+    steps: [
+      "Langfristiges Ziel (4+ Wochen) vollständig abschließen",
+      "Rückblick: Was lief nach Plan, was musste angepasst werden?",
+      "Neues System oder Prozess für die nächste Phase definieren",
+      "Anderen deinen Planungsansatz erklären oder dokumentieren",
+    ],
+    reward: { xp: 1450, affinity: { strategist: 18 }, title: "adaptive_executor", titleLabel: "Adaptive Executor" },
+  },
+
+  // ── Guardian Trial II + III ────────────────────────────
+  {
+    id: "trial_guardian_2", tier: 2, trial: true,
+    title: "Guardian Trial II — Stable Foundation",
+    path: "guardian", domain: "home", icon: "🏠", color: "#84cc16",
+    unlockCondition: "trial_guardian_1",
+    steps: [
+      "30 Tage täglich minimale Ordnungsroutine eingehalten",
+      "Finanzen und Haushalt gleichzeitig 4 Wochen im Griff",
+      "Einen Bereich dauerhaft verbessert (Möbel, System, Gewohnheit)",
+      "Reflexion: Was macht mein Umfeld stabiler und weniger stressig?",
+    ],
+    reward: { xp: 900, affinity: { guardian: 12 }, title: "stable_foundation", titleLabel: "Stable Foundation" },
+  },
+  {
+    id: "trial_guardian_3", tier: 3, trial: true,
+    title: "Guardian Trial III — The Guardian",
+    path: "guardian", domain: "home", icon: "🏠", color: "#84cc16",
+    unlockCondition: "trial_guardian_2",
+    steps: [
+      "Vollständiges Ordnungs- und Finanzsystem für 8 Wochen eingehalten",
+      "Eine Person bei Haushalt, Bürokratie oder Planung aktiv unterstützt",
+      "Notfall-Puffer und klare Routinen dokumentiert",
+      "Rückblick: Was ist jetzt dauerhaft stabil in meinem Leben?",
+    ],
+    reward: { xp: 1400, affinity: { guardian: 18 }, title: "the_guardian", titleLabel: "The Guardian" },
+  },
+
+  // ── Artisan Trial III ──────────────────────────────────
+  {
+    id: "trial_artisan_3", tier: 3, trial: true,
+    title: "Artisan Trial III — The Craftsman",
+    path: "artisan", domain: "creativity", icon: "🎨", color: "#a78bfa",
+    unlockCondition: "trial_artisan_2",
+    steps: [
+      "Umfangreiches Werk oder Projekt vollständig abschließen",
+      "Werk öffentlich zeigen oder einer echten Person präsentieren",
+      "Ehrliches externes Feedback eingeholt und reflektiert",
+      "Nächste Stufe: Was brauche ich um besser zu werden?",
+    ],
+    reward: { xp: 1450, affinity: { artisan: 18 }, title: "the_craftsman", titleLabel: "The Craftsman" },
+  },
+
+  // ── Charmer Trial III ──────────────────────────────────
+  {
+    id: "trial_charmer_3", tier: 3, trial: true,
+    title: "Charmer Trial III — The Presence",
+    path: "charmer", domain: "social", icon: "👑", color: "#ec4899",
+    unlockCondition: "trial_charmer_2",
+    steps: [
+      "10 bewusste soziale Interaktionen über 4 Wochen dokumentiert",
+      "Herausfordernde soziale Situation gemeistert — Reflexion schreiben",
+      "Eigenes Auftreten und Style bewusst weiterentwickelt",
+      "Feedback von einer Person eingeholt: Wie wirkst du auf andere?",
+    ],
+    reward: { xp: 1400, affinity: { charmer: 18 }, title: "social_sovereign", titleLabel: "Social Sovereign" },
+  },
+
+  // ── Explorer Trial III ─────────────────────────────────
+  {
+    id: "trial_explorer_3", tier: 3, trial: true,
+    title: "Explorer Trial III — Beyond the Map",
+    path: "explorer", domain: "adventure", icon: "🗺️", color: "#10b981",
+    unlockCondition: "trial_explorer_2",
+    steps: [
+      "Mehrtägiges Abenteuer oder neue Umgebung erlebt",
+      "5+ neue Aktivitäten oder Orte in diesem Jahr ausprobiert",
+      "Eine Komfortzone dauerhaft erweitert — dokumentiert was sich verändert hat",
+      "Nächstes Abenteuerziel definieren",
+    ],
+    reward: { xp: 1350, affinity: { explorer: 18 }, title: "beyond_the_map", titleLabel: "Beyond the Map" },
+  },
+
+  // ── Healer Trial III ───────────────────────────────────
+  {
+    id: "trial_healer_3", tier: 3, trial: true,
+    title: "Healer Trial III — Resilient Support",
+    path: "healer", domain: "recovery", icon: "💚", color: "#22c55e",
+    unlockCondition: "trial_healer_2",
+    steps: [
+      "30-Tage Recovery-Protokoll vollständig eingehalten",
+      "Eine Person aktiv durch schwierige Phase begleitet",
+      "Eigenes Wohlbefindensystem aufgebaut und dokumentiert",
+      "Reflexion: Wie halte ich mich selbst stabil während ich anderen helfe?",
+    ],
+    reward: { xp: 1400, affinity: { healer: 18 }, title: "resilient_support", titleLabel: "Resilient Support" },
+  },
+
+  // ── Leader Trial III ───────────────────────────────────
+  {
+    id: "trial_leader_3", tier: 3, trial: true,
+    title: "Leader Trial III — The Leader",
+    path: "leader", domain: "social", icon: "🏛️", color: "#6366f1",
+    unlockCondition: "trial_leader_2",
+    steps: [
+      "Gruppe oder Projekt über 4+ Wochen aktiv geführt",
+      "Gruppenkonflikt oder schwierige Entscheidung durchgestanden",
+      "Jemanden über längere Zeit gecoacht oder begleitet",
+      "Reflexion: Was macht mich als Leader aus — Stärken und Schwächen?",
+    ],
+    reward: { xp: 1500, affinity: { leader: 20 }, title: "the_leader", titleLabel: "The Leader" },
+  },
+
+  // ── Monk Trial III ─────────────────────────────────────
+  {
+    id: "trial_monk_3", tier: 3, trial: true,
+    title: "Monk Trial III — Inner Stillness",
+    path: "monk", domain: "recovery", icon: "🧘", color: "#8b5cf6",
+    unlockCondition: "trial_monk_2",
+    steps: [
+      "30-Tage Meditation oder Achtsamkeitsroutine eingehalten",
+      "Digital-Detox-Woche vollständig abgeschlossen",
+      "Persönliche Schlafroutine dauerhaft stabilisiert",
+      "Reflexion: Was bedeutet innere Ruhe für mich konkret?",
+    ],
+    reward: { xp: 1350, affinity: { monk: 18 }, title: "inner_stillness", titleLabel: "Inner Stillness" },
+  },
+
+  // ════════════════════════════════════════════════════════
   // SHADOW — Nur nach Spezialvoraussetzungen freigeschaltet
   // ════════════════════════════════════════════════════════
   {
