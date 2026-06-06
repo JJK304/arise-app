@@ -35,7 +35,7 @@ export function PreferencesSection({ preferences, rankColor, toggleArrayPref, sa
       <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:11 }}>◈ PERSONALISIERUNG</div>
 
       {/* Interessen */}
-      <div style={{ marginBottom:10 }}>
+      <div id="interests-section" style={{ marginBottom:10 }}>
         <SectionToggle id="interests" label="INTERESSEN" icon="◈"/>
         {collapsedSections["prefs_interests"]===false && (
           <div style={{ animation:"sectionOpen 0.2s ease" }}>

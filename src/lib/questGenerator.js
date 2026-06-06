@@ -1,11 +1,18 @@
 // ============================================================
-// QUEST GENERATOR v3 — Prompt 3 (Smarter, Behavior-Aware)
-// Scoring-basiertes System mit gewichteter Entscheidung:
-//   Active Goals:       35%
-//   Recent Behavior:    25%
-//   Selected Interests: 20%
-//   Path Affinity:      10%
-//   Neglected Domains:  10%
+// QUEST GENERATOR v4 — Etappe 5 (Signal-Aware)
+// Scoring-basiertes System mit Signal-Integration:
+//   Active Goals:        35%
+//   Recent Behavior:     30%
+//   Explicit Interests:  20%
+//   Signal/Path Level:   10%
+//   Balance Need:         5%
+//
+// Sichtbare Menge begrenzt:
+//   Daily personalized:  3–5
+//   Weekly personalized: 2–3
+//   Recovery:            max 2
+//   Schwache Signale:    nur neutrale Quests
+//   Starke Signale:      spezifische Quests + Gates
 //
 // Keine externe KI/API. Alles lokal, regelbasiert.
 // ============================================================
@@ -13,6 +20,7 @@ import { QUEST_TEMPLATES }            from "../data/questTemplates.js";
 import { INTERESTS, normalizeInterests } from "../data/interests.js";
 import { PATHS }                       from "../data/paths.js";
 import { catToDomain }                 from "../data/domains.js";
+import { calculatePathSignal, calculatePathSpecializationLevel, getTopSignalPaths } from "./signals.js";
 
 // ── XP-Multiplikatoren ─────────────────────────────────────
 const LENGTH_SCALE = { short: 0.7, medium: 1.0, long: 1.35 };
@@ -29,12 +37,23 @@ const GROUP_TO_VAR = {
 
 // ── Gewichtungen (Summe = 1.0) ──────────────────────────────
 const W = {
-  goal:      0.35,
-  behavior:  0.25,
-  interest:  0.20,
-  affinity:  0.10,
-  neglect:   0.10,
+  goal:     0.35,  // Active goal match — highest priority
+  behavior: 0.30,  // Recent behavior — stronger than manual selection
+  interest: 0.20,  // Explicit interest selection
+  signal:   0.10,  // Signal/path level (from signal system)
+  balance:  0.05,  // Balance need for neglected domains
 };
+
+// Signal level → quest specificity threshold
+// 0: no personalized quests (only starters)
+// 1: light personalization (generic templates)
+// 2: specific quests for this path/interest
+// 3: specific quests + gate/trial hints
+const SIGNAL_SPECIFICITY = { 0: 0, 1: 0.3, 2: 0.6, 3: 1.0 };
+
+// Max visible personalized quests per signal level
+const MAX_DAILY_BY_SIGNAL   = { 0: 0, 1: 2, 2: 4, 3: 5 };
+const MAX_WEEKLY_BY_SIGNAL  = { 0: 0, 1: 1, 2: 2, 3: 3 };
 
 // ══════════════════════════════════════════════════════════
 // Hilfsfunktionen
@@ -133,6 +152,7 @@ function analyzeHistory(questHistory, days = 14) {
 /**
  * Berechnet einen Score für einen Quest-Kandidaten basierend auf dem Kontext.
  * Score 0.0–1.0, höher = besser.
+ * Integriert Signal-Level für Spezifizitäts-Schwelle.
  */
 function scoreQuestCandidate(candidate, context) {
   const {
@@ -143,6 +163,7 @@ function scoreQuestCandidate(candidate, context) {
     behavior           = {},
     neglectedDomains   = [],
     recentlyDoneIds    = new Set(),
+    signalScores       = {},  // pathId → signal score (from signal system)
   } = context;
 
   // Don't re-score already selected quests
@@ -162,13 +183,13 @@ function scoreQuestCandidate(candidate, context) {
     score += W.goal * Math.min(goalMatchCount / activeGoals.length, 1.0);
   }
 
-  // ── 2. Behavior match (25%) ─────────────────────────────
+  // ── 2. Behavior match (30%) ─────────────────────────────
   const { domainCounts = {}, interestCounts = {}, recentCount = 0 } = behavior;
   if (recentCount > 0) {
-    // Domain behavior: reward domains the user actually completes
-    const domainFreq = (domainCounts[domain] || 0) / Math.max(recentCount, 1);
-    // Interest behavior: reward interests the user completes
-    const interestFreq = interestId ? (interestCounts[interestId] || 0) / Math.max(recentCount, 1) : 0;
+    const domainFreq   = (domainCounts[domain]     || 0) / Math.max(recentCount, 1);
+    const interestFreq = interestId
+      ? (interestCounts[interestId] || 0) / Math.max(recentCount, 1)
+      : 0;
     score += W.behavior * Math.max(domainFreq, interestFreq);
   }
 
@@ -176,34 +197,34 @@ function scoreQuestCandidate(candidate, context) {
   if (selectedInterests.length > 0) {
     const interestIdx = selectedInterests.indexOf(interestId);
     if (interestIdx !== -1) {
-      // Earlier in list = more recently chosen = slightly higher weight
       const positionalBoost = 1 - (interestIdx / selectedInterests.length) * 0.3;
       score += W.interest * positionalBoost;
     } else if (domain && selectedInterests.some(id => INTERESTS[id]?.domain === domain)) {
-      // Domain match via interest, even if not exact template match
       score += W.interest * 0.5;
     }
   }
 
-  // ── 4. Path affinity (10%) ─────────────────────────────
-  if (path && activePaths.has(path)) {
-    const affinityScore = Math.min((affinities[path] || 0) / 30, 1.0);
-    score += W.affinity * (0.5 + affinityScore * 0.5);
-  } else if (path) {
-    // Template has a path that matches at least partially
-    const tmplPaths = template?.paths || [];
-    const anyMatch = tmplPaths.some(p => activePaths.has(p));
-    if (anyMatch) score += W.affinity * 0.3;
+  // ── 4. Signal-Level boost (10%) ────────────────────────
+  // Uses real signal scores instead of affinity points alone
+  if (path) {
+    const rawSignal  = signalScores[path] || 0;
+    const normalized = Math.min(rawSignal / 20, 1.0);  // normalize to 0-1
+    if (activePaths.has(path)) {
+      score += W.signal * (0.5 + normalized * 0.5);
+    } else if (normalized > 0) {
+      // Path has signal even if not explicitly active
+      score += W.signal * normalized * 0.6;
+    }
+  } else if (template?.paths) {
+    // Template's possible paths — use best signal
+    const bestSignal = Math.max(...(template.paths.map(p => signalScores[p] || 0)));
+    if (bestSignal > 0) score += W.signal * Math.min(bestSignal / 20, 1.0) * 0.4;
   }
 
-  // ── 5. Neglected domain boost (10%) ────────────────────
+  // ── 5. Balance need (5%) ────────────────────────────────
   if (neglectedDomains.includes(domain)) {
-    score += W.neglect;
+    score += W.balance;
   }
-
-  // ── Deductions ─────────────────────────────────────────
-  // Don't repeat the same template+interest too often
-  // (handled by usedTemplates Set, not score)
 
   return Math.min(score, 1.0);
 }
@@ -226,7 +247,24 @@ export function generatePersonalizedQuests(preferences, context = {}, maxQuests 
     affinities       = {},
     currentStreak    = 0,
     neglectedDomains = [],
+    // Full state for signal system (optional — graceful fallback)
+    progressLogs     = [],
+    stats            = {},
+    gateProgress     = {},
   } = context;
+
+  // Build minimal state object for signal calculation
+  const _stateForSignal = {
+    questHistory,
+    progressLogs,
+    goals,
+    player: {
+      preferences,
+      affinities: affinities || {},
+    },
+    stats,
+    gateProgress,
+  };
 
   const rawInterests    = preferences?.interests            || [];
   const activePaths     = preferences?.activePaths          || [];
@@ -247,6 +285,32 @@ export function generatePersonalizedQuests(preferences, context = {}, maxQuests 
   // Analyze user behavior from history
   const behavior = analyzeHistory(questHistory, 14);
   const hasHistory = behavior.recentCount >= 5;
+
+  // ── Signal computation ───────────────────────────────────
+  // Calculate signal scores for all paths (0 = no signal)
+  let signalScores = {};
+  let dominantSignalLevel = 0;
+  let topSignalPath = null;
+  try {
+    const topPaths = getTopSignalPaths(_stateForSignal, 5);
+    for (const sp of topPaths) {
+      signalScores[sp.pathId] = sp.score;
+    }
+    if (topPaths.length > 0) {
+      dominantSignalLevel = topPaths[0].level;   // 0-3
+      topSignalPath       = topPaths[0].pathId;
+    }
+  } catch(_) {}
+
+  // Limit personalized quests based on signal level
+  const effectiveMaxDaily  = Math.min(maxQuests, MAX_DAILY_BY_SIGNAL[dominantSignalLevel]  ?? 5);
+  const effectiveMaxWeekly = Math.min(maxQuests, MAX_WEEKLY_BY_SIGNAL[dominantSignalLevel] ?? 3);
+  const effectiveMax = effectiveMaxDaily + effectiveMaxWeekly;
+
+  // If no signals at all, generate starters instead
+  if (dominantSignalLevel === 0 && interests.length === 0 && activePaths.length === 0) {
+    return generateStarterQuests(preferredLength);
+  }
 
   // Determine effective neglected domains
   const sevenDaysAgo = new Date();
@@ -359,6 +423,11 @@ export function generatePersonalizedQuests(preferences, context = {}, maxQuests 
         } else if (hasHistory && behavior.topDomains.includes(domain)) {
           behaviorReason = `aktiver Bereich: ${domain}`;
         }
+        // Signal-aware reason override
+        if (topSignalPath && paths?.includes(topSignalPath) && dominantSignalLevel >= 2) {
+          const pathName = PATHS[topSignalPath]?.name || topSignalPath;
+          behaviorReason = `dein ${pathName} Signal wächst · ${interest?.label || label}`;
+        }
 
         const q = buildQuest({
           template, topicLabel: label, interestId, domain,
@@ -379,6 +448,7 @@ export function generatePersonalizedQuests(preferences, context = {}, maxQuests 
     selectedInterests:  interests,
     activePaths:        pathSet,
     affinities,
+    signalScores,       // signal system scores
     behavior:           {
       ...behavior,
       domainCounts:   Object.fromEntries(
@@ -415,8 +485,15 @@ export function generatePersonalizedQuests(preferences, context = {}, maxQuests 
   let goalLinkedCount = 0;
   let neglectCount    = 0;
 
+  // Separate daily and weekly selection with signal-adjusted limits
+  let dailyCount  = 0;
+  let weeklyCount = 0;
+
   for (const { quest, goalLinked } of candidates) {
-    if (selected.length >= maxQuests) break;
+    const isWeekly = quest.type === "weekly";
+    if (isWeekly  && weeklyCount  >= effectiveMaxWeekly) continue;
+    if (!isWeekly && dailyCount   >= effectiveMaxDaily)  continue;
+    if (selected.length >= Math.max(effectiveMax, 3)) break;
     if (usedIds.has(quest.id)) continue;
     if (quest.score < 0) continue;
 
@@ -446,6 +523,7 @@ export function generatePersonalizedQuests(preferences, context = {}, maxQuests 
     domainUsed[dom] = (domainUsed[dom] || 0) + 1;
     if (quest.goalId) goalUsed[quest.goalId] = (goalUsed[quest.goalId] || 0) + 1;
     if (goalLinked) goalLinkedCount++;
+    if (quest.type === "weekly") weeklyCount++; else dailyCount++;
   }
 
   // ── Recovery Quest bei niedrigem Streak ────────────────
@@ -468,15 +546,72 @@ export function generatePersonalizedQuests(preferences, context = {}, maxQuests 
 }
 
 // ══════════════════════════════════════════════════════════
+// getVisibleContent
+// Trennt availableContent / recommendedContent / visibleContent.
+// Sichtbare Menge bleibt immer machbar.
+// ══════════════════════════════════════════════════════════
+
+/**
+ * Begrenzt die sichtbare Quest-Menge basierend auf Signal-Level.
+ *
+ * @param {object} pools         - { daily, weekly, personalized, recovery }
+ * @param {object} state         - vollständiger State für Signal-Berechnung
+ * @param {object} [opts]        - Optionen
+ * @returns {object}             - { visibleDaily, visibleWeekly, visiblePersonalized, visibleRecovery, signalLevel, reason }
+ */
+export function getVisibleContent(pools, state = {}, opts = {}) {
+  const {
+    maxDaily        = 5,
+    maxWeekly       = 3,
+    maxPersonalized = 5,
+    maxRecovery     = 2,
+  } = opts;
+
+  // Calculate dominant signal level
+  let signalLevel = 0;
+  let reason = "Kein Signal — allgemeine Quests";
+  try {
+    const topPaths = getTopSignalPaths(state, 3);
+    if (topPaths.length > 0) {
+      signalLevel = topPaths[0].level;
+      const pathName = PATHS[topPaths[0].pathId]?.name || topPaths[0].pathId;
+      const levelLabel = ["—", "schwach", "aktiv", "stark"][signalLevel] || "—";
+      reason = `${pathName} Signal ${levelLabel} · ${topPaths[0].reason || ""}`;
+    }
+  } catch(_) {}
+
+  // Adjust limits per signal level
+  const visMaxDaily  = Math.min(maxDaily,        MAX_DAILY_BY_SIGNAL[signalLevel]  ?? maxDaily);
+  const visMaxWeekly = Math.min(maxWeekly,       MAX_WEEKLY_BY_SIGNAL[signalLevel] ?? maxWeekly);
+
+  return {
+    visibleDaily:        (pools.daily        || []).slice(0, visMaxDaily),
+    visibleWeekly:       (pools.weekly       || []).slice(0, visMaxWeekly),
+    visiblePersonalized: (pools.personalized || []).slice(0, maxPersonalized),
+    visibleRecovery:     (pools.recovery     || []).slice(0, maxRecovery),
+    signalLevel,
+    reason,
+    // Meta
+    totalVisible:
+      Math.min((pools.daily  || []).length, visMaxDaily)  +
+      Math.min((pools.weekly || []).length, visMaxWeekly) +
+      Math.min((pools.personalized || []).length, maxPersonalized) +
+      Math.min((pools.recovery || []).length, maxRecovery),
+  };
+}
+
+// ══════════════════════════════════════════════════════════
 // Starter Quests — für Nutzer ohne Interessen
+// Neutral, kein Thema bevorzugt. Alle Richtungen offen.
 // ══════════════════════════════════════════════════════════
 export function generateStarterQuests(preferredLength = "medium") {
   const xpScale = LENGTH_SCALE[preferredLength] || 1.0;
-  return [
+
+  const dailyPool = [
     {
       id: "starter_focus",
-      title: "25 Min. Fokus-Session",
-      desc:  "Setze dich hin und arbeite 25 Minuten ohne Ablenkung an etwas Wichtigem.",
+      title: "System Focus",
+      desc:  "Arbeite 15 Minuten konzentriert an etwas Wichtigem — kein Handy, keine Ablenkung.",
       xp: Math.round(25 * xpScale), stat: "END", statPts: 0,
       type: "daily", actionType: "action",
       cat: "discipline", domain: "discipline",
@@ -485,8 +620,8 @@ export function generateStarterQuests(preferredLength = "medium") {
     },
     {
       id: "starter_move",
-      title: "20 Min. Körper aktivieren",
-      desc:  "Laufen, Dehnen, Gym oder Spaziergang — irgendetwas Aktives.",
+      title: "Body Activation",
+      desc:  "Bewege dich 20 Minuten bewusst — Laufen, Gym, Dehnen, Spazieren. Alles zählt.",
       xp: Math.round(22 * xpScale), stat: "VIT", statPts: 0,
       type: "daily", actionType: "action",
       cat: "cardio", domain: "body",
@@ -494,46 +629,117 @@ export function generateStarterQuests(preferredLength = "medium") {
       reason: "System Starter Quest",
     },
     {
-      id: "starter_learn",
-      title: "20 Min. Knowledge Intake",
-      desc:  "Ein Thema das dich interessiert — Podcast, Buch, Artikel oder Tutorial.",
-      xp: Math.round(22 * xpScale), stat: "INT", statPts: 0,
-      type: "daily", actionType: "action",
-      cat: "uni", domain: "mind",
-      path: "scholar", personalized: false, source: "starter",
-      reason: "System Starter Quest",
-    },
-    {
-      id: "starter_order",
-      title: "5 Min. Environment Clear",
-      desc:  "Schreibtisch, Zimmer, digitale Ablage — einen Bereich aufräumen.",
-      xp: Math.round(15 * xpScale), stat: "END", statPts: 0,
+      id: "starter_env",
+      title: "Environment Reset",
+      desc:  "Bringe einen Bereich 10 Minuten in Ordnung — Schreibtisch, Zimmer oder digitale Ablage.",
+      xp: Math.round(18 * xpScale), stat: "END", statPts: 0,
       type: "daily", actionType: "action",
       cat: "discipline", domain: "home",
       path: "guardian", personalized: false, source: "starter",
       reason: "System Starter Quest",
     },
     {
-      id: "starter_social",
-      title: "Social Link pflegen",
-      desc:  "Eine Freundschaft oder Beziehung aktiv pflegen — nicht warten.",
-      xp: Math.round(18 * xpScale), stat: "CHA", statPts: 0,
+      id: "starter_skill",
+      title: "Skill Spark",
+      desc:  "Übe 10 Minuten eine Fähigkeit die dir wichtig ist — irgendetwas, das dich weiterbringt.",
+      xp: Math.round(22 * xpScale), stat: "INT", statPts: 0,
       type: "daily", actionType: "action",
-      cat: "social", domain: "social",
-      path: "charmer", personalized: false, source: "starter",
+      cat: "mind", domain: "mind",
+      path: "scholar", personalized: false, source: "starter",
+      reason: "System Starter Quest",
+    },
+    {
+      id: "starter_objective",
+      title: "Objective Step",
+      desc:  "Mache einen kleinen, konkreten Fortschritt an einem deiner Ziele.",
+      xp: Math.round(20 * xpScale), stat: "END", statPts: 0,
+      type: "daily", actionType: "action",
+      cat: "discipline", domain: "discipline",
+      path: "strategist", personalized: false, source: "starter",
+      reason: "System Starter Quest",
+    },
+    {
+      id: "starter_recovery",
+      title: "Recovery Protocol",
+      desc:  "Plane oder mache 10 Minuten Regeneration — Schlaf, Pause, Atemübung oder Spaziergang.",
+      xp: Math.round(15 * xpScale), stat: "VIT", statPts: 0,
+      type: "daily", actionType: "action",
+      cat: "recovery", domain: "recovery",
+      path: "monk", personalized: false, source: "starter",
       reason: "System Starter Quest",
     },
     {
       id: "starter_reflect",
-      title: "5 Min. System Reflection",
-      desc:  "Was lief heute gut? Was möchte ich morgen anders machen?",
+      title: "Reflection Log",
+      desc:  "Notiere kurz was du heute verbessert hast oder morgen besser machen willst.",
       xp: Math.round(15 * xpScale), stat: "END", statPts: 0,
       type: "daily", actionType: "reflection",
       cat: "discipline", domain: "discipline",
       path: "monk", personalized: false, source: "starter",
       reason: "System Starter Quest",
     },
+    {
+      id: "starter_discipline",
+      title: "Discipline Check",
+      desc:  "Schließe eine bewusst aufgeschobene Kleinaufgabe heute noch ab.",
+      xp: Math.round(20 * xpScale), stat: "END", statPts: 0,
+      type: "daily", actionType: "action",
+      cat: "discipline", domain: "discipline",
+      path: "guardian", personalized: false, source: "starter",
+      reason: "System Starter Quest",
+    },
   ];
+
+  // Wähle 5 der 8 täglichen Starter-Quests — immer die ersten 5 (stabil)
+  const selectedDaily = dailyPool.slice(0, 5);
+
+  const weeklyPool = [
+    {
+      id: "starter_w_focus",
+      title: "Weekly Focus Order",
+      desc:  "Schließe diese Woche 3 Fokus-Sessions ab — je 15 Minuten ohne Ablenkung.",
+      xp: Math.round(110 * xpScale), stat: "END", statPts: 0,
+      type: "weekly", actionType: "action",
+      cat: "discipline", domain: "discipline",
+      path: "strategist", personalized: false, source: "starter",
+      reason: "System Starter Weekly",
+    },
+    {
+      id: "starter_w_body",
+      title: "Body Foundation",
+      desc:  "Schließe diese Woche 2 Bewegungs-Sessions ab — Gym, Laufen oder aktive Bewegung.",
+      xp: Math.round(120 * xpScale), stat: "VIT", statPts: 0,
+      type: "weekly", actionType: "action",
+      cat: "body", domain: "body",
+      path: "runner", personalized: false, source: "starter",
+      reason: "System Starter Weekly",
+    },
+    {
+      id: "starter_w_skill",
+      title: "Skill Foundation",
+      desc:  "Übe eine Fähigkeit an mindestens 2 Tagen diese Woche — was auch immer dich interessiert.",
+      xp: Math.round(130 * xpScale), stat: "INT", statPts: 0,
+      type: "weekly", actionType: "action",
+      cat: "mind", domain: "mind",
+      path: "scholar", personalized: false, source: "starter",
+      reason: "System Starter Weekly",
+    },
+    {
+      id: "starter_w_review",
+      title: "System Review",
+      desc:  "Führe ein kurzes Wochenreview durch — was lief gut, was möchte ich verbessern?",
+      xp: Math.round(90 * xpScale), stat: "END", statPts: 0,
+      type: "weekly", actionType: "reflection",
+      cat: "discipline", domain: "discipline",
+      path: "monk", personalized: false, source: "starter",
+      reason: "System Starter Weekly",
+    },
+  ];
+
+  // Zeige 2 wöchentliche Starter-Quests
+  const selectedWeekly = weeklyPool.slice(0, 2);
+
+  return [...selectedDaily, ...selectedWeekly];
 }
 
 // ══════════════════════════════════════════════════════════

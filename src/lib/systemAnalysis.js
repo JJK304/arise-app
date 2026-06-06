@@ -1,10 +1,13 @@
 // ============================================================
-// SYSTEM ANALYSIS — Prompt 15
+// SYSTEM ANALYSIS — Prompt 15 + Etappe 4 (Signal-System integriert)
 // Analysiert Verhalten, Goals, Preferences, Affinities und
 // Weekly Reviews lokal. Keine externe API.
 // Berücksichtigt: History, Goals, Affinities, Preferences,
 //   Balance Areas, Inaktivität, Rank-Phase, Weekly Reviews.
 // ============================================================
+
+import { getTopSignalPaths, derivePathAffinityFromProgress, getSignalSummary } from "./signals.js";
+
 
 const NEGLECT_THRESHOLD_DAYS = 5;
 const MIN_HISTORY = 5;
@@ -23,6 +26,9 @@ const DOMAIN_TO_PATH = {
   home:            "guardian",
   recovery:        "monk",
   adventure:       "explorer",
+  leadership:      "leader",
+  service:         "healer",
+  spirituality:    "monk",
   // Legacy
   strength:        "fighter",
   cardio:          "runner",
@@ -75,6 +81,7 @@ function countByPath(history) {
     fighter:0, runner:0, scholar:0, engineer:0,
     artisan:0, charmer:0, strategist:0, guardian:0,
     merchant:0, creator:0, monk:0, explorer:0,
+    leader:0, healer:0,
   };
   for (const e of history) {
     const pathId = e.path || DOMAIN_TO_PATH[e.domain] || DOMAIN_TO_PATH[e.cat];
@@ -125,6 +132,16 @@ export function analyzeSystem(
     currentStreak = 0,
     gateProgress  = {},
   } = context;
+
+  // Reconstruct full state object for signal system
+  const state_obj = {
+    questHistory,
+    progressLogs: context.progressLogs || [],
+    goals,
+    player: { affinities, preferences },
+    stats:  context.stats || {},
+    gateProgress,
+  };
 
   const result = {
     hasData:               false,
@@ -309,6 +326,29 @@ export function analyzeSystem(
     }
   }
 
+  // ── Signal-System integrieren ──
+  try {
+    const signalSummary = getSignalSummary(state_obj);
+    result.signalSummary    = signalSummary;
+    result.topSignalPaths   = signalSummary.topPaths;
+    result.signalStatus     = signalSummary.statusMessage;
+
+    // Signal-basierte Path-Empfehlung überschreibt History-basierte wenn stärker
+    if (signalSummary.dominantPath && signalSummary.dominantPath.level >= 2) {
+      result.suggestedMainPath = signalSummary.dominantPath.pathId;
+      if (signalSummary.topPaths[1]?.level >= 1) {
+        result.suggestedSecondaryPath = signalSummary.topPaths[1].pathId;
+      }
+      // Update message with signal reason
+      const mainName = PATHS_LABELS[result.suggestedMainPath] || result.suggestedMainPath;
+      const reason   = signalSummary.dominantPath.reason;
+      result.suggestedMessage = `Signal erkannt: ${mainName}. ${reason}.`;
+      result.systemMessage    = result.suggestedMessage;
+    }
+  } catch(_) {
+    // Signal system non-critical — fail silently
+  }
+
   return result;
 }
 
@@ -317,5 +357,6 @@ const PATHS_LABELS = {
   fighter: "Fighter", runner: "Runner", scholar: "Scholar", engineer: "Engineer",
   artisan: "Artisan", charmer: "Charmer", strategist: "Strategist", guardian: "Guardian",
   merchant: "Merchant", creator: "Creator", monk: "Monk", explorer: "Explorer",
+  leader: "Leader", healer: "Healer",
   shadow: "Shadow Monarch",
 };

@@ -517,6 +517,177 @@ export const QUEST_TEMPLATES = [
     baseXp: 40, actionType: "action",
     variables: { duration: [20, 35, 50] },
   },
+
+  // ════════════════════════════════════════════════════════
+  // LEADER — Führung, Verantwortung, Entscheidung
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_leader_decision",
+    titleTemplate: "Entscheidung treffen und kommunizieren",
+    descTemplate:  "Eine offene Entscheidung klar treffen — und dabei stehen. Keine Aufschübe.",
+    type: "daily", domain: "social",
+    paths: ["leader", "strategist"],
+    baseXp: 30, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_leader_help",
+    titleTemplate: "Jemanden aktiv unterstützen",
+    descTemplate:  "Jemandem helfen der Richtung oder Unterstützung braucht — ohne Gegenleistung.",
+    type: "daily", domain: "social",
+    paths: ["leader", "healer"],
+    baseXp: 28, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_leader_feedback",
+    titleTemplate: "Ehrliches Feedback geben",
+    descTemplate:  "Konstruktives Feedback formulieren und aussprechen — nicht nur Lob.",
+    type: "daily", domain: "social",
+    paths: ["leader", "charmer"],
+    baseXp: 25, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_leader_initiative",
+    titleTemplate: "Initiative ergreifen",
+    descTemplate:  "In einer Gruppe oder Situation als Erster handeln — nicht auf andere warten.",
+    type: "daily", domain: "social",
+    paths: ["leader", "explorer"],
+    baseXp: 27, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_leader_coaching",
+    titleTemplate: "{duration} Min. Coaching-Gespräch",
+    descTemplate:  "Jemandem durch Fragen helfen selbst die Lösung zu finden — nicht Lösungen vorgeben.",
+    type: "weekly", domain: "social",
+    paths: ["leader", "healer"],
+    baseXp: 55, actionType: "action",
+    variables: { duration: [20, 30, 45] },
+  },
+  {
+    id: "tpl_leader_reflect",
+    titleTemplate: "Führungsreflexion",
+    descTemplate:  "Was lief gut? Wo habe ich Einfluss ausgeübt? Wo habe ich Verantwortung vermieden?",
+    type: "weekly", domain: "social",
+    paths: ["leader", "strategist"],
+    baseXp: 45, actionType: "reflection",
+    variables: {},
+  },
+
+  // ════════════════════════════════════════════════════════
+  // HEALER — Regeneration, Empathie, Fürsorge, Stabilität
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_healer_listen",
+    titleTemplate: "Aktiv zuhören",
+    descTemplate:  "Mit jemandem sprechen ohne Ratschläge zu geben — nur zuhören und präsent sein.",
+    type: "daily", domain: "recovery",
+    paths: ["healer", "leader"],
+    baseXp: 24, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_healer_selfcare",
+    titleTemplate: "{duration} Min. bewusste Selbstfürsorge",
+    descTemplate:  "Etwas tun das dir gut tut — Bewegung, Ruhe, Essen, Pflege. Kein Schuldgefühl.",
+    type: "daily", domain: "recovery",
+    paths: ["healer", "monk"],
+    baseXp: 22, actionType: "action",
+    variables: { duration: [15, 25, 40] },
+  },
+  {
+    id: "tpl_healer_checkin",
+    titleTemplate: "Mentales Check-in",
+    descTemplate:  "Wie geht es dir wirklich? Ehrliche Bestandsaufnahme — Energie, Stimmung, Stress.",
+    type: "daily", domain: "recovery",
+    paths: ["healer", "monk"],
+    baseXp: 20, actionType: "reflection",
+    variables: {},
+  },
+  {
+    id: "tpl_healer_support",
+    titleTemplate: "Person aktiv unterstützen",
+    descTemplate:  "Jemandem durch eine schwierige Situation helfen — praktisch oder emotional.",
+    type: "daily", domain: "recovery",
+    paths: ["healer", "guardian"],
+    baseXp: 28, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_healer_boundaries",
+    titleTemplate: "Grenze setzen",
+    descTemplate:  "Eine klare Grenze kommunizieren — was du brauchst, was nicht geht. Respektvoll.",
+    type: "weekly", domain: "recovery",
+    paths: ["healer", "strategist"],
+    baseXp: 45, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_healer_recovery_plan",
+    titleTemplate: "Recovery-Plan für die Woche",
+    descTemplate:  "Wann regenerierst du dich diese Woche? Konkrete Zeiten planen und einhalten.",
+    type: "weekly", domain: "recovery",
+    paths: ["healer", "monk"],
+    baseXp: 50, actionType: "action",
+    variables: {},
+  },
+
+  // ════════════════════════════════════════════════════════
+  // FIGHTER — mehr Tiefe: Kraft + Technik + Form
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_fighter_form",
+    titleTemplate: "{duration} Min. Technik / Form üben",
+    descTemplate:  "Saubere Ausführung ist Fortschritt. Bewegungsqualität vor Gewicht oder Wiederholungen.",
+    type: "daily", domain: "body",
+    paths: ["fighter", "runner"],
+    baseXp: 30, actionType: "training",
+    variables: { duration: [15, 25, 40] },
+  },
+  {
+    id: "tpl_fighter_perf_log",
+    titleTemplate: "Trainings-Log eintragen",
+    descTemplate:  "Gewicht, Wiederholungen, Strecke oder Zeit notieren — Fortschritt entsteht durch Messung.",
+    type: "daily", domain: "body",
+    paths: ["fighter", "runner"],
+    baseXp: 18, actionType: "metric",
+    variables: {},
+  },
+  {
+    id: "tpl_fighter_weekly",
+    titleTemplate: "Trainingsplan diese Woche einhalten",
+    descTemplate:  "Alle geplanten Einheiten abschließen — keine Ausnahmen ohne Grund.",
+    type: "weekly", domain: "body",
+    paths: ["fighter"],
+    baseXp: 80, actionType: "action",
+    variables: {},
+  },
+
+  // ════════════════════════════════════════════════════════
+  // SCHOLAR — Reduce dominant count, improve quality
+  // (existing tpl_statistik_aufgaben + tpl_ki_recherche
+  //  already covered; new: cross-domain learning)
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_scholar_teach",
+    titleTemplate: "Konzept jemandem erklären",
+    descTemplate:  "Erkläre etwas das du gelernt hast — laut, schriftlich oder einem Freund.",
+    type: "weekly", domain: "mind",
+    paths: ["scholar", "leader"],
+    baseXp: 55, actionType: "action",
+    variables: {},
+  },
+  {
+    id: "tpl_scholar_notes_review",
+    titleTemplate: "Notizen strukturieren und reviewen",
+    descTemplate:  "Alte Notizen durchgehen, zusammenfassen, offene Fragen identifizieren.",
+    type: "weekly", domain: "mind",
+    paths: ["scholar", "strategist"],
+    baseXp: 45, actionType: "reflection",
+    variables: {},
+  },
 ];
 
 // ── Legacy-Compat: INTEREST_TOPICS wird noch von altem Code genutzt ──

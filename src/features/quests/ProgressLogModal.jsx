@@ -7,9 +7,11 @@ import { getLogFields, METRIC_LABELS, canLogWithBonus } from "../../lib/progress
 export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss, progressLogs }) {
   if (!quest) return null;
 
-  const fields = getLogFields(quest);
+  let fields;
+  try { fields = getLogFields(quest); } 
+  catch(_) { fields = { metrics: ["duration"], notesLabel: "Notiz (optional)", notesRequired: false }; }
   const isReflection = quest.actionType === "reflection";
-  const bonus = canLogWithBonus(progressLogs, quest.id);
+  const bonus = canLogWithBonus(progressLogs || [], quest.id);
   const xpHint = bonus ? "5–15" : "0";
 
   return (
@@ -21,7 +23,7 @@ export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss
         {/* Header */}
         <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
           <div>
-            <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#8b5cf666",marginBottom:3 }}>PROGRESS ARCHIVE</div>
+            <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#8b5cf666",marginBottom:3 }}>SYSTEM RECORD</div>
             <div style={{ fontSize:"0.88rem",color:"#e2e8f0",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{quest.title}</div>
           </div>
           <button onClick={onDismiss}
@@ -74,7 +76,7 @@ export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss
         <div style={{ display:"flex",gap:8 }}>
           <button onClick={() => onSave(quest, logForm)}
             style={{ flex:1,background:"rgba(139,92,246,0.15)",border:"1px solid #8b5cf644",color:"#8b5cf6",borderRadius:9,padding:"11px",fontSize:"0.78rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.06em" }}>
-            ◈ SAVE LOG ENTRY
+            ◈ ARCHIVE PROGRESS
           </button>
           <button onClick={onDismiss}
             style={{ background:"transparent",border:"1px solid rgba(148,163,184,0.15)",color:"#64748b",borderRadius:9,padding:"11px 14px",fontSize:"0.78rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>

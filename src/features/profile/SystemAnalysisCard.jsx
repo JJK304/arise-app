@@ -5,6 +5,7 @@
 // ============================================================
 import { PATHS } from "../../data/paths.js";
 import { canUnlockShadow } from "../../data/paths.js";
+import { getNextPathMilestone } from "../../data/gates.js";
 
 export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState, showNotif }) {
   const affinities      = state.player?.affinities || {};
@@ -30,8 +31,30 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
           {msg || "Complete more quests for the system to recognize your path."}
         </div>
 
-        {/* Dominant Paths */}
-        {sysAnalysis.dominantPaths.length > 0 && (
+        {/* Signal Paths — from signal system */}
+        {(sysAnalysis.topSignalPaths || []).length > 0 ? (
+          <div style={{ marginBottom: sysAnalysis.balanceHints.length>0||showSuggestion ? 8 : 0 }}>
+            <div style={{ fontSize:"0.5rem",letterSpacing:"0.12em",color:"#00ffff44",marginBottom:4 }}>SIGNAL DETECTED</div>
+            <div style={{ display:"flex",gap:5,flexWrap:"wrap" }}>
+              {(sysAnalysis.topSignalPaths || []).slice(0,4).map(sp => {
+                const p = PATHS[sp.pathId];
+                const levelLabel = ["—","WEAK","ACTIVE","STRONG"][sp.level] || "—";
+                const levelColor = ["#64748b","#64748b","#f59e0b","#22c55e"][sp.level] || "#64748b";
+                return (
+                  <div key={sp.pathId} title={sp.reason} style={{ background:`${p?.color}10`,border:`1px solid ${p?.color}${sp.level >= 2 ? "40" : "1a"}`,borderRadius:20,padding:"3px 9px",display:"flex",alignItems:"center",gap:4 }}>
+                    <span style={{ fontSize:"0.6rem",color:p?.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{p?.icon} {p?.name}</span>
+                    <span style={{ fontSize:"0.48rem",color:levelColor,fontFamily:"'Orbitron',sans-serif",fontWeight:700 }}>{levelLabel}</span>
+                  </div>
+                );
+              })}
+            </div>
+            {sysAnalysis.topSignalPaths?.[0]?.reason && (
+              <div style={{ fontSize:"0.58rem",color:"#64748b",marginTop:4 }}>
+                {sysAnalysis.topSignalPaths[0].reason}
+              </div>
+            )}
+          </div>
+        ) : sysAnalysis.dominantPaths?.length > 0 ? (
           <div style={{ display:"flex",gap:5,flexWrap:"wrap",marginBottom:sysAnalysis.balanceHints.length>0||showSuggestion?8:0 }}>
             {sysAnalysis.dominantPaths.map(pathId => {
               const p = PATHS[pathId];
@@ -43,7 +66,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
               );
             })}
           </div>
-        )}
+        ) : null}
 
         {/* Balance Hints */}
         {sysAnalysis.balanceHints.length > 0 && (
@@ -79,6 +102,31 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
             )}
           </div>
         )}
+
+        {/* Next Path Milestone */}
+        {(() => {
+          const dominantPath = sysAnalysis?.topSignalPaths?.[0]?.pathId ||
+                               sysAnalysis?.suggestedMainPath ||
+                               state.player?.mainPath;
+          const signalLv = sysAnalysis?.topSignalPaths?.[0]?.level || 0;
+          if (!dominantPath) return null;
+          try {
+            const milestone = getNextPathMilestone(dominantPath, state, signalLv);
+            if (!milestone) return null;
+            const p = PATHS[dominantPath];
+            return (
+              <div style={{ marginTop:8,background:`${p?.color}08`,border:`1px solid ${p?.color}1a`,borderRadius:8,padding:"8px 11px" }}>
+                <div style={{ fontSize:"0.5rem",letterSpacing:"0.12em",color:`${p?.color}88`,marginBottom:3 }}>NEXT MILESTONE</div>
+                <div style={{ fontSize:"0.68rem",color:"#cbd5e1",lineHeight:1.4 }}>
+                  {p?.icon} {milestone.label}
+                </div>
+                {milestone.specific && (
+                  <div style={{ fontSize:"0.54rem",color:"#64748b",marginTop:2 }}>Spezifisch für {p?.name}</div>
+                )}
+              </div>
+            );
+          } catch(_) { return null; }
+        })()}
 
         {/* Shadow */}
         {shadowUnlockable && (

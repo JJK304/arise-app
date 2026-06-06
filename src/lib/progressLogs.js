@@ -108,52 +108,15 @@ export function getRecentLogs(progressLogs, n = 10) {
 /**
  * Gibt Felder zurück die für einen bestimmten Quest-Typ relevant sind.
  * Steuert was im Log-Modal angezeigt wird.
+ * Abgedeckte Domains: body, mind, craft, creativity, recovery,
+ *   social, finance, career, home, discipline, adventure
  */
 export function getLogFields(quest) {
   const domain  = quest?.domain || quest?.cat || "";
   const aType   = quest?.actionType || "";
+  const path    = quest?.path || "";
 
-  // Fitness / Körper
-  if (domain === "body" || ["strength","cardio"].includes(domain)) {
-    return {
-      metrics: ["duration","reps","weight","sets","distance","energy"],
-      notesLabel: "Wie lief es?",
-      notesRequired: false,
-    };
-  }
-  // Lernen / Studium
-  if (domain === "mind" || domain === "uni") {
-    return {
-      metrics: ["duration","tasksCompleted","understanding"],
-      notesLabel: "Was gelernt? Was war schwer?",
-      notesRequired: aType === "reflection",
-    };
-  }
-  // Projekt / Craft
-  if (domain === "craft" || aType === "project") {
-    return {
-      metrics: ["duration","progressPercent"],
-      notesLabel: "Was gebaut? Nächster Schritt?",
-      notesRequired: false,
-    };
-  }
-  // Recovery
-  if (domain === "recovery" || aType === "recovery" || quest?.recovery) {
-    return {
-      metrics: ["mood","energy","stress","sleepQuality"],
-      notesLabel: "Was hat geholfen?",
-      notesRequired: false,
-    };
-  }
-  // Kreativität
-  if (domain === "creativity") {
-    return {
-      metrics: ["duration","progressPercent"],
-      notesLabel: "Was erstellt? Wie fühlst du dich damit?",
-      notesRequired: false,
-    };
-  }
-  // Reflexion
+  // Reflexion (höchste Priorität — überschreibt Domain-Checks)
   if (aType === "reflection") {
     return {
       metrics: ["mood","energy"],
@@ -161,6 +124,111 @@ export function getLogFields(quest) {
       notesRequired: true,
     };
   }
+
+  // Metric Quest
+  if (aType === "metric") {
+    return {
+      metrics: ["duration","tasksCompleted","progressPercent"],
+      notesLabel: "Was gemessen? Was dokumentiert?",
+      notesRequired: false,
+    };
+  }
+
+  // Fitness / Körper
+  if (domain === "body" || ["strength","cardio"].includes(domain) ||
+      ["fighter","runner"].includes(path)) {
+    return {
+      metrics: ["duration","reps","weight","sets","distance","energy"],
+      notesLabel: "Wie lief es? Technik, Energie, Fortschritt?",
+      notesRequired: false,
+    };
+  }
+
+  // Lernen / Wissen
+  if (domain === "mind" || domain === "uni" ||
+      path === "scholar" || aType === "deep_work") {
+    return {
+      metrics: ["duration","tasksCompleted","understanding"],
+      notesLabel: "Was gelernt? Was war schwer? Nächster Schritt?",
+      notesRequired: aType === "reflection",
+    };
+  }
+
+  // Craft / Technik / Projekt
+  if (domain === "craft" || aType === "project" ||
+      ["engineer","artisan"].includes(path)) {
+    return {
+      metrics: ["duration","progressPercent"],
+      notesLabel: "Was gebaut? Was debuggt? Nächster Schritt?",
+      notesRequired: false,
+    };
+  }
+
+  // Recovery / Healer
+  if (domain === "recovery" || aType === "recovery" ||
+      ["monk","healer"].includes(path) || quest?.recovery) {
+    return {
+      metrics: ["mood","energy","stress","sleepQuality"],
+      notesLabel: "Was hat geholfen? Wie geht es dir?",
+      notesRequired: false,
+    };
+  }
+
+  // Kreativität / Creator
+  if (domain === "creativity" || ["creator","artisan"].includes(path)) {
+    return {
+      metrics: ["duration","progressPercent"],
+      notesLabel: "Was erstellt? Wie bist du damit? Feedback?",
+      notesRequired: false,
+    };
+  }
+
+  // Social / Charmer / Leader
+  if (domain === "social" || domain === "appearance" ||
+      ["charmer","leader"].includes(path)) {
+    return {
+      metrics: ["duration","energy"],
+      notesLabel: "Situation, Reaktion, Reflexion?",
+      notesRequired: aType === "reflection",
+    };
+  }
+
+  // Finance / Career / Merchant
+  if (domain === "finance" || domain === "career" || path === "merchant") {
+    return {
+      metrics: ["tasksCompleted","progressPercent"],
+      notesLabel: "Was erledigt? Nächster Schritt? Betrag optional?",
+      notesRequired: false,
+    };
+  }
+
+  // Home / Guardian
+  if (domain === "home" || path === "guardian") {
+    return {
+      metrics: ["duration","tasksCompleted"],
+      notesLabel: "Welcher Bereich? Was erledigt? Nächster Schritt?",
+      notesRequired: false,
+    };
+  }
+
+  // Discipline / Strategist
+  if (domain === "discipline" || ["strategist"].includes(path)) {
+    return {
+      metrics: ["tasksCompleted","duration"],
+      notesLabel: "Was abgeschlossen? Was für morgen?",
+      notesRequired: false,
+    };
+  }
+
+  // Adventure / Explorer
+  if (domain === "adventure" || path === "explorer") {
+    return {
+      metrics: ["duration","energy"],
+      notesLabel: "Was erlebt? Was hat sich verändert?",
+      notesRequired: false,
+    };
+  }
+
   // Default
   return {
     metrics: ["duration"],
@@ -173,16 +241,18 @@ export function getLogFields(quest) {
  * Label-Map für Metric-Felder im UI.
  */
 export const METRIC_LABELS = {
-  duration:        { label: "Dauer (Min.)", icon: "⏱️",  type: "number", min: 1,   max: 300  },
-  reps:            { label: "Wdh.",         icon: "🔁",  type: "number", min: 1,   max: 500  },
-  weight:          { label: "Gewicht (kg)", icon: "⚖️",  type: "number", min: 0,   max: 500  },
-  sets:            { label: "Sätze",        icon: "📊",  type: "number", min: 1,   max: 20   },
-  distance:        { label: "Distanz (km)", icon: "📏",  type: "number", min: 0.1, max: 200  },
-  tasksCompleted:  { label: "Aufgaben",     icon: "✅",  type: "number", min: 0,   max: 100  },
-  understanding:   { label: "Verständnis",  icon: "🧠",  type: "range",  min: 1,   max: 5    },
-  mood:            { label: "Stimmung",     icon: "😊",  type: "range",  min: 1,   max: 5    },
-  energy:          { label: "Energie",      icon: "⚡",  type: "range",  min: 1,   max: 5    },
-  stress:          { label: "Stress",       icon: "🌊",  type: "range",  min: 1,   max: 5    },
-  sleepQuality:    { label: "Schlaf",       icon: "😴",  type: "range",  min: 1,   max: 5    },
-  progressPercent: { label: "Fortschritt%", icon: "📈",  type: "number", min: 0,   max: 100  },
+  duration:        { label: "Dauer (Min.)",  icon: "⏱️",  type: "number", min: 1,   max: 300  },
+  reps:            { label: "Wdh.",          icon: "🔁",  type: "number", min: 1,   max: 500  },
+  weight:          { label: "Gewicht (kg)",  icon: "⚖️",  type: "number", min: 0,   max: 500  },
+  sets:            { label: "Sätze",         icon: "📊",  type: "number", min: 1,   max: 20   },
+  distance:        { label: "Distanz (km)",  icon: "📏",  type: "number", min: 0.1, max: 200  },
+  tasksCompleted:  { label: "Aufgaben ✓",    icon: "✅",  type: "number", min: 0,   max: 100  },
+  understanding:   { label: "Verständnis",   icon: "🧠",  type: "range",  min: 1,   max: 5    },
+  mood:            { label: "Stimmung",      icon: "😊",  type: "range",  min: 1,   max: 5    },
+  energy:          { label: "Energie",       icon: "⚡",  type: "range",  min: 1,   max: 5    },
+  stress:          { label: "Stress",        icon: "🌊",  type: "range",  min: 1,   max: 5    },
+  sleepQuality:    { label: "Schlaf",        icon: "😴",  type: "range",  min: 1,   max: 5    },
+  progressPercent: { label: "Fortschritt %", icon: "📈",  type: "number", min: 0,   max: 100  },
+  confidence:      { label: "Selbstsicherheit", icon: "💪", type: "range", min: 1, max: 5    },
+  nextStep:        { label: "Nächster Schritt",  icon: "➡️", type: "text",  min: 0, max: 0     },
 };

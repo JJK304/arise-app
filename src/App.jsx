@@ -28,13 +28,14 @@ import {
 } from "./lib/history.js";
 import { useCountUp } from "./lib/useCountUp.js";
 import { migrateState, makeHistoryEntry } from "./lib/migration.js";
-import { generatePersonalizedQuests, generateStarterQuests, getNextBestQuests } from "./lib/questGenerator.js";
+import { generatePersonalizedQuests, generateStarterQuests, getNextBestQuests, getVisibleContent } from "./lib/questGenerator.js";
 import { applyQuestCompletion, applyGateCompletion, canCompleteQuest } from "./lib/questCompletion.js";
 import { rotateQuestPool, canCompleteCustomQuest, calculateCustomQuestXpBounds } from "./lib/questRotation.js";
 import { createWeeklyReview, hasReviewThisWeek, getCurrentWeekReview, getWeekQuestStats, addWeeklyReview } from "./lib/weeklyReview.js";
 import { updateXpHistory } from "./lib/rewards.js";
 import { PreferencesSection } from "./features/settings/PreferencesSection.jsx";
 import { SystemAnalysisCard } from "./features/profile/SystemAnalysisCard.jsx";
+import { OnboardingModal } from "./features/profile/OnboardingModal.jsx";
 import { ProgressLogModal } from "./features/quests/ProgressLogModal.jsx";
 import { DEMO_PROFILES } from "./data/demoProfiles.js";
 import { analyzeSystem } from "./lib/systemAnalysis.js";
@@ -106,6 +107,7 @@ export default function AriseApp() {
   const [showReviewForm, setShowReviewForm] = useState(false);
   // Demo profiles
   const [showDemo, setShowDemo] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const notifRef = useRef(null);
   const achievRef = useRef(null);
   const feedbackRef = useRef(null);
@@ -124,6 +126,10 @@ export default function AriseApp() {
       }
       const b = await loadData("arise_body");
       if(b) setBodyEntries(b);
+      // Show onboarding on first start (no existing state)
+      if (!raw) {
+        setTimeout(() => setShowOnboarding(true), 2000);
+      }
       setTimeout(() => setShowSplash(false), 1800);
     })();
   }, []);
@@ -232,14 +238,39 @@ export default function AriseApp() {
   };
 
   // ── shouldPromptProgressLog ─────────────────────────────
-  // Nur bei bestimmten Quest-Typen Log-Modal zeigen.
-  // Normale Action-Quests: kein Modal, nur XP-Feedback.
+  // Log-Modal nur bei bestimmten Quest-Typen zeigen.
+  // Normale daily action-Quests: kein Modal — nur XP-Feedback.
+  //
+  // Modal erscheint bei:
+  //   requiresLog: true         → explizit markiert
+  //   actionType: reflection    → Reflexionsquests
+  //   actionType: metric        → Metrik-Quests
+  //   actionType: project       → Projekt-Quests
+  //   actionType: training      → Trainings-Quests (Body)
+  //   type: gate_step           → Gate-Schritte
+  //   trial: true               → Trials
+  //   suggestLog + goalProgress  → zielverknüpfte Quests mit Fortschritt
+  //
+  // Modal erscheint NICHT bei:
+  //   normalen daily action-Quests
+  //   starter quests
+  //   recovery quests (bereits eigener Flow)
   function shouldPromptProgressLog(quest, _state, feedback) {
     if (!quest) return false;
     if (quest.requiresLog) return true;
+    // Explicit action types that warrant a log
     if (["reflection", "metric", "project"].includes(quest.actionType)) return true;
+    // Training quests (body domain) — optional log with metrics
+    if (quest.actionType === "training" && quest.domain === "body") return true;
+    // Gate steps and trials
     if (quest.type === "gate_step") return true;
+    if (quest.trial) return true;
+    // Goal-linked quests where progress happened
     if (feedback?.goalProgress?.length > 0 && quest.suggestLog) return true;
+    // Starter and generic quests — no log
+    if (quest.source === "starter" || !quest.personalized) return false;
+    // Personalized quests with goal link
+    if (quest.goalId && quest.domain) return true;
     return false;
   }
 
@@ -276,12 +307,38 @@ export default function AriseApp() {
       feedbackRef.current = setTimeout(() => setNewTitles([]), 4500);
     }
 
+    // Build signal hint for feedback display
+    let signalHint = null;
+    try {
+      const challengePath = challenge.path;
+      if (challengePath && challengePath !== "shadow") {
+        const pathGainKeys = Object.keys(feedback.pathGains || {}).filter(k => k !== "shadow");
+        const topGainPath  = pathGainKeys.sort((a,b) => (feedback.pathGains[b]||0)-(feedback.pathGains[a]||0))[0];
+        const displayPath  = topGainPath || challengePath;
+        if (displayPath && PATHS[displayPath]) {
+          const affinityNow = (newState.player?.affinities?.[displayPath] || 0);
+          if (affinityNow > 0 && affinityNow % 5 === 0) {
+            signalHint = `${PATHS[displayPath].name} Signal +${affinityNow}`;
+          } else if (challenge.source === "starter" || !challenge.personalized) {
+            // no hint for generic starters
+          } else {
+            signalHint = `${PATHS[displayPath].icon} ${PATHS[displayPath].name} Signal aktiv`;
+          }
+        }
+      }
+      if (!signalHint && challenge.interestId) {
+        signalHint = `Interesse '${challenge.interestId}' Signal`;
+      }
+    } catch(_) {}
+
     setQuestFeedback({
-      xp:       feedback.xp,
-      statKey:  feedback.statKey,
-      statPts:  feedback.statPts,
-      pathGains:feedback.pathGains,
-      newTitles:feedback.newTitles,
+      xp:         feedback.xp,
+      statKey:    feedback.statKey,
+      statPts:    feedback.statPts,
+      pathGains:  feedback.pathGains,
+      newTitles:  feedback.newTitles,
+      signalHint,
+      type:       challenge.type || "daily",
     });
     clearTimeout(feedbackRef.current);
     feedbackRef.current = setTimeout(() => setQuestFeedback(null), 3000);
@@ -567,11 +624,15 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
   const prefs = state.player?.preferences || {};
   const hasInterests = (prefs.interests?.length || 0) > 0 || (prefs.activePaths?.length || 0) > 0;
   const questContext = {
-    goals:            state.goals       || [],
+    goals:            state.goals        || [],
     questHistory:     state.questHistory || [],
     affinities:       state.player?.affinities || {},
     currentStreak:    state.currentStreak || 0,
     neglectedDomains: [], // Wird nach sysAnalysis befüllt (unten)
+    // Signal system context
+    progressLogs:     Array.isArray(state.progressLogs) ? state.progressLogs : [],
+    stats:            state.stats        || {},
+    gateProgress:     state.gateProgress || {},
   };
   const personalizedQuests = hasInterests
     ? generatePersonalizedQuests(
@@ -592,6 +653,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
       level:         state.level         || 1,
       currentStreak: state.currentStreak || 0,
       gateProgress:  state.gateProgress  || {},
+      progressLogs:  Array.isArray(state.progressLogs)  ? state.progressLogs  : [],
+      stats:         state.stats         || {},
     }
   );
 
@@ -621,9 +684,20 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
     recovery:     recoveryQuests,
   }, rotationContext);
 
+  // Apply visible content limits based on signal level
+  const _visState = {
+    questHistory: Array.isArray(state.questHistory) ? state.questHistory : [],
+    progressLogs: Array.isArray(state.progressLogs) ? state.progressLogs : [],
+    goals:        Array.isArray(state.goals)        ? state.goals        : [],
+    player:       state.player || {},
+    stats:        state.stats  || {},
+    gateProgress: state.gateProgress || {},
+  };
+  const visibleContent = getVisibleContent(rotated, _visState);
+
   // Rotate daily/weekly from DB — custom + milestones always shown fully
-  const rotatedDaily   = rotated.daily;
-  const rotatedWeekly  = rotated.weekly;
+  const rotatedDaily   = visibleContent.visibleDaily;
+  const rotatedWeekly  = visibleContent.visibleWeekly;
 
   let displayChallenges = [
     ...rotatedDaily,
@@ -635,8 +709,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
   ];
   if(showTodayOnly) displayChallenges = displayChallenges.filter(c=>c.type==="daily"&&!isQuestDone(c));
   if(filterType!=="all") displayChallenges = displayChallenges.filter(c=>c.type===filterType);
-  if(filterType==="personalized") displayChallenges = rotated.personalized;
-  if(filterType==="recovery")     displayChallenges = rotated.recovery;
+  if(filterType==="personalized") displayChallenges = visibleContent.visiblePersonalized || rotated.personalized;
+  if(filterType==="recovery")     displayChallenges = visibleContent.visibleRecovery     || rotated.recovery;
   if(filterType==="goal-linked")  {
     const activeGoalIds  = new Set((state.goals||[]).filter(g=>g.status==="active").map(g=>g.id));
     const activeGoalDomains = new Set((state.goals||[]).filter(g=>g.status==="active").map(g=>g.domain).filter(Boolean));
@@ -733,39 +807,95 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
         </div>
       )}
 
-      {/* Quest Feedback Moment */}
+      {/* Quest Feedback Moment — QUEST CLEARED */}
       {questFeedback && (
         <div style={{ position:"fixed",bottom:90,left:"50%",transform:"translateX(-50%)",zIndex:497,animation:"slideDown 0.25s ease",pointerEvents:"none" }}>
-          <div style={{ background:"rgba(0,0,0,0.94)",border:"1px solid #22c55e33",borderRadius:12,padding:"12px 18px",display:"flex",flexDirection:"column",gap:5,minWidth:190 }}>
-            {/* QUEST CLEARED label */}
-            <div style={{ fontSize:"0.44rem",letterSpacing:"0.3em",color:"#22c55e88",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,marginBottom:1 }}>QUEST CLEARED</div>
-            {/* XP */}
-            <div style={{ display:"flex",alignItems:"center",gap:7 }}>
-              <span style={{ color:"#22c55e",fontSize:"1rem",fontFamily:"'Orbitron',sans-serif",fontWeight:900 }}>+{questFeedback.xp} XP</span>
+          <div style={{ background:"rgba(2,2,14,0.97)",border:"1px solid #22c55e28",borderRadius:14,padding:"13px 18px",display:"flex",flexDirection:"column",gap:4,minWidth:200,maxWidth:280,boxShadow:"0 4px 32px rgba(0,0,0,0.7)" }}>
+
+            {/* Header row */}
+            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:2 }}>
+              <div style={{ fontSize:"0.42rem",letterSpacing:"0.35em",color:"#22c55e66",fontFamily:"'Orbitron',sans-serif",fontWeight:700 }}>
+                QUEST CLEARED
+              </div>
+              {questFeedback.type === "milestone" && (
+                <span style={{ fontSize:"0.48rem",color:"#f59e0b88",background:"rgba(245,158,11,0.1)",border:"1px solid #f59e0b22",borderRadius:4,padding:"1px 6px",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.1em" }}>
+                  MILESTONE
+                </span>
+              )}
             </div>
-            {/* Stat up */}
-            {questFeedback.statKey && (
-              <div style={{ fontSize:"0.7rem",color:"#f59e0b" }}>
-                ★ +{questFeedback.statPts} {questFeedback.statKey} stat
+
+            {/* XP — prominent */}
+            <div style={{ display:"flex",alignItems:"baseline",gap:6 }}>
+              <span style={{ color:"#22c55e",fontSize:"1.2rem",fontFamily:"'Orbitron',sans-serif",fontWeight:900,lineHeight:1 }}>
+                +{questFeedback.xp}
+              </span>
+              <span style={{ color:"#22c55e66",fontSize:"0.58rem",fontFamily:"'Orbitron',sans-serif",fontWeight:700,letterSpacing:"0.1em" }}>
+                XP
+              </span>
+            </div>
+
+            {/* Stat gain */}
+            {questFeedback.statKey && questFeedback.statPts > 0 && (
+              <div style={{ display:"flex",alignItems:"center",gap:5,fontSize:"0.68rem" }}>
+                <span style={{ color:"#f59e0b",fontWeight:700 }}>+{questFeedback.statPts}</span>
+                <span style={{ color:"#f59e0b88" }}>{questFeedback.statKey}</span>
               </div>
             )}
-            {/* Path affinity gains */}
-            {Object.entries(questFeedback.pathGains || {}).map(([pathId, pts]) => (
-              <div key={pathId} style={{ fontSize:"0.66rem",color:PATHS[pathId]?.color||"#aaa" }}>
-                {PATHS[pathId]?.icon} {PATHS[pathId]?.name} Affinity +{pts}
-              </div>
-            ))}
+
+            {/* Path affinity gains — only top 2, only if significant */}
+            {Object.entries(questFeedback.pathGains || {})
+              .filter(([k, v]) => k !== "shadow" && v > 0)
+              .slice(0, 2)
+              .map(([pathId, pts]) => {
+                const p = PATHS[pathId];
+                if (!p) return null;
+                return (
+                  <div key={pathId} style={{ display:"flex",alignItems:"center",gap:4,fontSize:"0.62rem" }}>
+                    <span style={{ color:p.color }}>{p.icon}</span>
+                    <span style={{ color:`${p.color}cc` }}>{p.name}</span>
+                    <span style={{ color:`${p.color}77` }}>+{pts}</span>
+                  </div>
+                );
+              })
+            }
+
             {/* New title hint */}
-            {(questFeedback.newTitles || []).map(id => {
+            {(questFeedback.newTitles || []).slice(0,1).map(id => {
               const t = TITLES.find(tt => tt.id === id);
               return t ? (
-                <div key={id} style={{ fontSize:"0.66rem",color:t.color }}>
-                  {t.icon} Titel: {t.title}
+                <div key={id} style={{ display:"flex",alignItems:"center",gap:4,fontSize:"0.62rem",color:t.color,borderTop:"1px solid rgba(255,255,255,0.05)",paddingTop:3,marginTop:1 }}>
+                  <span>{t.icon}</span>
+                  <span>Titel: {t.title}</span>
                 </div>
               ) : null;
             })}
+
+            {/* Signal hint — compact */}
+            {questFeedback.signalHint && (
+              <div style={{ fontSize:"0.58rem",color:"#00ffff66",fontFamily:"'Rajdhani',sans-serif",letterSpacing:"0.04em",borderTop:"1px solid rgba(255,255,255,0.04)",paddingTop:3,marginTop:1 }}>
+                ◈ {questFeedback.signalHint}
+              </div>
+            )}
+
           </div>
         </div>
+      )}
+
+      {/* ── ONBOARDING MODAL ── */}
+      {showOnboarding && (
+        <OnboardingModal
+          rc={rc}
+          onDismiss={() => setShowOnboarding(false)}
+          onSetInterests={() => {
+            setShowOnboarding(false);
+            setView("profile");
+            // Scroll to interests section via slight delay
+            setTimeout(() => {
+              const el = document.getElementById("interests-section");
+              if (el) el.scrollIntoView({ behavior: "smooth" });
+            }, 300);
+          }}
+        />
       )}
 
       {/* ── PROGRESS LOG MODAL ── */}
@@ -1019,7 +1149,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             {/* ── XP HISTORY ── */}
             {(state.xpHistory||[]).length >= 2 && (
               <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:12,padding:"12px",marginBottom:12 }}>
-                <MiniChart data={state.xpHistory.map(h=>({v:h.v,l:h.l}))} color={rc.primary} height={52} label="AWAKENING PROGRESS — XP PRO WOCHE"/>
+                <MiniChart data={(state.xpHistory||[]).map(h=>({v:h.v,l:h.l}))} color={rc.primary} height={52} label="AWAKENING PROGRESS — XP PRO WOCHE"/>
               </div>
             )}
 
@@ -1933,6 +2063,14 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
 
               {collapsedSections["settings"]===false && (
                 <div style={{ display:"flex",flexDirection:"column",gap:8,animation:"sectionOpen 0.2s ease" }}>
+
+                  {/* Onboarding wieder anzeigen */}
+                  <button
+                    onClick={() => setShowOnboarding(true)}
+                    style={{ background:"rgba(0,255,255,0.06)",border:"1px solid #00ffff22",color:"#00ffff88",borderRadius:10,padding:"11px",fontSize:"0.76rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer",letterSpacing:"0.06em",display:"flex",alignItems:"center",justifyContent:"center",gap:8 }}
+                  >
+                    ◈ ONBOARDING ANZEIGEN
+                  </button>
 
                   {/* Vibration toggle */}
                   <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.1)",borderRadius:11,padding:"14px 16px",display:"flex",justifyContent:"space-between",alignItems:"center" }}>

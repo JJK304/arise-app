@@ -142,6 +142,29 @@ export const PATHS = {
     desc:    "Die Welt ist deine Lehrerin. Jede neue Erfahrung macht dich größer.",
   },
 
+  leader: {
+    id:      "leader",
+    name:    "Leader",
+    icon:    "🦁",
+    color:   "#d97706",
+    focus:   "Führung, Entscheidungen, Verantwortung, Einfluss",
+    domains: ["social", "career", "discipline"],
+    stats:   ["CHA", "END", "SOC"],
+    cats:    ["social", "discipline"],
+    desc:    "Du führst nicht durch Macht, sondern durch Beispiel. Andere wachsen in deiner Nähe.",
+  },
+  healer: {
+    id:      "healer",
+    name:    "Healer",
+    icon:    "💚",
+    color:   "#34d399",
+    focus:   "Unterstützung, Empathie, mentale Gesundheit, Regeneration",
+    domains: ["recovery", "social", "home"],
+    stats:   ["VIT", "CHA", "SOC"],
+    cats:    ["health", "social"],
+    desc:    "Du regenerierst dich und andere. Stabilität, Fürsorge und emotionale Stärke sind deine Gaben.",
+  },
+
   // ── Shadow: Sonderklasse — nicht als Startklasse wählbar ─
   shadow: {
     id:              "shadow",

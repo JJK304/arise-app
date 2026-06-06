@@ -74,10 +74,10 @@ export const EXTRA_WEEKLIES = {
     { id:"xw_e_4", title:"5x täglich Dankbarkeitsnotiz diese Woche",  desc:"5 von 7 Tagen: 3 Dinge aufschreiben die gut liefen.",             xp:105, stat:"VIT", statPts:0, type:"weekly", cat:"health",     domain:"recovery" },
     { id:"xw_e_5", title:"Budget der Woche aufschreiben",              desc:"Einnahmen vs. Ausgaben — erste Bestandsaufnahme.",                xp:85,  stat:"INT", statPts:0, type:"weekly", cat:"discipline", domain:"finance" },
     { id:"xw_e_6", title:"2 Social Challenges diese Woche",            desc:"Zweimal aktiv auf andere zugehen oder ein Treffen organisieren.", xp:115, stat:"CHA", statPts:0, type:"weekly", cat:"social",     domain:"social" },
-    { id:"xw_e_7", title:"Lernziel für nächste Woche setzen",          desc:"Konkret: was willst du lernen, wie viel, bis wann.",              xp:80,  stat:"INT", statPts:0, type:"weekly", cat:"uni",        domain:"mind" },
+    { id:"xw_e_7", title:"Lernziel für nächste Woche setzen",          desc:"Konkret: was willst du lernen, wie viel, bis wann.",              xp:80,  stat:"INT", statPts:0, type:"weekly", cat:"mind",       domain:"mind" },
   ],
   D: [
-    { id:"xw_d_1", title:"3 Lernsessions à 45 Min.",                   desc:"3x 45 Min. fokussiertes Lernen — kein Multitasking.",             xp:180, stat:"INT", statPts:0, type:"weekly", cat:"uni",        domain:"mind" },
+    { id:"xw_d_1", title:"3 Lernsessions à 45 Min.",                   desc:"3x 45 Min. fokussiertes Lernen — kein Multitasking.",             xp:180, stat:"INT", statPts:0, type:"weekly", cat:"mind",       domain:"mind" },
     { id:"xw_d_2", title:"2 Trainingseinheiten + Recovery-Tag",        desc:"2x Training, 1x bewusste Erholung mit Stretching/Spa.",          xp:165, stat:"END", statPts:0, type:"weekly", cat:"strength",   domain:"body" },
     { id:"xw_d_3", title:"Projekt 1 Schritt voranbringen",             desc:"Coding, Elektronik, kreatives Projekt — einen Schritt weiter.",   xp:150, stat:"CRA", statPts:0, type:"weekly", cat:"skill_tech", domain:"craft" },
     { id:"xw_d_4", title:"1 Social Challenge + Reflexion",             desc:"Einmal auf jemanden zugehen und reflektieren wie es war.",        xp:130, stat:"CHA", statPts:0, type:"weekly", cat:"social",     domain:"social" },
@@ -93,7 +93,7 @@ export const EXTRA_WEEKLIES = {
 export const EXTRA_MILESTONES = {
   E: [
     // Learning streaks
-    { id:"xm_e_learn1",  title:"10 Lernsessions abgeschlossen",        desc:"10 fokussierte Lernblöcke — alle gezählt. Kein Halbherziges.",   xp:400, stat:"INT", statPts:5,  type:"milestone", cat:"uni",           domain:"mind" },
+    { id:"xm_e_learn1",  title:"10 Lernsessions abgeschlossen",        desc:"10 fokussierte Lernblöcke — alle gezählt. Kein Halbherziges.",   xp:400, stat:"INT", statPts:5,  type:"milestone", cat:"mind",          domain:"mind" },
     { id:"xm_e_learn2",  title:"Erster Wochenplan eingehalten",        desc:"Eine komplette Woche nach Plan — alle Key-Tasks erledigt.",       xp:350, stat:"END", statPts:5,  type:"milestone", cat:"discipline",    domain:"discipline" },
     { id:"xm_e_log1",    title:"10 Progress Logs gespeichert",         desc:"10 Mal Fortschritt dokumentiert. Daten > Eindrücke.",             xp:300, stat:"INT", statPts:4,  type:"milestone", cat:"discipline",    domain:"discipline" },
     // Social / Appearance
@@ -111,7 +111,7 @@ export const EXTRA_MILESTONES = {
   ],
   D: [
     // Learning milestones
-    { id:"xm_d_learn1",  title:"25 Lernsessions abgeschlossen",        desc:"25 fokussierte Deep-Work-Blöcke. Du bist kein Anfänger mehr.",   xp:600, stat:"INT", statPts:7,  type:"milestone", cat:"uni",           domain:"mind" },
+    { id:"xm_d_learn1",  title:"25 Lernsessions abgeschlossen",        desc:"25 fokussierte Deep-Work-Blöcke. Du bist kein Anfänger mehr.",   xp:600, stat:"INT", statPts:7,  type:"milestone", cat:"mind",          domain:"mind" },
     { id:"xm_d_streak1", title:"14-Tage-Streak",                       desc:"14 Tage am Stück mindestens eine Quest erledigt.",                xp:550, stat:"END", statPts:8,  type:"milestone", cat:"discipline",    domain:"discipline" },
     // Project milestones
     { id:"xm_d_proj1",   title:"Erstes echtes Projekt abgeschlossen",  desc:"Coding-, Elektronik-, Handwerk- oder Kreativprojekt — fertig.",  xp:700, stat:"CRA", statPts:9,  type:"milestone", cat:"skill_tech",    domain:"craft" },
@@ -127,7 +127,7 @@ export const EXTRA_MILESTONES = {
     { id:"xm_d_cre1",    title:"3 kreative Werke fertiggestellt",      desc:"Nicht gut sein — fertig sein. 3 abgeschlossene Werke.",           xp:600, stat:"CRE", statPts:7,  type:"milestone", cat:"skill_creative", domain:"creativity" },
   ],
   C: [
-    { id:"xm_c_learn1",  title:"50 Lernsessions abgeschlossen",        desc:"50 fokussierte Sessions. Du hast dir eine Disziplin aufgebaut.",  xp:800, stat:"INT", statPts:10, type:"milestone", cat:"uni",           domain:"mind" },
+    { id:"xm_c_learn1",  title:"50 Lernsessions abgeschlossen",        desc:"50 fokussierte Sessions. Du hast dir eine Disziplin aufgebaut.",  xp:800, stat:"INT", statPts:10, type:"milestone", cat:"mind",          domain:"mind" },
     { id:"xm_c_streak1", title:"30-Tage-Streak",                       desc:"30 Tage am Stück. Kein einziger Aussetzer.",                      xp:750, stat:"END", statPts:10, type:"milestone", cat:"discipline",    domain:"discipline" },
     { id:"xm_c_goal1",   title:"Erstes Ziel vollständig abgeschlossen", desc:"Ein Goal von 0 auf 100% — vollständig durchgezogen.",            xp:900, stat:"END", statPts:12, type:"milestone", cat:"discipline",    domain:"discipline" },
     { id:"xm_c_gate1",   title:"Drei Gates abgeschlossen",             desc:"Drei Prüfungen gemeistert. Du bist kein Anfänger mehr.",          xp:800, stat:"END", statPts:10, type:"milestone", cat:"discipline",    domain:"discipline" },

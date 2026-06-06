@@ -40,6 +40,8 @@ export const defaultState = (name) => ({
       creator:    0,
       monk:       0,
       explorer:   0,
+      leader:     0,
+      healer:     0,
       shadow:     0,
     },
     preferences: {

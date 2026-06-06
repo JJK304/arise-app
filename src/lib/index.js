@@ -20,3 +20,5 @@ export * from "./questCompletion.js";
 export * from "./weeklyReview.js";
 // Prompt 19:
 export { clampCustomQuestXp, clampXp, suggestXp } from "./rewards.js";
+// Etappe 4 — Signal System:
+export * from "./signals.js";

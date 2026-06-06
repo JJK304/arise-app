@@ -23,6 +23,8 @@ const DEFAULT_AFFINITIES = {
   creator:    0,
   monk:       0,
   explorer:   0,
+  leader:     0,
+  healer:     0,
   shadow:     0,
 };
 
@@ -172,7 +174,8 @@ export function migrateState(raw) {
   if (!Array.isArray(s.goals)) s.goals = [];
 
   // ── Weekly Reviews (neu) ──
-  if (!Array.isArray(s.weeklyReviews)) s.weeklyReviews = [];
+  if (!Array.isArray(s.weeklyReviews))       s.weeklyReviews       = [];
+  if (!Array.isArray(s.completedMilestones)) s.completedMilestones = [];
 
   return s;
 }

@@ -552,6 +552,604 @@ export const GATES = [
   },
 
   // ════════════════════════════════════════════════════════
+  // LEADER
+  // ════════════════════════════════════════════════════════
+  {
+    id: "gate_leader_1", tier: 1,
+    title: "Leader Gate I — First Decision",
+    path: "leader", domain: "social", icon: "🦁", color: "#d97706",
+    unlockCondition: null,
+    steps: [
+      "Eine Entscheidung treffen die andere betrifft — und dazu stehen",
+      "In einer Gruppe oder Situation Initiative ergreifen",
+      "Jemandem helfen der eine Führung oder Richtung braucht",
+      "Reflexion: Was macht gute Führung aus? (Notiz schreiben)",
+    ],
+    reward: { xp: 360, affinity: { leader: 10 }, title: "first_decision", titleLabel: "First Decision" },
+  },
+  {
+    id: "gate_leader_2", tier: 2,
+    title: "Leader Gate II — The Motivator",
+    path: "leader", domain: "social", icon: "🦁", color: "#d97706",
+    unlockCondition: "gate_leader_1",
+    steps: [
+      "Ein Projekt oder eine Gruppe über 2+ Wochen aktiv leiten",
+      "Jemanden in einer Fähigkeit oder Entscheidung unterstützen und coachen",
+      "Konflikt in einer Gruppe ansprechen und lösen",
+      "Eigene Führungsstärken und Schwächen ehrlich analysieren",
+      "Feedback von anderen über deinen Führungsstil einholen",
+    ],
+    reward: { xp: 700, affinity: { leader: 15 }, title: "the_motivator", titleLabel: "The Motivator" },
+  },
+  {
+    id: "gate_leader_3", tier: 3,
+    title: "Leader Gate III — Architect of People",
+    path: "leader", domain: "social", icon: "🦁", color: "#d97706",
+    unlockCondition: "gate_leader_2",
+    steps: [
+      "Langfristiges Projekt oder Vorhaben mit anderen erfolgreich abschließen",
+      "Einen Mentee oder Person über mindestens 1 Monat begleiten",
+      "Eigene Führungsphilosophie in 10 Sätzen formulieren",
+      "Schwierige Entscheidung treffen und Verantwortung dafür übernehmen",
+      "Wirkung dokumentieren: Was hat sich durch deine Führung verändert?",
+    ],
+    reward: { xp: 1100, affinity: { leader: 20 }, title: "architect_people", titleLabel: "Architect of People" },
+  },
+
+  // ════════════════════════════════════════════════════════
+  // HEALER
+  // ════════════════════════════════════════════════════════
+  {
+    id: "gate_healer_1", tier: 1,
+    title: "Healer Gate I — First Aid",
+    path: "healer", domain: "recovery", icon: "💚", color: "#34d399",
+    unlockCondition: null,
+    steps: [
+      "7 Tage eigene Schlafqualität tracken und einen Verbesserungsschritt umsetzen",
+      "Jemandem aktiv zuhören ohne Ratschläge zu geben — nur präsent sein",
+      "Eigenen Stresslevel analysieren und einen Auslöser identifizieren",
+    ],
+    reward: { xp: 330, affinity: { healer: 10 }, title: "first_aid", titleLabel: "First Aid" },
+  },
+  {
+    id: "gate_healer_2", tier: 2,
+    title: "Healer Gate II — Steady Support",
+    path: "healer", domain: "recovery", icon: "💚", color: "#34d399",
+    unlockCondition: "gate_healer_1",
+    steps: [
+      "14 Tage tägliche Recovery-Routine einhalten (Schlaf, Atemübung oder Bewegung)",
+      "Eine Person aktiv über längere Zeit emotional oder praktisch unterstützen",
+      "Eigene Grenzen klar kommunizieren — in einem schwierigen Gespräch",
+      "Erholung planen: bewusst Ruhezeit in Wochenstruktur integrieren",
+      "Reflexion: Wie geht es dir wirklich? Ehrliche Bestandsaufnahme.",
+    ],
+    reward: { xp: 680, affinity: { healer: 15 }, title: "steady_support", titleLabel: "Steady Support" },
+  },
+  {
+    id: "gate_healer_3", tier: 3,
+    title: "Healer Gate III — The Resilient",
+    path: "healer", domain: "recovery", icon: "💚", color: "#34d399",
+    unlockCondition: "gate_healer_2",
+    steps: [
+      "30-Tage Recovery-Protokoll: täglich mindestens eine bewusste Erholungseinheit",
+      "Jemanden durch eine schwierige Phase begleiten und danach gemeinsam reflektieren",
+      "Eigene mentale Stärken und Schwachstellen dokumentieren",
+      "Resilienz-Skill entwickeln: Stressor über 2 Wochen aktiv anders bewältigen",
+      "Persönliches Wohlbefindensystem aufbauen und schriftlich festhalten",
+    ],
+    reward: { xp: 1000, affinity: { healer: 20 }, title: "the_resilient", titleLabel: "The Resilient" },
+  },
+
+  // ════════════════════════════════════════════════════════
+  // DISCOVERY GATES — Allgemeine Einstiegs-Gates
+  // Erscheinen früh für jeden Nutzer.
+  // Öffnen Branches und zeigen mögliche Spezialisierungen.
+  // ════════════════════════════════════════════════════════
+  {
+    id: "gate_discovery_focus", tier: 1,
+    title: "Focus Gate I — First Deep Work",
+    path: "strategist", domain: "discipline", icon: "🎯", color: "#0ea5e9",
+    unlockCondition: null,
+    discovery: true,
+    steps: [
+      "3 Fokus-Sessions à 25 Minuten in einer Woche abschließen",
+      "Ablenkungen für eine Session vollständig eliminieren",
+      "Reflexion: Welche Themen ziehen deine Aufmerksamkeit am stärksten?",
+    ],
+    reward: { xp: 280, affinity: { strategist: 6, scholar: 4 }, title: "focused_mind", titleLabel: "Focused Mind" },
+  },
+  {
+    id: "gate_discovery_body", tier: 1,
+    title: "Body Gate I — Activation Protocol",
+    path: "fighter", domain: "body", icon: "⚡", color: "#ef4444",
+    unlockCondition: null,
+    discovery: true,
+    steps: [
+      "5 Tage in Folge mindestens 20 Minuten körperlich aktiv sein",
+      "Einen Körperwert tracken (Gewicht, Liegestütze oder Laufstrecke)",
+      "Reflexion: Welche Art von Bewegung macht dir wirklich Spaß?",
+    ],
+    reward: { xp: 270, affinity: { fighter: 5, runner: 5 }, title: "body_awakened", titleLabel: "Body Awakened" },
+  },
+  {
+    id: "gate_discovery_creation", tier: 1,
+    title: "Creation Gate I — First Output",
+    path: "artisan", domain: "creativity", icon: "✨", color: "#a78bfa",
+    unlockCondition: null,
+    discovery: true,
+    steps: [
+      "Etwas fertig erstellen — egal wie klein (Skizze, Text, Song, Rezept, Code)",
+      "Das Ergebnis jemandem zeigen oder archivieren",
+      "Reflexion: Was möchtest du noch erschaffen?",
+    ],
+    reward: { xp: 260, affinity: { artisan: 5, creator: 5 }, title: "first_output", titleLabel: "First Output" },
+  },
+  {
+    id: "gate_discovery_social", tier: 1,
+    title: "Social Gate I — First Connection",
+    path: "charmer", domain: "social", icon: "🤝", color: "#ec4899",
+    unlockCondition: null,
+    discovery: true,
+    steps: [
+      "Mit einer Person ein echtes Gespräch führen (nicht nur Small Talk)",
+      "Jemandem aktiv helfen ohne Gegenleistung",
+      "Reflexion: Welche Arten von sozialer Energie liegen dir?",
+    ],
+    reward: { xp: 250, affinity: { charmer: 5, leader: 4 }, title: "first_connection", titleLabel: "First Connection" },
+  },
+  {
+    id: "gate_discovery_discipline", tier: 1,
+    title: "Discipline Gate I — System Start",
+    path: "guardian", domain: "discipline", icon: "🛡️", color: "#84cc16",
+    unlockCondition: null,
+    discovery: true,
+    steps: [
+      "7 Tage lang täglich eine kleine Routine einhalten",
+      "Einen Lebensbereich aufräumen oder strukturieren",
+      "Reflexion: Welche Gewohnheiten willst du aufbauen?",
+    ],
+    reward: { xp: 270, affinity: { guardian: 6, strategist: 4 }, title: "system_start", titleLabel: "System Start" },
+  },
+  {
+    id: "gate_discovery_recovery", tier: 1,
+    title: "Recovery Gate I — Rest Protocol",
+    path: "monk", domain: "recovery", icon: "💚", color: "#10b981",
+    unlockCondition: null,
+    discovery: true,
+    steps: [
+      "5 Tage bewusst auf Schlaf achten (feste Schlafenszeit)",
+      "Eine Entspannungs- oder Atemübung 3 Mal durchführen",
+      "Reflexion: Was raubt dir Energie? Was gibt dir Energie?",
+    ],
+    reward: { xp: 250, affinity: { monk: 6, healer: 4 }, title: "rest_protocol", titleLabel: "Rest Protocol" },
+  },
+  {
+    id: "gate_discovery_skill", tier: 1,
+    title: "Skill Gate I — First Dedication",
+    path: "scholar", domain: "mind", icon: "🔑", color: "#3b82f6",
+    unlockCondition: null,
+    discovery: true,
+    steps: [
+      "Eine Fähigkeit 7 Tage lang täglich üben (mind. 10 Min.)",
+      "Lernfortschritt notieren oder dokumentieren",
+      "Reflexion: Welche Fähigkeiten möchtest du wirklich meistern?",
+    ],
+    reward: { xp: 260, affinity: { scholar: 5, engineer: 3, artisan: 2 }, title: "first_dedication", titleLabel: "First Dedication" },
+  },
+
+    // ════════════════════════════════════════════════════════
+  // TRIALS — Echte Prüfungen mit Anwendungsnachweis
+  // trial: true  →  prüfen echte Fähigkeit, nicht Wiederholung
+  // Tier 1: Einstieg (1–3 Schritte, kurze Sessions)
+  // Tier 2: Anwendung (mehrere Sessions, Dokumentation)
+  // Tier 3: Ergebnis (messbarer Fortschritt, Reflexion)
+  // ════════════════════════════════════════════════════════
+
+  // ── Scholar Trials ───────────────────────────────────
+  {
+    id: "trial_scholar_1", tier: 1, trial: true,
+    title: "Scholar Trial I — Explain & Apply",
+    path: "scholar", domain: "mind", icon: "🧠", color: "#3b82f6",
+    unlockCondition: "gate_scholar_1",
+    steps: [
+      "Fokus-Session abschließen (min. 25 Min.) und Notizen erstellen",
+      "Ein Konzept aus dieser Session einem anderen erklären oder aufschreiben",
+      "Offene Fragen identifizieren und für nächste Session vormerken",
+    ],
+    reward: { xp: 500, affinity: { scholar: 8 }, title: "theory_applied", titleLabel: "Theory Applied" },
+  },
+  {
+    id: "trial_scholar_2", tier: 2, trial: true,
+    title: "Scholar Trial II — Deep Synthesis",
+    path: "scholar", domain: "mind", icon: "🧠", color: "#3b82f6",
+    unlockCondition: "trial_scholar_1",
+    steps: [
+      "5 Deep-Work-Sessions zu einem Thema (je 45+ Min.) abschließen",
+      "Gelerntes auf eine eigene Aufgabe oder Problem anwenden",
+      "Fehleranalyse: Was hat nicht funktioniert? Warum?",
+      "Zusammenfassung schreiben: Was kann ich jetzt, was ich vorher nicht konnte?",
+    ],
+    reward: { xp: 900, affinity: { scholar: 12 }, title: "deep_synthesis", titleLabel: "Deep Synthesis" },
+  },
+  {
+    id: "trial_scholar_3", tier: 3, trial: true,
+    title: "Scholar Trial III — Mastery Proof",
+    path: "scholar", domain: "mind", icon: "🧠", color: "#3b82f6",
+    unlockCondition: "trial_scholar_2",
+    steps: [
+      "Komplexes Thema von Grund auf selbst erarbeiten und verstehen",
+      "Erklärungsdokument erstellen (eigene Worte, keine Kopie)",
+      "Prüfungssimulation oder anspruchsvolle Aufgabe meistern",
+      "Reflexion: Was fehlt noch? Roadmap für nächste Stufe.",
+    ],
+    reward: { xp: 1500, affinity: { scholar: 18 }, title: "knowledge_proven", titleLabel: "Knowledge Proven" },
+  },
+
+  // ── Engineer Trials ───────────────────────────────────
+  {
+    id: "trial_engineer_1", tier: 1, trial: true,
+    title: "Engineer Trial I — Build & Debug",
+    path: "engineer", domain: "craft", icon: "🔧", color: "#f97316",
+    unlockCondition: "gate_engineer_1",
+    steps: [
+      "Problem definieren und Lösungsansatz skizzieren",
+      "Ersten funktionierenden Prototyp / Entwurf erstellen",
+      "Fehler finden und beheben — dokumentieren was nicht funktioniert hat",
+    ],
+    reward: { xp: 520, affinity: { engineer: 8 }, title: "first_build", titleLabel: "First Build" },
+  },
+  {
+    id: "trial_engineer_2", tier: 2, trial: true,
+    title: "Engineer Trial II — Prototype & Improve",
+    path: "engineer", domain: "craft", icon: "🔧", color: "#f97316",
+    unlockCondition: "trial_engineer_1",
+    steps: [
+      "Prototyp iterativ verbessern (min. 3 Iterationen)",
+      "Technisches Problem systematisch debuggen und lösen",
+      "Verbesserung testen und Ergebnis dokumentieren",
+      "Was würde ich beim nächsten Mal anders machen?",
+    ],
+    reward: { xp: 950, affinity: { engineer: 12 }, title: "iterative_builder", titleLabel: "Iterative Builder" },
+  },
+  {
+    id: "trial_engineer_3", tier: 3, trial: true,
+    title: "Engineer Trial III — Ship It",
+    path: "engineer", domain: "craft", icon: "🔧", color: "#f97316",
+    unlockCondition: "trial_engineer_2",
+    steps: [
+      "Funktionierendes Projekt vollständig abschließen",
+      "Projekt dokumentieren (README, Notizen oder Protokoll)",
+      "Anderen zeigen oder deployen — echter Output",
+      "Retrospektive: Was hat dieses Projekt dich gelehrt?",
+    ],
+    reward: { xp: 1600, affinity: { engineer: 18 }, title: "shipped", titleLabel: "Shipped" },
+  },
+
+  // ── Fighter Trials ─────────────────────────────────────
+  {
+    id: "trial_fighter_1", tier: 1, trial: true,
+    title: "Fighter Trial I — Form Check",
+    path: "fighter", domain: "body", icon: "⚔️", color: "#ef4444",
+    unlockCondition: "gate_fighter_1",
+    steps: [
+      "Training abschließen und Technik / Form dokumentieren",
+      "Mindestens eine Übung mit bewusstem Fokus auf Ausführung",
+      "Trainingslog: Gewicht, Wiederholungen, Energie-Level",
+    ],
+    reward: { xp: 480, affinity: { fighter: 8 }, title: "form_checked", titleLabel: "Form Checked" },
+  },
+  {
+    id: "trial_fighter_2", tier: 2, trial: true,
+    title: "Fighter Trial II — Performance Block",
+    path: "fighter", domain: "body", icon: "⚔️", color: "#ef4444",
+    unlockCondition: "trial_fighter_1",
+    steps: [
+      "3-Wochen Trainingsblock abschließen (min. 3 Einheiten/Woche)",
+      "Leistungswert tracken: Verbesserung messbar nachweisen",
+      "Recovery-Protokoll einhalten (Schlaf, Ernährung dokumentieren)",
+      "Körper-Feedback dokumentieren: Energie, Schmerzen, Fortschritt",
+    ],
+    reward: { xp: 900, affinity: { fighter: 12 }, title: "performance_block", titleLabel: "Performance Block" },
+  },
+  {
+    id: "trial_fighter_3", tier: 3, trial: true,
+    title: "Fighter Trial III — Warrior Standard",
+    path: "fighter", domain: "body", icon: "⚔️", color: "#ef4444",
+    unlockCondition: "trial_fighter_2",
+    steps: [
+      "Messbarer Leistungsfortschritt über 6 Wochen dokumentieren",
+      "Persönliche Bestleistung in einer Disziplin erreichen",
+      "Routine nachweislich konsistent: kein Aussetzer über 2 Wochen",
+      "Reflexion: Wie hat Training deinen Alltag verändert?",
+    ],
+    reward: { xp: 1600, affinity: { fighter: 18 }, title: "warrior_standard", titleLabel: "Warrior Standard" },
+  },
+
+  // ── Creator Trials ─────────────────────────────────────
+  {
+    id: "trial_creator_1", tier: 1, trial: true,
+    title: "Creator Trial I — Finish Something",
+    path: "creator", domain: "creativity", icon: "🎬", color: "#e879f9",
+    unlockCondition: "gate_creator_1",
+    steps: [
+      "Kleines Werk fertigstellen — ein Post, eine Skizze, ein Track, ein Video",
+      "Ergebnis zeigen oder veröffentlichen",
+      "Reflexion: Was würdest du beim nächsten Mal verbessern?",
+    ],
+    reward: { xp: 480, affinity: { creator: 8 }, title: "finished_creator", titleLabel: "Finished" },
+  },
+  {
+    id: "trial_creator_2", tier: 2, trial: true,
+    title: "Creator Trial II — Feedback Loop",
+    path: "creator", domain: "creativity", icon: "🎬", color: "#e879f9",
+    unlockCondition: "trial_creator_1",
+    steps: [
+      "Werk erstellen und echtes Feedback von außen einholen",
+      "Feedback einarbeiten und Werk verbessern",
+      "Begründen warum du Feedback angenommen oder abgelehnt hast",
+      "Zweites Werk fertigstellen und mit dem ersten vergleichen",
+    ],
+    reward: { xp: 900, affinity: { creator: 12 }, title: "feedback_loop", titleLabel: "Feedback Loop" },
+  },
+  {
+    id: "trial_creator_3", tier: 3, trial: true,
+    title: "Creator Trial III — Publish or Archive",
+    path: "creator", domain: "creativity", icon: "🎬", color: "#e879f9",
+    unlockCondition: "trial_creator_2",
+    steps: [
+      "Fertiges Werk veröffentlichen oder bewusst archivieren",
+      "Eigene kreative Stimme definieren: Was unterscheidet mich?",
+      "3 Werke abschließen die einen nachvollziehbaren Fortschritt zeigen",
+      "Portfolio-Eintrag oder Reflexion: Wer bin ich als Creator?",
+    ],
+    reward: { xp: 1600, affinity: { creator: 18 }, title: "published", titleLabel: "Published" },
+  },
+
+  // ── Merchant Trials ────────────────────────────────────
+  {
+    id: "trial_merchant_1", tier: 1, trial: true,
+    title: "Merchant Trial I — Map Your Finances",
+    path: "merchant", domain: "finance", icon: "💰", color: "#22c55e",
+    unlockCondition: "gate_merchant_1",
+    steps: [
+      "Alle Einnahmen und Ausgaben des letzten Monats aufschlüsseln",
+      "Karriere-Status ehrlich einschätzen: Wo stehe ich gerade?",
+      "Einen konkreten nächsten Schritt definieren (Finanzen oder Karriere)",
+    ],
+    reward: { xp: 480, affinity: { merchant: 8 }, title: "mapped_finances", titleLabel: "Mapped" },
+  },
+  {
+    id: "trial_merchant_2", tier: 2, trial: true,
+    title: "Merchant Trial II — Execute a Plan",
+    path: "merchant", domain: "finance", icon: "💰", color: "#22c55e",
+    unlockCondition: "trial_merchant_1",
+    steps: [
+      "4 Wochen Budget konsequent tracken und auswerten",
+      "Einen konkreten Karriere- oder Finanz-Schritt umsetzen",
+      "Netzwerk-Gespräch oder Verhandlung durchführen",
+      "Ergebnis dokumentieren und nächsten Schritt definieren",
+    ],
+    reward: { xp: 900, affinity: { merchant: 12 }, title: "plan_executed", titleLabel: "Plan Executed" },
+  },
+  {
+    id: "trial_merchant_3", tier: 3, trial: true,
+    title: "Merchant Trial III — Deal Closed",
+    path: "merchant", domain: "finance", icon: "💰", color: "#22c55e",
+    unlockCondition: "trial_merchant_2",
+    steps: [
+      "Großes Finanzziel erreicht oder Karriereschritt abgeschlossen",
+      "Nebenprojekt oder Investment aktiv und laufend",
+      "3-Monats-Rückblick: Was hat sich verändert?",
+      "Nächstes Jahresziel formulieren und Plan erstellen",
+    ],
+    reward: { xp: 1600, affinity: { merchant: 18 }, title: "deal_closed", titleLabel: "Deal Closed" },
+  },
+
+  // ── Charmer Trials ─────────────────────────────────────
+  {
+    id: "trial_charmer_1", tier: 1, trial: true,
+    title: "Charmer Trial I — Communicate & Reflect",
+    path: "charmer", domain: "social", icon: "👑", color: "#ec4899",
+    unlockCondition: "gate_charmer_1",
+    steps: [
+      "Drei echte Gespräche führen — bewusst mit Aufmerksamkeit",
+      "Körpersprache und Stimme in einem Gespräch beobachten",
+      "Reflexion: Was lief gut? Was wirkte unbequem?",
+    ],
+    reward: { xp: 460, affinity: { charmer: 8 }, title: "communicated", titleLabel: "Communicated" },
+  },
+  {
+    id: "trial_charmer_2", tier: 2, trial: true,
+    title: "Charmer Trial II — Presence Check",
+    path: "charmer", domain: "social", icon: "👑", color: "#ec4899",
+    unlockCondition: "trial_charmer_1",
+    steps: [
+      "5 soziale Situationen bewusst gestalten (nicht passiv mitmachen)",
+      "Eigenen Style oder Auftreten überdenken und eine Änderung umsetzen",
+      "Unbequeme soziale Situation gezielt angehen",
+      "Feedback: Wie wirke ich auf andere? (direkt fragen)",
+    ],
+    reward: { xp: 850, affinity: { charmer: 12 }, title: "presence_check", titleLabel: "Presence" },
+  },
+
+  // ── Monk Trials ────────────────────────────────────────
+  {
+    id: "trial_monk_1", tier: 1, trial: true,
+    title: "Monk Trial I — Recover & Stabilize",
+    path: "monk", domain: "recovery", icon: "🧘", color: "#10b981",
+    unlockCondition: "gate_monk_1",
+    steps: [
+      "7 Tage Schlafroutine einhalten und dokumentieren",
+      "Stressor identifizieren und einen gezielten Schritt dagegen unternehmen",
+      "Wöchentliche Recovery-Reflexion: Was hat mir Energie gegeben?",
+    ],
+    reward: { xp: 460, affinity: { monk: 8 }, title: "stabilized", titleLabel: "Stabilized" },
+  },
+  {
+    id: "trial_monk_2", tier: 2, trial: true,
+    title: "Monk Trial II — The Still Point",
+    path: "monk", domain: "recovery", icon: "🧘", color: "#10b981",
+    unlockCondition: "trial_monk_1",
+    steps: [
+      "14 Tage täglich meditieren oder Atemübung (min. 5 Min.)",
+      "Belastende Gewohnheit identifizieren und 2 Wochen aktiv reduzieren",
+      "Energie-Bilanz: Was kostet, was gibt? Konsequenz daraus ziehen.",
+      "Persönliche Lebensregeln formulieren (3–5 Sätze)",
+    ],
+    reward: { xp: 850, affinity: { monk: 12 }, title: "still_point", titleLabel: "Still Point" },
+  },
+
+  // ── Explorer Trials ────────────────────────────────────
+  {
+    id: "trial_explorer_1", tier: 1, trial: true,
+    title: "Explorer Trial I — Act Outside Comfort Zone",
+    path: "explorer", domain: "adventure", icon: "🌍", color: "#f59e0b",
+    unlockCondition: "gate_explorer_1",
+    steps: [
+      "Eine Aktivität tun die dir Unbehagen bereitet",
+      "Neue Person kennenlernen und echtes Gespräch führen",
+      "Erfahrung dokumentieren: Was hat sich nach dem Unbehagen verändert?",
+    ],
+    reward: { xp: 460, affinity: { explorer: 8 }, title: "comfort_broken", titleLabel: "Comfort Broken" },
+  },
+  {
+    id: "trial_explorer_2", tier: 2, trial: true,
+    title: "Explorer Trial II — The Expedition",
+    path: "explorer", domain: "adventure", icon: "🌍", color: "#f59e0b",
+    unlockCondition: "trial_explorer_1",
+    steps: [
+      "In einem Monat 3 neue Erfahrungen bewusst suchen",
+      "Solo-Ausflug oder Aktivität ohne gewohnte Begleitung",
+      "Erlebnislog führen: Was hat jede Erfahrung verändert?",
+      "Nächste große Komfortzone definieren und ersten Schritt planen",
+    ],
+    reward: { xp: 850, affinity: { explorer: 12 }, title: "expedition", titleLabel: "Expedition" },
+  },
+
+  // ── Leader Trials ──────────────────────────────────────
+  {
+    id: "trial_leader_1", tier: 1, trial: true,
+    title: "Leader Trial I — Decide & Guide",
+    path: "leader", domain: "social", icon: "🦁", color: "#d97706",
+    unlockCondition: "gate_leader_1",
+    steps: [
+      "Eine wichtige Entscheidung für andere treffen und begründen",
+      "Initiative ergreifen und Gruppe oder Situation aktiv gestalten",
+      "Reflexion: Wie hat die Entscheidung gewirkt?",
+    ],
+    reward: { xp: 480, affinity: { leader: 8 }, title: "decided_guided", titleLabel: "Decided" },
+  },
+  {
+    id: "trial_leader_2", tier: 2, trial: true,
+    title: "Leader Trial II — The Long Game",
+    path: "leader", domain: "social", icon: "🦁", color: "#d97706",
+    unlockCondition: "trial_leader_1",
+    steps: [
+      "Projekt oder Gruppe über 3+ Wochen aktiv führen",
+      "Jemanden coachen — Fragen stellen statt Lösungen geben",
+      "Schwieriges Gespräch führen (Feedback, Konflikt, Erwartung)",
+      "Führungsreflexion: Was hat sich durch deine Führung verändert?",
+    ],
+    reward: { xp: 900, affinity: { leader: 12 }, title: "long_game", titleLabel: "Long Game" },
+  },
+
+  // ── Healer Trials ──────────────────────────────────────
+  {
+    id: "trial_healer_1", tier: 1, trial: true,
+    title: "Healer Trial I — Support & Reflect",
+    path: "healer", domain: "recovery", icon: "💚", color: "#34d399",
+    unlockCondition: "gate_healer_1",
+    steps: [
+      "Person aktiv unterstützen und danach reflektieren",
+      "Eigene mentale Energie ehrlich einschätzen",
+      "Recovery-Routine 7 Tage einhalten und dokumentieren",
+    ],
+    reward: { xp: 460, affinity: { healer: 8 }, title: "supported", titleLabel: "Supported" },
+  },
+  {
+    id: "trial_healer_2", tier: 2, trial: true,
+    title: "Healer Trial II — Resilience Built",
+    path: "healer", domain: "recovery", icon: "💚", color: "#34d399",
+    unlockCondition: "trial_healer_1",
+    steps: [
+      "14 Tage tägliche Recovery-Routine ohne Aussetzer",
+      "Jemanden durch schwierige Phase begleiten und Reflexion schreiben",
+      "Eigene Belastungsgrenzen klar definieren und kommunizieren",
+      "Persönliches Wohlbefindensystem in 5 Punkten formulieren",
+    ],
+    reward: { xp: 850, affinity: { healer: 12 }, title: "resilience_built", titleLabel: "Resilience Built" },
+  },
+
+  // ── Artisan Trials ─────────────────────────────────────
+  {
+    id: "trial_artisan_1", tier: 1, trial: true,
+    title: "Artisan Trial I — First Craft",
+    path: "artisan", domain: "creativity", icon: "🎨", color: "#a78bfa",
+    unlockCondition: "gate_artisan_1",
+    steps: [
+      "Kleines handwerkliches oder kreatives Werk vollständig fertigstellen",
+      "Prozess dokumentieren (Fotos, Notizen oder kurze Beschreibung)",
+      "Selbsteinschätzung: Was kann ich, was will ich noch lernen?",
+    ],
+    reward: { xp: 480, affinity: { artisan: 8 }, title: "first_craft", titleLabel: "First Craft" },
+  },
+  {
+    id: "trial_artisan_2", tier: 2, trial: true,
+    title: "Artisan Trial II — Mastery of Medium",
+    path: "artisan", domain: "creativity", icon: "🎨", color: "#a78bfa",
+    unlockCondition: "trial_artisan_1",
+    steps: [
+      "Anspruchsvolleres Werk in gewähltem Medium fertigstellen",
+      "Technik bewusst verbessern: eine Schwäche gezielt angehen",
+      "Feedback einholen und reflektieren",
+      "Zweites Werk — sichtbarer Fortschritt zum ersten",
+    ],
+    reward: { xp: 900, affinity: { artisan: 12 }, title: "mastery_medium", titleLabel: "Mastery of Medium" },
+  },
+
+  // ── Runner Trials ──────────────────────────────────────
+  {
+    id: "trial_runner_1", tier: 1, trial: true,
+    title: "Runner Trial I — Distance Check",
+    path: "runner", domain: "body", icon: "⚡", color: "#f59e0b",
+    unlockCondition: "gate_runner_1",
+    steps: [
+      "3 Lauf-Sessions in einer Woche abschließen",
+      "Strecke oder Zeit dokumentieren",
+      "Reflexion: Wo liegt mein Limit? Was muss ich verbessern?",
+    ],
+    reward: { xp: 460, affinity: { runner: 8 }, title: "distance_checked", titleLabel: "Distance Checked" },
+  },
+
+  // ── Strategist Trials ──────────────────────────────────
+  {
+    id: "trial_strategist_1", tier: 1, trial: true,
+    title: "Strategist Trial I — Plan & Execute",
+    path: "strategist", domain: "discipline", icon: "♟️", color: "#0ea5e9",
+    unlockCondition: "gate_strategist_1",
+    steps: [
+      "Wochenplan erstellen und zu 80%+ einhalten",
+      "Tages-Review täglich über eine Woche durchführen",
+      "Eine Gewohnheit neu einführen und 7 Tage einhalten",
+    ],
+    reward: { xp: 480, affinity: { strategist: 8 }, title: "plan_executed_s", titleLabel: "Plan Executed" },
+  },
+
+  // ── Guardian Trials ────────────────────────────────────
+  {
+    id: "trial_guardian_1", tier: 1, trial: true,
+    title: "Guardian Trial I — Hold the Structure",
+    path: "guardian", domain: "home", icon: "🏠", color: "#84cc16",
+    unlockCondition: "gate_guardian_1",
+    steps: [
+      "14 Tage täglich aufräumen (< 10 Min. reichen)",
+      "Haushalt und Finanzen in einer Woche vollständig im Griff",
+      "Reflexion: Was brauche ich damit mein Umfeld funktioniert?",
+    ],
+    reward: { xp: 480, affinity: { guardian: 8 }, title: "structure_held", titleLabel: "Structure Held" },
+  },
+
+    // ════════════════════════════════════════════════════════
   // SHADOW — Nur nach Spezialvoraussetzungen freigeschaltet
   // ════════════════════════════════════════════════════════
   {
@@ -572,6 +1170,177 @@ export const GATES = [
 // ── Export Helpers ────────────────────────────────────────
 
 export const GATE_IDS = GATES.map(g => g.id);
+
+// ══════════════════════════════════════════════════════════
+// MASTERY MILESTONES
+// Langfristige Progression — werden aus State berechnet.
+// Jeder Path hat generische + spezifische Milestones.
+// Spezifische Milestones erscheinen erst mit Signalen.
+// ══════════════════════════════════════════════════════════
+
+// Generic milestones apply to every path
+const GENERIC_MILESTONES = [
+  { id: "m_quests_5",   label: "5 Quests in diesem Path abgeschlossen",   threshold: 5,   type: "quest_count" },
+  { id: "m_quests_10",  label: "10 Quests in diesem Path abgeschlossen",  threshold: 10,  type: "quest_count" },
+  { id: "m_quests_25",  label: "25 Quests in diesem Path abgeschlossen",  threshold: 25,  type: "quest_count" },
+  { id: "m_gate_1",     label: "Gate I abgeschlossen",                    threshold: 1,   type: "gate_tier",  tier: 1 },
+  { id: "m_gate_2",     label: "Gate II abgeschlossen",                   threshold: 1,   type: "gate_tier",  tier: 2 },
+  { id: "m_goal_1",     label: "Erstes Ziel in diesem Path abgeschlossen",threshold: 1,   type: "goal_count" },
+  { id: "m_logs_5",     label: "5 Progress Logs in diesem Path",          threshold: 5,   type: "log_count" },
+  { id: "m_logs_10",    label: "10 Progress Logs in diesem Path",         threshold: 10,  type: "log_count" },
+];
+
+// Path-specific milestones (appear after signal ≥ 2)
+export const PATH_MILESTONES = {
+  fighter: [
+    { id: "m_fighter_10train", label: "10 Trainingseinheiten abgeschlossen", threshold: 10, type: "quest_count" },
+    { id: "m_fighter_perf",    label: "Messbarer Leistungsfortschritt dokumentiert", threshold: 1, type: "log_with_metric" },
+    { id: "m_fighter_streak",  label: "14-Tage Training Streak", threshold: 14, type: "streak_domain", domain: "body" },
+  ],
+  runner: [
+    { id: "m_runner_10runs",   label: "10 Lauf-Sessions abgeschlossen", threshold: 10, type: "quest_count" },
+    { id: "m_runner_distance", label: "Streckenfortschritt dokumentiert", threshold: 1, type: "log_with_metric" },
+    { id: "m_runner_5km",      label: "5km ohne Stopp gelaufen", threshold: 1, type: "manual" },
+  ],
+  scholar: [
+    { id: "m_scholar_sessions",label: "25 Lernsessions abgeschlossen", threshold: 25, type: "quest_count" },
+    { id: "m_scholar_explain", label: "Konzept erklärt oder weitergegeben", threshold: 1, type: "manual" },
+    { id: "m_scholar_book",    label: "Buch oder Kurs vollständig abgeschlossen", threshold: 1, type: "manual" },
+  ],
+  engineer: [
+    { id: "m_eng_project",     label: "Erstes eigenes Projekt fertiggestellt", threshold: 1, type: "manual" },
+    { id: "m_eng_debug",       label: "Komplexes Problem gefunden und gelöst", threshold: 1, type: "manual" },
+    { id: "m_eng_docs",        label: "Projekt dokumentiert", threshold: 1, type: "log_count" },
+  ],
+  artisan: [
+    { id: "m_art_work",        label: "Erstes Werk abgeschlossen", threshold: 1, type: "manual" },
+    { id: "m_art_feedback",    label: "Feedback zu eigenem Werk eingeholt", threshold: 1, type: "manual" },
+    { id: "m_art_3logs",       label: "3 kreative Fortschritte dokumentiert", threshold: 3, type: "log_count" },
+  ],
+  creator: [
+    { id: "m_creator_post",    label: "Erstes Werk veröffentlicht oder geteilt", threshold: 1, type: "manual" },
+    { id: "m_creator_series",  label: "Content-Serie mit 3+ Teilen fertig", threshold: 1, type: "manual" },
+    { id: "m_creator_fb",      label: "Echtes Feedback von Außenstehenden", threshold: 1, type: "manual" },
+  ],
+  charmer: [
+    { id: "m_charmer_events",  label: "5 echte soziale Events / Gespräche", threshold: 5, type: "quest_count" },
+    { id: "m_charmer_comfort", label: "Sozial unbequeme Situation gemeistert", threshold: 1, type: "manual" },
+    { id: "m_charmer_style",   label: "Bewusste Style-Entscheidung umgesetzt", threshold: 1, type: "manual" },
+  ],
+  strategist: [
+    { id: "m_strat_plan",      label: "Wochenplan 4 Wochen eingehalten", threshold: 4, type: "streak_domain", domain: "discipline" },
+    { id: "m_strat_goal",      label: "Ziel mit Plan und Review abgeschlossen", threshold: 1, type: "goal_count" },
+    { id: "m_strat_review",    label: "4 Wochenreviews durchgeführt", threshold: 4, type: "log_count" },
+  ],
+  guardian: [
+    { id: "m_guard_order",     label: "30-Tage Ordnungsroutine eingehalten", threshold: 30, type: "streak_domain", domain: "home" },
+    { id: "m_guard_budget",    label: "Budget 4 Wochen getrackt", threshold: 4, type: "log_count" },
+    { id: "m_guard_emergency", label: "Notfall-Puffer angelegt", threshold: 1, type: "manual" },
+  ],
+  merchant: [
+    { id: "m_merch_budget",    label: "4 Wochen Budget konsequent geführt", threshold: 4, type: "log_count" },
+    { id: "m_merch_invest",    label: "Erste Investition oder Nebenprojekt gestartet", threshold: 1, type: "manual" },
+    { id: "m_merch_career",    label: "Karriereschritt aktiv umgesetzt", threshold: 1, type: "manual" },
+  ],
+  monk: [
+    { id: "m_monk_7rec",       label: "7 Recovery-Einheiten abgeschlossen", threshold: 7, type: "quest_count" },
+    { id: "m_monk_sleep",      label: "Schlafroutine 2 Wochen eingehalten", threshold: 14, type: "streak_domain", domain: "recovery" },
+    { id: "m_monk_detox",      label: "Digital Detox Weekend abgeschlossen", threshold: 1, type: "manual" },
+  ],
+  explorer: [
+    { id: "m_exp_5new",        label: "5 neue Orte oder Aktivitäten erlebt", threshold: 5, type: "quest_count" },
+    { id: "m_exp_solo",        label: "Solo-Aktivität außerhalb der Komfortzone", threshold: 1, type: "manual" },
+    { id: "m_exp_trip",        label: "Mehrtägige Reise oder Abenteuer absolviert", threshold: 1, type: "manual" },
+  ],
+  leader: [
+    { id: "m_lead_decision",   label: "3 wichtige Entscheidungen für andere getroffen", threshold: 3, type: "quest_count" },
+    { id: "m_lead_mentored",   label: "Jemanden über 1 Monat begleitet", threshold: 1, type: "manual" },
+    { id: "m_lead_conflict",   label: "Gruppenkonflikt angesprochen und gelöst", threshold: 1, type: "manual" },
+  ],
+  healer: [
+    { id: "m_heal_30routine",  label: "30-Tage Recovery-Protokoll abgeschlossen", threshold: 30, type: "streak_domain", domain: "recovery" },
+    { id: "m_heal_support",    label: "Person aktiv durch schwierige Phase begleitet", threshold: 1, type: "manual" },
+    { id: "m_heal_resilience", label: "Persönliches Wohlbefindensystem aufgebaut", threshold: 1, type: "manual" },
+  ],
+  shadow: [],
+};
+
+/**
+ * Gibt den nächsten relevanten Milestone für einen Path zurück.
+ * Nur wenn signal >= 2 werden path-spezifische Milestones gezeigt.
+ *
+ * @param {string} pathId
+ * @param {object} state     - vollständiger State
+ * @param {number} [signalLevel] - 0-3
+ */
+export function getNextPathMilestone(pathId, state, signalLevel = 0) {
+  const {
+    questHistory   = [],
+    progressLogs   = [],
+    goals          = [],
+    gateProgress   = {},
+    completedMilestones = [],
+  } = state;
+
+  const pathQuests = questHistory.filter(h =>
+    h.path === pathId || h.domain === (PATH_DOMAINS[pathId] || "")
+  );
+  const pathLogs   = progressLogs.filter(l => l.path === pathId);
+  const pathGoals  = goals.filter(g => g.status === "completed" && g.path === pathId);
+  const pathGates  = Object.entries(gateProgress)
+    .filter(([id, g]) => g?.completed && id.includes(pathId));
+
+  const gatesByTier = {
+    1: pathGates.filter(([id]) => GATES.find(g => g.id === id)?.tier === 1).length,
+    2: pathGates.filter(([id]) => GATES.find(g => g.id === id)?.tier === 2).length,
+  };
+
+  // Check generic milestones
+  for (const m of GENERIC_MILESTONES) {
+    const doneId = `${pathId}_${m.id}`;
+    if (completedMilestones.includes(doneId)) continue;
+
+    let reached = false;
+    if (m.type === "quest_count")  reached = pathQuests.length  >= m.threshold;
+    if (m.type === "log_count")    reached = pathLogs.length    >= m.threshold;
+    if (m.type === "goal_count")   reached = pathGoals.length   >= m.threshold;
+    if (m.type === "gate_tier")    reached = (gatesByTier[m.tier] || 0) >= m.threshold;
+
+    if (!reached) {
+      return { ...m, id: doneId, pathId, reached: false, specific: false };
+    }
+  }
+
+  // Check path-specific milestones (only if signal >= 2)
+  if (signalLevel >= 2) {
+    const specific = PATH_MILESTONES[pathId] || [];
+    for (const m of specific) {
+      const doneId = `${pathId}_${m.id}`;
+      if (completedMilestones.includes(doneId)) continue;
+
+      let reached = false;
+      if (m.type === "quest_count") reached = pathQuests.length >= m.threshold;
+      if (m.type === "log_count")   reached = pathLogs.length   >= m.threshold;
+      if (m.type === "goal_count")  reached = pathGoals.length  >= m.threshold;
+      if (m.type === "manual")      reached = false; // manual = user confirms
+
+      if (!reached) {
+        return { ...m, id: doneId, pathId, reached: false, specific: true };
+      }
+    }
+  }
+
+  return null; // all milestones done
+}
+
+// Domain lookup for milestone calculation
+const PATH_DOMAINS = {
+  fighter: "body", runner: "body", scholar: "mind", engineer: "craft",
+  artisan: "creativity", creator: "creativity", charmer: "social",
+  strategist: "discipline", guardian: "home", merchant: "finance",
+  monk: "recovery", explorer: "adventure", leader: "social", healer: "recovery",
+};
+
 
 /**
  * Gibt zurück ob ein Gate bereits completed ist.
@@ -603,19 +1372,66 @@ export function isGateUnlocked(gate, gateProgress = {}, completionStatus = {}) {
  *   - Für dominante/suggested Paths
  *   - Niedrigster verfügbarer Tier zuerst
  */
-export function getRecommendedGates(sysAnalysis, gateProgress = {}) {
-  const dominated = sysAnalysis?.dominantPaths || [];
-  const suggested = sysAnalysis?.suggestedMainPath;
-  const targetPaths = new Set([...dominated, suggested].filter(Boolean));
+/**
+ * Gibt empfohlene Gates zurück — Signal-aware:
+ *   - Discovery Gates für neue Nutzer (keine komplettierten Gates)
+ *   - Path Gates für Nutzer mit Signal ≥ 1
+ *   - Höchstens 2 Gates gleichzeitig anzeigen
+ *   - Niedrigster Tier zuerst innerhalb eines Paths
+ *
+ * @param {object} sysAnalysis    - von analyzeSystem()
+ * @param {object} gateProgress   - state.gateProgress
+ * @param {object} [state]        - vollständiger State für Signal-System (optional)
+ */
+export function getRecommendedGates(sysAnalysis, gateProgress = {}, state = null) {
+  const completedCount = Object.values(gateProgress).filter(g => g?.completed).length;
 
-  const candidates = GATES.filter(g => {
-    if (g.special) return false;
+  // For brand-new users: show discovery gates first
+  const discoveryGates = GATES.filter(g =>
+    g.discovery &&
+    !g.special &&
+    !isGateCompleted(g.id, gateProgress) &&
+    isGateUnlocked(g, gateProgress)
+  );
+
+  // ── Signal-based path targeting ──────────────────────────
+  let targetPaths = new Set();
+
+  // From sysAnalysis (already includes signal data from analyzeSystem)
+  const dominated = sysAnalysis?.dominantPaths || [];
+  const suggested  = sysAnalysis?.suggestedMainPath;
+  const topSignals = (sysAnalysis?.topSignalPaths || []).map(sp => sp.pathId);
+  targetPaths = new Set([...dominated, ...topSignals, suggested].filter(Boolean));
+
+  // Path Gates for user with some history
+  const pathGates = GATES.filter(g => {
+    if (g.special || g.discovery) return false;
     if (isGateCompleted(g.id, gateProgress)) return false;
     if (!isGateUnlocked(g, gateProgress)) return false;
     return targetPaths.size === 0 || targetPaths.has(g.path);
   });
 
-  // Sortiere nach Tier (aufsteigend) → niedrigster Tier zuerst
-  candidates.sort((a, b) => a.tier - b.tier);
-  return candidates.slice(0, 3);
+  // Sort: tier ascending, then by path signal strength
+  pathGates.sort((a, b) => {
+    if (a.tier !== b.tier) return a.tier - b.tier;
+    // Prefer paths with more history
+    const aIdx = [...targetPaths].indexOf(a.path);
+    const bIdx = [...targetPaths].indexOf(b.path);
+    return (aIdx === -1 ? 999 : aIdx) - (bIdx === -1 ? 999 : bIdx);
+  });
+
+  // Strategy: show discovery gates if < 2 completed gates, else path gates
+  const MAX_SHOWN = 2;
+  if (completedCount < 2) {
+    // Mix: 1 discovery + 1 path gate (if available)
+    const result = [];
+    if (discoveryGates.length > 0) result.push(discoveryGates[0]);
+    const pathCandidate = pathGates.find(g => g.path !== result[0]?.path);
+    if (pathCandidate && result.length < MAX_SHOWN) result.push(pathCandidate);
+    if (result.length === 0 && pathGates.length > 0) result.push(pathGates[0]);
+    return result;
+  }
+
+  // After 2+ gates: only path-specific gates
+  return pathGates.slice(0, MAX_SHOWN);
 }
