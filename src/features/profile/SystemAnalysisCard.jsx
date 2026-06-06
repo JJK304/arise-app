@@ -27,7 +27,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
         </div>
 
         <div style={{ fontSize:"0.76rem",color:"#64748b",lineHeight:1.55,marginBottom:sysAnalysis.dominantPaths.length>0?8:0 }}>
-          {msg || "Schließe weitere Quests ab, damit dein System deinen Pfad erkennt."}
+          {msg || "Complete more quests for the system to recognize your path."}
         </div>
 
         {/* Dominant Paths */}
@@ -65,7 +65,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
                 setState(s2); saveData("arise_v3", s2);
                 showNotif(`◈ Main Path: ${PATHS[sysAnalysis.suggestedMainPath]?.name}`, PATHS[sysAnalysis.suggestedMainPath]?.color);
               }} style={{ background:`${PATHS[sysAnalysis.suggestedMainPath]?.color}16`,border:`1px solid ${PATHS[sysAnalysis.suggestedMainPath]?.color}44`,color:PATHS[sysAnalysis.suggestedMainPath]?.color,borderRadius:7,padding:"7px 12px",fontSize:"0.67rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.05em" }}>
-                Als Main Path übernehmen
+                ◈ Set as Main Path
               </button>
             )}
             {!secPath && sysAnalysis.suggestedSecondaryPath && (
@@ -74,7 +74,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
                 setState(s2); saveData("arise_v3", s2);
                 showNotif(`◈ Secondary Path: ${PATHS[sysAnalysis.suggestedSecondaryPath]?.name}`, PATHS[sysAnalysis.suggestedSecondaryPath]?.color);
               }} style={{ background:`${PATHS[sysAnalysis.suggestedSecondaryPath]?.color}12`,border:`1px solid ${PATHS[sysAnalysis.suggestedSecondaryPath]?.color}33`,color:PATHS[sysAnalysis.suggestedSecondaryPath]?.color,borderRadius:7,padding:"7px 12px",fontSize:"0.67rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.05em" }}>
-                Als Secondary Path
+                ◈ Set as Secondary Path
               </button>
             )}
           </div>

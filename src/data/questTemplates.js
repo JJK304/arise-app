@@ -348,6 +348,175 @@ export const QUEST_TEMPLATES = [
     baseXp: 22, actionType: "action",
     variables: { duration: [30, 60, 90] },
   },
+
+  // ════════════════════════════════════════════════════════
+  // CAREER / FINANCE — Neue Templates Prompt 4
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_bewerbung_schreiben",
+    titleTemplate: "Bewerbungsunterlagen {topic} aktualisieren",
+    descTemplate:  "CV, Anschreiben oder Portfolio auf aktuellen Stand bringen.",
+    type: "daily", domain: "career",
+    paths: ["merchant", "guardian"],
+    baseXp: 38, actionType: "project",
+    variables: { topic: "interest_mind" },
+  },
+  {
+    id: "tpl_nebenprojekt",
+    titleTemplate: "{duration} Min. an {topic}-Projekt arbeiten",
+    descTemplate:  "Eigenes Vorhaben voranbringen — ein konkreter Schritt heute.",
+    type: "daily", domain: "career",
+    paths: ["merchant", "creator", "engineer"],
+    baseXp: 42, actionType: "project",
+    variables: { duration: [30, 45, 60], topic: "interest_tech" },
+  },
+  {
+    id: "tpl_investieren_lernen",
+    titleTemplate: "{duration} Min. Investitionsthema recherchieren",
+    descTemplate:  "ETF, Aktien, Immobilien — Wissen aufbauen, nicht blinden Tipps folgen.",
+    type: "daily", domain: "finance",
+    paths: ["merchant", "scholar"],
+    baseXp: 28, actionType: "action",
+    variables: { duration: [15, 25, 40] },
+  },
+  {
+    id: "tpl_budget_review",
+    titleTemplate: "Monatsausgaben überprüfen und kategorisieren",
+    descTemplate:  "Was gibt man wofür aus? Wo lässt sich optimieren?",
+    type: "weekly", domain: "finance",
+    paths: ["merchant", "guardian"],
+    baseXp: 35, actionType: "metric",
+    variables: {},
+  },
+  {
+    id: "tpl_portfolio_update",
+    titleTemplate: "{topic} Portfolio-Eintrag erstellen oder aktualisieren",
+    descTemplate:  "Arbeit dokumentieren und präsentierbar machen.",
+    type: "daily", domain: "career",
+    paths: ["creator", "merchant", "artisan"],
+    baseXp: 32, actionType: "project",
+    variables: { topic: "interest_creative" },
+  },
+  {
+    id: "tpl_netzwerk_aufbauen",
+    titleTemplate: "1 neue Person im {topic}-Bereich kontaktieren",
+    descTemplate:  "Kalt-Kontakt oder Reaktivierung — echte Verbindung zählt mehr als Follower.",
+    type: "weekly", domain: "social",
+    paths: ["charmer", "merchant"],
+    baseXp: 40, actionType: "action",
+    variables: { topic: "interest_mind" },
+  },
+
+  // ════════════════════════════════════════════════════════
+  // CREATIVITY — Neue Templates Prompt 4
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_beatmaking_session",
+    titleTemplate: "{duration} Min. Beat produzieren",
+    descTemplate:  "DAW öffnen, Loop starten — fertigstellen ist Bonus.",
+    type: "daily", domain: "creativity",
+    paths: ["artisan", "creator"],
+    baseXp: 35, actionType: "creative",
+    variables: { duration: [25, 45, 60] },
+  },
+  {
+    id: "tpl_podcast_episode",
+    titleTemplate: "Podcast-Skript oder Folge planen",
+    descTemplate:  "Struktur, Thema, Talking Points für die nächste Folge.",
+    type: "daily", domain: "creativity",
+    paths: ["creator", "charmer"],
+    baseXp: 30, actionType: "project",
+    variables: {},
+  },
+  {
+    id: "tpl_kreativ_schreiben",
+    titleTemplate: "{duration} Min. kreativ schreiben",
+    descTemplate:  "Story, Essay, Tagebuch oder Braindump — keine Zensur.",
+    type: "daily", domain: "creativity",
+    paths: ["artisan", "creator"],
+    baseXp: 28, actionType: "creative",
+    variables: { duration: [15, 25, 45] },
+  },
+  {
+    id: "tpl_3d_design",
+    titleTemplate: "{duration} Min. {topic} 3D-Modell bearbeiten",
+    descTemplate:  "Ein Objekt modellieren, texturieren oder druckvorbereiten.",
+    type: "daily", domain: "creativity",
+    paths: ["artisan", "engineer"],
+    baseXp: 38, actionType: "project",
+    variables: { duration: [30, 45, 60], topic: "interest_tech" },
+  },
+
+  // ════════════════════════════════════════════════════════
+  // BODY — Neue Templates Prompt 4
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_schwimmen",
+    titleTemplate: "{duration} Min. schwimmen",
+    descTemplate:  "Bahnen ziehen — Tempo und Technik zählen mehr als Distanz.",
+    type: "daily", domain: "body",
+    paths: ["runner", "fighter"],
+    baseXp: 35, actionType: "cardio",
+    variables: { duration: [20, 30, 45] },
+  },
+  {
+    id: "tpl_radfahren",
+    titleTemplate: "{distance} km Radfahren",
+    descTemplate:  "Draußen oder auf dem Ergometer — Puls hoch, Kopf frei.",
+    type: "daily", domain: "body",
+    paths: ["runner", "explorer"],
+    baseXp: 30, actionType: "cardio",
+    variables: { distance: [10, 20, 35] },
+  },
+  {
+    id: "tpl_meal_prep",
+    titleTemplate: "Meal Prep: {count} Mahlzeiten vorbereiten",
+    descTemplate:  "Essen vorkochen spart Zeit und verhindert schlechte Impuls-Entscheidungen.",
+    type: "weekly", domain: "body",
+    paths: ["guardian", "monk"],
+    baseXp: 32, actionType: "action",
+    variables: { count: [3, 5, 7] },
+  },
+  {
+    id: "tpl_calisthenics",
+    titleTemplate: "Calisthenics-Session: {duration} Min.",
+    descTemplate:  "Körpergewicht-Training — Pull-ups, Dips, Hollow Hold, Planche-Progression.",
+    type: "daily", domain: "body",
+    paths: ["fighter", "explorer"],
+    baseXp: 38, actionType: "training",
+    variables: { duration: [20, 35, 50] },
+  },
+
+  // ════════════════════════════════════════════════════════
+  // MIND — Neue Templates Prompt 4
+  // ════════════════════════════════════════════════════════
+  {
+    id: "tpl_rhetorik_ueben",
+    titleTemplate: "{duration} Min. Rede / Vortrag üben",
+    descTemplate:  "Laut sprechen, aufnehmen, anhören, verbessern — Wiederholung macht Meister.",
+    type: "daily", domain: "mind",
+    paths: ["charmer", "scholar"],
+    baseXp: 32, actionType: "action",
+    variables: { duration: [10, 20, 30] },
+  },
+  {
+    id: "tpl_statistik_aufgaben",
+    titleTemplate: "{count} Statistik-Aufgaben lösen",
+    descTemplate:  "Verteilungen, Tests, Bayes — mit Hand und dann mit Code.",
+    type: "daily", domain: "mind",
+    paths: ["scholar", "engineer"],
+    baseXp: 38, actionType: "action",
+    variables: { count: [3, 5, 8] },
+  },
+  {
+    id: "tpl_ki_recherche",
+    titleTemplate: "{duration} Min. KI/ML Paper oder Konzept studieren",
+    descTemplate:  "Einen Algorithmus, ein Paper oder ein Konzept wirklich verstehen.",
+    type: "daily", domain: "mind",
+    paths: ["scholar", "engineer"],
+    baseXp: 40, actionType: "action",
+    variables: { duration: [20, 35, 50] },
+  },
 ];
 
 // ── Legacy-Compat: INTEREST_TOPICS wird noch von altem Code genutzt ──

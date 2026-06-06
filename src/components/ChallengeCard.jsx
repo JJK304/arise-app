@@ -12,8 +12,8 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
     custom:"#06b6d4", personalized:"#a78bfa", recovery:"#22c55e",
   };
   const typeLabels = {
-    daily:"◈ DAILY", weekly:"◉ WEEKLY", milestone:"★ MEILENSTEIN",
-    custom:"✦ EIGENE", personalized:"◈ FÜR MICH", recovery:"💚 RECOVERY",
+    daily:"◈ DAILY", weekly:"◉ WEEKLY", milestone:"★ MILESTONE",
+    custom:"✦ CUSTOM", personalized:"◈ RECOMMENDED", recovery:"💚 RECOVERY",
     gate:"🔑 GATE",
   };
 
@@ -78,7 +78,7 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
             <span style={{ color:tc, fontSize:"0.58rem", letterSpacing:"0.08em", fontWeight:700 }}>{typeLabel}</span>
 
             {recommended && !done && (
-              <span style={{ background:`${tc}22`, border:`1px solid ${tc}44`, color:tc, borderRadius:20, padding:"1px 6px", fontSize:"0.52rem", letterSpacing:"0.06em", fontWeight:700 }}>EMPFOHLEN</span>
+              <span style={{ background:`${tc}22`, border:`1px solid ${tc}44`, color:tc, borderRadius:20, padding:"1px 6px", fontSize:"0.52rem", letterSpacing:"0.06em", fontWeight:700 }}>◈ RECOMMENDED</span>
             )}
 
             <span style={{ color:"#222" }}>·</span>
@@ -147,9 +147,9 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
                 </span>
               )}
 
-              {/* Reason (why suggested) */}
-              {challenge.reason && challenge.personalized && (
-                <span style={{ color:"#1e293b",fontSize:"0.52rem" }}>
+              {/* Reason — why the system suggested this */}
+              {challenge.reason && (challenge.personalized || challenge.source === "generated") && (
+                <span style={{ color:"#a78bfa55",fontSize:"0.52rem",fontFamily:"'Rajdhani',sans-serif" }}>
                   ↳ {challenge.reason}
                 </span>
               )}
@@ -180,7 +180,7 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
             onMouseEnter={e => e.currentTarget.style.boxShadow = `0 0 10px ${tc}44`}
             onMouseLeave={e => e.currentTarget.style.boxShadow = "none"}
           >
-            {isMilestone ? "BEWIESEN" : "DONE"}
+            {isMilestone ? "CLEARED" : "DONE"}
           </button>
         )}
         {done && (

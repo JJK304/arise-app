@@ -231,10 +231,22 @@ export default function AriseApp() {
     getGlobalLevel,
   };
 
+  // ── shouldPromptProgressLog ─────────────────────────────
+  // Nur bei bestimmten Quest-Typen Log-Modal zeigen.
+  // Normale Action-Quests: kein Modal, nur XP-Feedback.
+  function shouldPromptProgressLog(quest, _state, feedback) {
+    if (!quest) return false;
+    if (quest.requiresLog) return true;
+    if (["reflection", "metric", "project"].includes(quest.actionType)) return true;
+    if (quest.type === "gate_step") return true;
+    if (feedback?.goalProgress?.length > 0 && quest.suggestLog) return true;
+    return false;
+  }
+
   const handleComplete = (challenge) => {
     const { newState, feedback, alreadyDone } = applyQuestCompletion(state, challenge, completionOptions);
     if (alreadyDone) {
-      showNotif("Quest bereits erledigt", "#64748b");
+      showNotif("Quest already cleared", "#64748b");
       return;
     }
 
@@ -278,8 +290,8 @@ export default function AriseApp() {
     setState(newState); saveData("arise_v3", newState);
     setTimeout(() => checkAchievements(newState, bodyEntries), 100);
 
-    // Optional Progress Log
-    if (challenge.type !== "milestone" && challenge.type !== "custom") {
+    // Optional Progress Log — nur bei passenden Quest-Typen
+    if (shouldPromptProgressLog(challenge, newState, feedback)) {
       setPendingLogQuest(challenge);
       setLogForm({ notes: "", metrics: {} });
     }
@@ -288,10 +300,13 @@ export default function AriseApp() {
 
   const saveProgressLog = (quest, formData) => {
     if (!quest) return;
+    // Defensive guards — sicherstellen dass Arrays vorhanden
+    const progressLogs = Array.isArray(state.progressLogs) ? state.progressLogs : [];
+    const goals        = Array.isArray(state.goals)        ? state.goals        : [];
     // Anti-spam: XP-Bonus nur wenn noch kein Log heute für diese Quest
-    const withBonus = canLogWithBonus(state.progressLogs, quest.id);
+    const withBonus = canLogWithBonus(progressLogs, quest.id);
     // Passende Goals aus State finden
-    const matchingGoal = (state.goals || []).find(g =>
+    const matchingGoal = goals.find(g =>
       g.status === "active" && (g.domain === quest.domain || g.path === quest.path)
     );
     const log = createProgressLog({
@@ -301,7 +316,7 @@ export default function AriseApp() {
       metrics:  formData.metrics || {},
       notes:    formData.notes   || "",
     });
-    let s = { ...state, progressLogs: addProgressLog(state.progressLogs, log) };
+    let s = { ...state, progressLogs: addProgressLog(progressLogs, log) };
     // XP-Bonus nur einmal pro Quest/Tag
     if (withBonus && log.xpBonus > 0) {
       s.xp      = (s.xp      || 0) + log.xpBonus;
@@ -340,15 +355,23 @@ export default function AriseApp() {
   };
 
   const saveWeeklyReview = (reflection) => {
-    if (hasReviewThisWeek(state.weeklyReviews)) {
+    // Defensive guards
+    const safeState = {
+      ...state,
+      progressLogs:  Array.isArray(state.progressLogs)  ? state.progressLogs  : [],
+      questHistory:  Array.isArray(state.questHistory)   ? state.questHistory  : [],
+      weeklyReviews: Array.isArray(state.weeklyReviews)  ? state.weeklyReviews : [],
+      goals:         Array.isArray(state.goals)          ? state.goals         : [],
+    };
+    if (hasReviewThisWeek(safeState.weeklyReviews)) {
       showNotif("Review dieser Woche bereits gespeichert", "#64748b");
       return;
     }
-    const review = createWeeklyReview(state, reflection);
+    const review = createWeeklyReview(safeState, reflection);
     // XP-Bonus vergeben
     let s = {
       ...state,
-      weeklyReviews: addWeeklyReview(state.weeklyReviews, review),
+      weeklyReviews: addWeeklyReview(safeState.weeklyReviews, review),
       xp:      (state.xp      || 0) + review.xpBonus,
       totalXP: (state.totalXP || 0) + review.xpBonus,
     };
@@ -385,7 +408,7 @@ export default function AriseApp() {
     setState(s); saveData("arise_v3", s);
     setCustomForm({ title:"",desc:"",xp:"35",type:"daily",domain:"discipline",path:"",difficulty:"normal",tags:"" });
     setShowCustomForm(false);
-    showNotif("✦ Quest hinzugefügt", "#06b6d4");
+    showNotif("✦ Quest cleared for duty", "#06b6d4");
   };
 
   const deleteCustomQuest = (id) => {
@@ -559,12 +582,12 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
 
   // System-Analyse aus Quest-Verlauf + vollständigem Kontext
   const sysAnalysis = analyzeSystem(
-    state.questHistory,
+    Array.isArray(state.questHistory) ? state.questHistory : [],
     state.player?.affinities,
     state.player?.preferences,
     {
-      goals:         state.goals         || [],
-      weeklyReviews: state.weeklyReviews || [],
+      goals:         Array.isArray(state.goals)         ? state.goals         : [],
+      weeklyReviews: Array.isArray(state.weeklyReviews) ? state.weeklyReviews : [],
       rank:          state.rank          || "E",
       level:         state.level         || 1,
       currentStreak: state.currentStreak || 0,
@@ -713,7 +736,9 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
       {/* Quest Feedback Moment */}
       {questFeedback && (
         <div style={{ position:"fixed",bottom:90,left:"50%",transform:"translateX(-50%)",zIndex:497,animation:"slideDown 0.25s ease",pointerEvents:"none" }}>
-          <div style={{ background:"rgba(0,0,0,0.92)",border:"1px solid #ffffff18",borderRadius:12,padding:"12px 18px",display:"flex",flexDirection:"column",gap:5,minWidth:180 }}>
+          <div style={{ background:"rgba(0,0,0,0.94)",border:"1px solid #22c55e33",borderRadius:12,padding:"12px 18px",display:"flex",flexDirection:"column",gap:5,minWidth:190 }}>
+            {/* QUEST CLEARED label */}
+            <div style={{ fontSize:"0.44rem",letterSpacing:"0.3em",color:"#22c55e88",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,marginBottom:1 }}>QUEST CLEARED</div>
             {/* XP */}
             <div style={{ display:"flex",alignItems:"center",gap:7 }}>
               <span style={{ color:"#22c55e",fontSize:"1rem",fontFamily:"'Orbitron',sans-serif",fontWeight:900 }}>+{questFeedback.xp} XP</span>
@@ -727,7 +752,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             {/* Path affinity gains */}
             {Object.entries(questFeedback.pathGains || {}).map(([pathId, pts]) => (
               <div key={pathId} style={{ fontSize:"0.66rem",color:PATHS[pathId]?.color||"#aaa" }}>
-                {PATHS[pathId]?.icon} {PATHS[pathId]?.name} +{pts}
+                {PATHS[pathId]?.icon} {PATHS[pathId]?.name} Affinity +{pts}
               </div>
             ))}
             {/* New title hint */}
@@ -790,7 +815,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 </div>
               ) : (
                 <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:10,padding:"16px",marginBottom:18,textAlign:"center" }}>
-                  <div style={{ color:"#1e293b",fontSize:"0.8rem",marginBottom:4 }}>Noch keine Meilensteine abgeschlossen</div>
+                  <div style={{ color:"#1e293b",fontSize:"0.8rem",marginBottom:4 }}>No Milestones Unlocked Yet</div>
                   <div style={{ color:"#111",fontSize:"0.7rem" }}>Schließe einen Meilenstein ab um deinen ersten Punkt zu verdienen</div>
                 </div>
               )}
@@ -860,10 +885,10 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             <div style={{ width:`${xpPct}%`,height:"100%",background:`linear-gradient(90deg,${rc.primary}44,${rc.primary})`,boxShadow:`0 0 8px ${rc.primary}88`,borderRadius:4,transition:"width 0.8s ease" }}/>
           </div>
           <div style={{ fontSize:"0.56rem",color:"#334155",marginTop:3,transition:"all 0.3s" }}>
-            {view==="quests"  && `Heute: ${todayDone}/${rotatedDaily.length} tägl. · ${totalMilestonesDone} Meilensteine`}
-            {view==="profile" && `Global Lv.${globalLvl}/${TOTAL_LEVELS} · ${(state.totalXP||0).toLocaleString()} XP gesamt`}
-            {view==="goals"   && `${(state.goals||[]).filter(g=>g.status==="active").length} aktiv · ${(state.goals||[]).filter(g=>g.status==="completed").length} abgeschlossen`}
-            {view==="review"  && `${(state.weeklyReviews||[]).length} Reviews gespeichert · ${getWeekQuestStats(state.questHistory).count} Quests diese Woche`}
+            {view==="quests"  && `Daily: ${todayDone}/${rotatedDaily.length} cleared · ${totalMilestonesDone} Milestones`}
+            {view==="profile" && `Lv.${globalLvl}/${TOTAL_LEVELS} Global · ${(state.totalXP||0).toLocaleString()} Total XP`}
+            {view==="goals"   && `${(state.goals||[]).filter(g=>g.status==="active").length} active · ${(state.goals||[]).filter(g=>g.status==="completed").length} completed`}
+            {view==="review"  && `${(state.weeklyReviews||[]).length} Reports · ${getWeekQuestStats(state.questHistory).count} Quests cleared this week`}
             {view==="body"    && (bodyEntries.length > 0 ? `Letzter Check-In: ${bodyEntries[0].date}` : "Noch kein Check-In")}
             {view==="stats"   && `${Object.values(state.stats||{}).reduce((a,b)=>a+b,0)} Stat-Punkte insgesamt`}
             {view==="more"    && `${unlockedAchievements.length}/${ACHIEVEMENTS.length} Achievements · System v3`}
@@ -977,8 +1002,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             {/* ── QUICK STATS: Streak / XP / Milestones / Quests ── */}
             <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:6,marginBottom:12 }}>
               {[
-                { label:"Streak",   val:`${state.currentStreak||0}`, suffix:"🔥", color:"#f59e0b" },
-                { label:"Rekord",   val:`${state.longestStreak||0}`,  suffix:"🔥", color:"#f97316" },
+                { label:"Streak ⚡",   val:`${state.currentStreak||0}`, suffix:"🔥", color:"#f59e0b" },
+                { label:"Best Run",   val:`${state.longestStreak||0}`,  suffix:"🔥", color:"#f97316" },
                 { label:"Total XP", val:(state.totalXP||0)>=1000?`${((state.totalXP||0)/1000).toFixed(1)}k`:`${state.totalXP||0}`, suffix:"", color:"#00ffff" },
                 { label:"Meilst.",  val:`${totalMilestonesDone}`,     suffix:"★",  color:rc.primary },
               ].map(item=>(
@@ -1128,11 +1153,11 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                   {[
                     { label:"Daily",  done:doneDaily,  total:totalDaily,  pct:pctD, color:"#3b82f6" },
                     { label:"Weekly", done:doneWeekly, total:totalWeekly, pct:pctW, color:"#8b5cf6" },
-                    ...(activeGoalCount > 0 ? [{ label:"Ziele", done:completedGoalCount, total:totalGoalCount, pct:pctG, color:"#f59e0b" }] : []),
+                    ...(activeGoalCount > 0 ? [{ label:"OBJECTIVES", done:completedGoalCount, total:totalGoalCount, pct:pctG, color:"#f59e0b" }] : []),
                   ].map(item => (
                     <div key={item.label} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:9,padding:"9px 11px" }}>
                       <div style={{ display:"flex",justifyContent:"space-between",marginBottom:5 }}>
-                        <span style={{ fontSize:"0.58rem",color:"#334155",letterSpacing:"0.08em" }}>{item.label.toUpperCase()}</span>
+                        <span style={{ fontSize:"0.58rem",color:"#334155",letterSpacing:"0.08em" }}>{item.label}</span>
                         <span style={{ fontSize:"0.68rem",color:item.pct===100?"#22c55e":item.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{item.done}/{item.total}</span>
                       </div>
                       <div style={{ background:"rgba(255,255,255,0.05)",borderRadius:3,height:3,overflow:"hidden" }}>
@@ -1167,9 +1192,9 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             {/* Custom quest form */}
             {showCustomForm && (
               <div style={{ background:"rgba(6,182,212,0.06)",border:"1px solid #06b6d422",borderRadius:11,padding:"14px",marginBottom:12,animation:"slideDown 0.2s ease" }}>
-                <div style={{ fontSize:"0.58rem",letterSpacing:"0.2em",color:"#06b6d4",marginBottom:10 }}>NEUE EIGENE QUEST</div>
-                <input value={customForm.title} onChange={e=>setCustomForm(p=>({...p,title:e.target.value}))} placeholder="Quest-Name *" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid #1a1a2e",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",marginBottom:7 }}/>
-                <input value={customForm.desc} onChange={e=>setCustomForm(p=>({...p,desc:e.target.value}))} placeholder="Beschreibung (optional)" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid #1a1a2e",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",marginBottom:7 }}/>
+                <div style={{ fontSize:"0.58rem",letterSpacing:"0.2em",color:"#06b6d4",marginBottom:10 }}>NEW CUSTOM ORDER</div>
+                <input value={customForm.title} onChange={e=>setCustomForm(p=>({...p,title:e.target.value}))} placeholder="Quest Title *" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid #1a1a2e",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",marginBottom:7 }}/>
+                <input value={customForm.desc} onChange={e=>setCustomForm(p=>({...p,desc:e.target.value}))} placeholder="Description (optional)" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid #1a1a2e",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",marginBottom:7 }}/>
                 <div style={{ display:"flex",gap:7,marginBottom:10 }}>
                   <div style={{ flex:1 }}>
                     <div style={{ fontSize:"0.58rem",color:"#334155",marginBottom:3 }}>XP</div>
@@ -1183,8 +1208,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                   </div>
                 </div>
                 <div style={{ display:"flex",gap:7 }}>
-                  <button onClick={addCustomQuest} style={{ flex:1,background:"linear-gradient(135deg,#06b6d418,#06b6d430)",border:"1px solid #06b6d444",color:"#06b6d4",borderRadius:8,padding:"9px",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer" }}>SPEICHERN</button>
-                  <button onClick={()=>setShowCustomForm(false)} style={{ flex:1,background:"transparent",border:"1px solid #1a1a2e",color:"#334155",borderRadius:8,padding:"9px",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer" }}>ABBRECHEN</button>
+                  <button onClick={addCustomQuest} style={{ flex:1,background:"linear-gradient(135deg,#06b6d418,#06b6d430)",border:"1px solid #06b6d444",color:"#06b6d4",borderRadius:8,padding:"9px",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer" }}>CREATE ORDER</button>
+                  <button onClick={()=>setShowCustomForm(false)} style={{ flex:1,background:"transparent",border:"1px solid #1a1a2e",color:"#334155",borderRadius:8,padding:"9px",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer" }}>CANCEL</button>
                 </div>
               </div>
             )}
@@ -1193,7 +1218,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             <div style={{ display:"flex",gap:5,marginBottom:8,overflowX:"auto",paddingBottom:2 }}>
               {["all","daily","weekly","milestone","gate","recovery","personalized","custom","goal-linked"].map(f=>(
                 <button key={f} onClick={()=>setFilterType(f)} style={{ background:filterType===f?`${rc.primary}18`:"transparent",border:`1px solid ${filterType===f?rc.primary+"44":"#111"}`,color:filterType===f?rc.primary:"#222",borderRadius:7,padding:"5px 11px",fontSize:"0.64rem",letterSpacing:"0.08em",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,textTransform:"uppercase",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s" }}>
-                  {f==="all"?"Alle":f==="daily"?"Daily":f==="weekly"?"Weekly":f==="milestone"?"Meilst.":f==="gate"?"◈ Gates":f==="recovery"?"💚 Recovery":f==="personalized"?"★ Für mich":"Eigene"}
+                  {f==="all"?"All":f==="daily"?"Daily":f==="weekly"?"Weekly":f==="milestone"?"Milestones":f==="gate"?"◈ Gates":f==="recovery"?"Recovery":f==="personalized"?"★ Recommended":"Custom"}
                 </button>
               ))}
             </div>
@@ -1231,7 +1256,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               </div>
             ) : (showTodayOnly || filterType!=="all" || filterCat!=="all") ? (
               <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
-                {displayChallenges.length===0 && <div style={{ color:"#1e293b",textAlign:"center",padding:"40px 0",fontSize:"0.85rem" }}>{showTodayOnly?"Alle heutigen Quests erledigt! ✓":"Keine Quests für diesen Filter."}</div>}
+                {displayChallenges.length===0 && <div style={{ color:"#1e293b",textAlign:"center",padding:"40px 0",fontSize:"0.85rem" }}>{showTodayOnly?"⚡ All daily quests cleared.":"No quests match this filter."}</div>}
                 {[...displayChallenges].sort((a,b)=>{
                   const da=isQuestDone(a)?1:0;
                   const db=isQuestDone(b)?1:0;
@@ -1250,7 +1275,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                   <div>
                     <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:8 }}>
                       <span style={{ color:"#f59e0b",fontSize:"0.7rem" }}>◈</span>
-                      <span style={{ fontFamily:"'Rajdhani',sans-serif",fontWeight:700,fontSize:"0.65rem",letterSpacing:"0.2em",color:"#f59e0b" }}>GATE DETECTED</span>
+                      <span style={{ fontFamily:"'Rajdhani',sans-serif",fontWeight:700,fontSize:"0.65rem",letterSpacing:"0.2em",color:"#f59e0b" }}>◈ NEXT GATE AVAILABLE</span>
                       <div style={{ flex:1,height:1,background:"#f59e0b22",borderRadius:1 }}/>
                     </div>
                     <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
@@ -1270,15 +1295,15 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 )}
 
                 {[
-                  { key:"daily",     label:"DAILY QUESTS",     icon:"◈", items:currentDB.daily,   color:"#3b82f6", recommended:false },
-                  { key:"weekly",    label:"WEEKLY QUESTS",    icon:"◉", items:currentDB.weekly,  color:"#8b5cf6", recommended:false },
-                  { key:"milestone", label:"MEILENSTEINE",     icon:"★", items:allMilestones,     color:"#f59e0b", recommended:false },
-                  { key:"custom",    label:"EIGENE QUESTS",    icon:"✦", items:customQuests,      color:"#06b6d4", recommended:false },
+                  { key:"daily",     label:"DAILY SYSTEM QUESTS", icon:"◈", items:currentDB.daily,   color:"#3b82f6", recommended:false },
+                  { key:"weekly",    label:"WEEKLY ORDERS", icon:"◉", items:currentDB.weekly,  color:"#8b5cf6", recommended:false },
+                  { key:"milestone", label:"AWAKENING MILESTONES", icon:"★", items:allMilestones,     color:"#f59e0b", recommended:false },
+                  { key:"custom",    label:"CUSTOM ORDERS", icon:"✦", items:customQuests,      color:"#06b6d4", recommended:false },
                   ...(personalizedQuests.length > 0 ? [
-                    { key:"personalized", label:"FÜR MICH", icon:"★", items:personalizedQuests, color:"#a78bfa", recommended:true },
+                    { key:"personalized", label:"◈ SYSTEM RECOMMENDATION", icon:"★", items:personalizedQuests, color:"#a78bfa", recommended:true },
                   ] : []),
                   ...(recoveryQuests.length > 0 ? [
-                    { key:"recovery", label:"SYSTEM RECOVERY", icon:"💚", items:recoveryQuests, color:"#22c55e", recommended:true },
+                    { key:"recovery", label:"◈ RECOVERY PROTOCOL", icon:"💚", items:recoveryQuests, color:"#22c55e", recommended:true },
                   ] : []),
                 ].filter(s=>s.items.length>0).map(section=>{
                   const done=section.items.filter(c=>isQuestDone(c)).length;
@@ -1456,16 +1481,16 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
           return (
             <div>
               <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
-                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b" }}>AKTIVE ZIELE ({activeGoals.length})</div>
+                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b" }}>ACTIVE OBJECTIVES ({activeGoals.length})</div>
                 <button onClick={()=>setShowGoalForm(v=>!v)}
                   style={{ background:`${rc.primary}18`,border:`1px solid ${rc.primary}44`,color:rc.primary,borderRadius:8,padding:"5px 12px",fontSize:"0.68rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
-                  {showGoalForm ? "✕ ABBRECHEN" : "+ NEUES ZIEL"}
+                  {showGoalForm ? "✕ CANCEL" : "+ NEUES ZIEL"}
                 </button>
               </div>
 
               {showGoalForm && (
                 <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #1a1a2e",borderRadius:12,padding:"14px",marginBottom:14 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#334155",marginBottom:10 }}>ZIEL ERSTELLEN</div>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#334155",marginBottom:10 }}>DEFINE OBJECTIVE</div>
                   <div style={{ marginBottom:10 }}>
                     <div style={{ fontSize:"0.56rem",color:"#64748b",marginBottom:6 }}>Vorlage</div>
                     <div style={{ display:"flex",flexWrap:"wrap",gap:5 }}>
@@ -1505,7 +1530,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                   </div>
                   <button onClick={addGoal}
                     style={{ width:"100%",background:`${rc.primary}18`,border:`1px solid ${rc.primary}44`,color:rc.primary,borderRadius:9,padding:"11px",fontSize:"0.78rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.08em" }}>
-                    🎯 ZIEL STARTEN
+                    ◈ OBJECTIVE AKTIVIEREN
                   </button>
                 </div>
               )}
@@ -1522,21 +1547,21 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
 
               {goals.filter(g=>g.status==="paused").length > 0 && (
                 <div style={{ marginTop:16 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:8 }}>PAUSIERT</div>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:8 }}>PAUSED</div>
                   {goals.filter(g=>g.status==="paused").map(g => <GoalCard key={g.id} goal={g} />)}
                 </div>
               )}
 
               {doneGoals.length > 0 && (
                 <div style={{ marginTop:16 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:8 }}>ABGESCHLOSSEN ({doneGoals.length})</div>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:8 }}>COMPLETED ({doneGoals.length})</div>
                   {doneGoals.map(g => <GoalCard key={g.id} goal={g} />)}
                 </div>
               )}
               {/* Recent Logs Preview in Goals tab */}
               {(state.progressLogs || []).length > 0 && (
                 <div style={{ marginTop:20 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:10 }}>LETZTE LOGS ({(state.progressLogs||[]).length})</div>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:10 }}>PROGRESS ARCHIVE ({(state.progressLogs||[]).length})</div>
                   {getRecentLogs(state.progressLogs, 5).map(log => (
                     <div key={log.id} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:9,padding:"10px 12px",marginBottom:7,display:"flex",gap:10,alignItems:"flex-start" }}>
                       <div style={{ flex:1 }}>
@@ -1685,14 +1710,17 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
 
         {/* ── WEEKLY REVIEW ── */}
         {view==="review" && (() => {
-          const weekStats     = getWeekQuestStats(state.questHistory);
-          const existingReview= getCurrentWeekReview(state.weeklyReviews);
-          const alreadyDone   = hasReviewThisWeek(state.weeklyReviews);
-          const allReviews    = [...(state.weeklyReviews||[])].reverse();
-          const activeGoals   = (state.goals||[]).filter(g=>g.status==="active");
+          // Defensive guards — Review crasht sonst bei frisch gespeicherten Logs
+          const safeQuestHistory  = Array.isArray(state.questHistory)  ? state.questHistory  : [];
+          const safeWeeklyReviews = Array.isArray(state.weeklyReviews) ? state.weeklyReviews : [];
+          const safeGoals         = Array.isArray(state.goals)         ? state.goals         : [];
+          const weekStats     = getWeekQuestStats(safeQuestHistory);
+          const existingReview= getCurrentWeekReview(safeWeeklyReviews);
+          const alreadyDone   = hasReviewThisWeek(safeWeeklyReviews);
+          const allReviews    = [...safeWeeklyReviews].reverse();
+          const activeGoals   = safeGoals.filter(g=>g.status==="active");
 
           const DomainPill = ({domain, count}) => {
-            const { DOMAINS } = require("./data/domains.js");
             const d = DOMAINS[domain] || { label: domain, icon:"◈", color:"#64748b" };
             return (
               <span style={{ background:`${d.color}15`,border:`1px solid ${d.color}33`,color:d.color,borderRadius:20,padding:"3px 9px",fontSize:"0.62rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,display:"inline-flex",alignItems:"center",gap:4 }}>
@@ -1705,21 +1733,21 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             <div>
               {/* Header */}
               <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
-                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b" }}>WOCHENREVIEW</div>
+                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b" }}>WEEKLY SYSTEM REPORT</div>
                 {!alreadyDone && (
                   <button onClick={()=>setShowReviewForm(v=>!v)}
                     style={{ background:"rgba(139,92,246,0.12)",border:"1px solid #8b5cf644",color:"#8b5cf6",borderRadius:8,padding:"5px 12px",fontSize:"0.68rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
-                    {showReviewForm ? "✕ ABBRECHEN" : "📋 REVIEW SCHREIBEN"}
+                    {showReviewForm ? "✕ CANCEL" : "◈ WRITE SYSTEM REPORT"}
                   </button>
                 )}
                 {alreadyDone && (
-                  <span style={{ fontSize:"0.62rem",color:"#22c55e",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>✓ Diese Woche erledigt</span>
+                  <span style={{ fontSize:"0.62rem",color:"#22c55e",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>✓ Report Submitted</span>
                 )}
               </div>
 
               {/* Diese Woche Stats — immer sichtbar */}
               <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:12,padding:"14px",marginBottom:12 }}>
-                <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#334155",marginBottom:10 }}>DIESE WOCHE</div>
+                <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#334155",marginBottom:10 }}>CURRENT CYCLE</div>
                 <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:12 }}>
                   <div style={{ background:"rgba(255,255,255,0.03)",borderRadius:8,padding:"10px",textAlign:"center" }}>
                     <div style={{ fontSize:"1.4rem",fontWeight:900,fontFamily:"'Orbitron',sans-serif",color:rc.primary,lineHeight:1 }}>{weekStats.count}</div>
@@ -1734,7 +1762,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 {/* Top Domains */}
                 {weekStats.topDomains.length > 0 && (
                   <div style={{ marginBottom:10 }}>
-                    <div style={{ fontSize:"0.52rem",color:"#1e293b",marginBottom:6 }}>TOP DOMAINS</div>
+                    <div style={{ fontSize:"0.52rem",color:"#1e293b",marginBottom:6 }}>DOMINANT DOMAINS</div>
                     <div style={{ display:"flex",flexWrap:"wrap",gap:5 }}>
                       {weekStats.topDomains.map(({domain,count}) => (
                         <DomainPill key={domain} domain={domain} count={count}/>
@@ -1746,7 +1774,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 {/* Top Paths */}
                 {weekStats.topPaths.length > 0 && (
                   <div style={{ marginBottom:8 }}>
-                    <div style={{ fontSize:"0.52rem",color:"#1e293b",marginBottom:6 }}>AKTIVE PFADE</div>
+                    <div style={{ fontSize:"0.52rem",color:"#1e293b",marginBottom:6 }}>ACTIVE PATHS</div>
                     <div style={{ display:"flex",flexWrap:"wrap",gap:5 }}>
                       {weekStats.topPaths.map(({path,count}) => {
                         const p = PATHS[path];
@@ -1762,14 +1790,14 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 )}
 
                 {weekStats.count === 0 && (
-                  <div style={{ color:"#1e293b",fontSize:"0.72rem",textAlign:"center" }}>Noch keine Quests diese Woche.</div>
+                  <div style={{ color:"#1e293b",fontSize:"0.72rem",textAlign:"center" }}>No quests cleared this cycle.</div>
                 )}
               </div>
 
               {/* Aktive Ziele Vorschau */}
               {activeGoals.length > 0 && (
                 <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:12,padding:"14px",marginBottom:12 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#334155",marginBottom:10 }}>AKTIVE ZIELE</div>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#334155",marginBottom:10 }}>ACTIVE OBJECTIVES</div>
                   {activeGoals.slice(0,3).map(g => {
                     const pct = Math.min(Math.round((g.currentValue/g.targetValue)*100),100);
                     return (
@@ -1790,7 +1818,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               {/* Review Form */}
               {showReviewForm && !alreadyDone && (
                 <div style={{ background:"rgba(139,92,246,0.04)",border:"1px solid #8b5cf622",borderRadius:12,padding:"14px",marginBottom:12 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#8b5cf6",marginBottom:12 }}>REFLEXION (optional)</div>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#8b5cf6",marginBottom:12 }}>SYSTEM REFLECTION</div>
 
                   {[
                     { key:"wentWell",  label:"Was lief diese Woche gut?",               placeholder:"Erfolge, Highlights, Fortschritte..." },
@@ -1817,11 +1845,11 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                   <div style={{ display:"flex",gap:7 }}>
                     <button onClick={()=>saveWeeklyReview(reviewForm)}
                       style={{ flex:1,background:"rgba(139,92,246,0.15)",border:"1px solid #8b5cf644",color:"#8b5cf6",borderRadius:9,padding:"11px",fontSize:"0.78rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.06em" }}>
-                      📋 REVIEW SPEICHERN
+                      ◈ SUBMIT REPORT
                     </button>
                     <button onClick={()=>{ saveWeeklyReview({}); }}
                       style={{ background:"transparent",border:"1px solid #1a1a2e",color:"#334155",borderRadius:9,padding:"11px 14px",fontSize:"0.78rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
-                      OHNE NOTIZ
+                      SKIP REFLECTION
                     </button>
                   </div>
                 </div>
@@ -1830,11 +1858,11 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               {/* Vergangene Reviews */}
               {allReviews.length > 0 && (
                 <div style={{ marginTop:8 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#1e293b",marginBottom:10 }}>VERGANGENE REVIEWS ({allReviews.length})</div>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#1e293b",marginBottom:10 }}>PAST SYSTEM REPORTS ({allReviews.length})</div>
                   {allReviews.slice(0,5).map(review => (
                     <div key={review.id} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:10,padding:"12px",marginBottom:8 }}>
                       <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6 }}>
-                        <div style={{ fontSize:"0.7rem",color:"#94a3b8",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>KW {review.weekKey?.replace(/.*-W/,"")}</div>
+                        <div style={{ fontSize:"0.7rem",color:"#94a3b8",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>Week {review.weekKey?.replace(/.*-W/,"")}</div>
                         <div style={{ display:"flex",gap:8 }}>
                           <span style={{ fontSize:"0.6rem",color:"#22c55e" }}>✓ {review.completedQuestsCount} Quests</span>
                           <span style={{ fontSize:"0.6rem",color:"#f59e0b" }}>+{review.xpThisWeek||0} XP</span>
@@ -1854,8 +1882,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               {allReviews.length === 0 && !showReviewForm && (
                 <div style={{ textAlign:"center",padding:"30px 20px",color:"#334155" }}>
                   <div style={{ fontSize:"2rem",marginBottom:10 }}>📋</div>
-                  <div style={{ fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,marginBottom:6 }}>Noch kein Review</div>
-                  <div style={{ fontSize:"0.68rem",lineHeight:1.5 }}>Erstelle wöchentlich ein kurzes Review um Fortschritt zu reflektieren.</div>
+                  <div style={{ fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,marginBottom:6 }}>No System Reports</div>
+                  <div style={{ fontSize:"0.68rem",lineHeight:1.5 }}>Submit a weekly system report to track your awakening progress.</div>
                 </div>
               )}
             </div>
@@ -1867,7 +1895,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
           <div>
 
             {/* Achievements */}
-            <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:11 }}>SYSTEM RECORDS ({unlockedAchievements.length}/{ACHIEVEMENTS.length})</div>
+            <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:11 }}>ACHIEVEMENT LOG ({unlockedAchievements.length}/{ACHIEVEMENTS.length})</div>
             <div style={{ display:"flex",flexDirection:"column",gap:6,marginBottom:22 }}>
               {ACHIEVEMENTS.map(a=>{
                 const unlocked=(state.unlockedAchievements||[]).includes(a.id);
@@ -1898,7 +1926,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             <div style={{ marginBottom:8 }}>
               <button onClick={()=>toggleSection("settings")} style={{ width:"100%",background:"transparent",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:8,padding:"2px 0",marginBottom:collapsedSections["settings"]===false?10:0 }}>
                 <span style={{ color:rc.primary,fontSize:"0.7rem" }}>⚙</span>
-                <span style={{ fontFamily:"'Rajdhani',sans-serif",fontWeight:700,fontSize:"0.65rem",letterSpacing:"0.2em",color:rc.primary }}>SYSTEM EINSTELLUNGEN</span>
+                <span style={{ fontFamily:"'Rajdhani',sans-serif",fontWeight:700,fontSize:"0.65rem",letterSpacing:"0.2em",color:rc.primary }}>SYSTEM CONFIGURATION</span>
                 <div style={{ flex:1,height:1,background:`${rc.primary}22`,borderRadius:1 }}/>
                 <span style={{ fontSize:"0.6rem",color:"#1e293b",transform:collapsedSections["settings"]===false?"rotate(0deg)":"rotate(-90deg)",transition:"transform 0.2s",display:"inline-block" }}>▾</span>
               </button>
@@ -1968,7 +1996,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                       <div style={{ color:"#7f1d1d",fontSize:"0.72rem",marginBottom:12,lineHeight:1.5 }}>Rang, Level, XP, Stats, Körper-Daten — alle Fortschritte werden gelöscht.</div>
                       <div style={{ display:"flex",gap:8 }}>
                         <button onClick={handleReset} style={{ flex:1,background:"linear-gradient(135deg,#ef444418,#ef444430)",border:"1px solid #ef444466",color:"#ef4444",borderRadius:8,padding:"11px",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer",letterSpacing:"0.06em" }}>JA, LÖSCHEN</button>
-                        <button onClick={()=>setConfirmReset(false)} style={{ flex:1,background:"transparent",border:"1px solid #1a1a2e",color:"#334155",borderRadius:8,padding:"11px",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer" }}>ABBRECHEN</button>
+                        <button onClick={()=>setConfirmReset(false)} style={{ flex:1,background:"transparent",border:"1px solid #1a1a2e",color:"#334155",borderRadius:8,padding:"11px",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer" }}>CANCEL</button>
                       </div>
                     </div>
                   )}

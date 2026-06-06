@@ -17,7 +17,7 @@ export function createWeeklyReview(state, reflection = {}) {
   const weekKey = getWeekKey();
   const today   = getTodayKey();
 
-  const qh = state.questHistory || [];
+  const qh = Array.isArray(state.questHistory) ? state.questHistory : [];
   const now = new Date();
   const weekStart = new Date(now);
   weekStart.setDate(now.getDate() - 6); // letzte 7 Tage
@@ -111,11 +111,13 @@ export function getCurrentWeekReview(weeklyReviews) {
  * Für Preview im Review-UI.
  */
 export function getWeekQuestStats(questHistory) {
+  // Defensive: handle undefined/null/non-array input
+  const safeHistory = Array.isArray(questHistory) ? questHistory : [];
   const now = new Date();
   const weekStart = new Date(now);
   weekStart.setDate(now.getDate() - 6);
 
-  const weekQuests = (questHistory || []).filter(h => {
+  const weekQuests = safeHistory.filter(h => {
     if (!h.completedAt) return false;
     const d = new Date(h.completedAt);
     return d >= weekStart && d <= now;

@@ -3,6 +3,7 @@
 // Einmalig, automatisch freigeschaltet, nie doppelt vergeben.
 // Deckt Progression, Content-Breite, Gates, Goals, Logs ab.
 // ============================================================
+import { GATES } from "./gates.js";
 import { RANKS } from "./ranks.js";
 import { CHALLENGES_DB } from "./challenges.js";
 
@@ -42,7 +43,6 @@ export const ACHIEVEMENTS = [
   { id:"ach_20", title:"Gatebreaker",      desc:"3 Gates abgeschlossen",                     icon:"🗝️", check:(s,b) => Object.values(s.gateProgress||{}).filter(g => g.completed).length >= 3 },
   { id:"ach_21", title:"Gate Master",      desc:"5 Gates abgeschlossen",                     icon:"🔐",  check:(s,b) => Object.values(s.gateProgress||{}).filter(g => g.completed).length >= 5 },
   { id:"ach_22", title:"Tier III",         desc:"Ersten Tier-III-Gate abgeschlossen",        icon:"🏆",  check:(s,b) => {
-    const { GATES } = require("./gates.js"); // dynamisch um zirkuläre Imports zu vermeiden
     return GATES.filter(g => g.tier === 3).some(g => s.gateProgress?.[g.id]?.completed);
   }},
 
