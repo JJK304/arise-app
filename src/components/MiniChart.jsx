@@ -3,7 +3,7 @@
 // ============================================================
 export const MiniChart = ({ data, color = "#00ffff", height = 60, label = "" }) => {
   if (!data || data.length < 2) return (
-    <div style={{ height, display:"flex", alignItems:"center", justifyContent:"center", color:"#1e293b", fontSize:"0.7rem" }}>
+    <div style={{ height, display:"flex", alignItems:"center", justifyContent:"center", color:"#64748b", fontSize:"0.7rem" }}>
       Noch zu wenig Daten — schließe weitere Quests ab
     </div>
   );
@@ -16,7 +16,7 @@ export const MiniChart = ({ data, color = "#00ffff", height = 60, label = "" }) 
   const area = path + ` L${pts[pts.length - 1].x},${h} L${pts[0].x},${h} Z`;
   return (
     <div>
-      {label && <div style={{ fontSize:"0.58rem", color:"#334155", letterSpacing:"0.1em", marginBottom:4 }}>{label}</div>}
+      {label && <div style={{ fontSize:"0.58rem", color:"#64748b", letterSpacing:"0.1em", marginBottom:4 }}>{label}</div>}
       <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow:"visible" }}>
         <defs>
           <linearGradient id={`g_${color.replace("#", "")}`} x1="0" y1="0" x2="0" y2="1">
@@ -29,8 +29,8 @@ export const MiniChart = ({ data, color = "#00ffff", height = 60, label = "" }) 
         {pts.map((p, i) => i === pts.length - 1 && (
           <circle key={i} cx={p.x} cy={p.y} r={3} fill={color} stroke="#050508" strokeWidth={1.5}/>
         ))}
-        <text x={pts[0].x} y={h - 1} textAnchor="middle" fontSize={8} fill="#334155">{data[0].l}</text>
-        <text x={pts[pts.length - 1].x} y={h - 1} textAnchor="middle" fontSize={8} fill="#334155">{data[data.length - 1].l}</text>
+        <text x={pts[0].x} y={h - 1} textAnchor="middle" fontSize={8} fill="#64748b">{data[0].l}</text>
+        <text x={pts[pts.length - 1].x} y={h - 1} textAnchor="middle" fontSize={8} fill="#64748b">{data[data.length - 1].l}</text>
         <text x={pts[pts.length - 1].x + 4} y={pts[pts.length - 1].y - 4} fontSize={9} fill={color} fontWeight={700} fontFamily="'Rajdhani',sans-serif">{vals[vals.length - 1]}</text>
       </svg>
     </div>

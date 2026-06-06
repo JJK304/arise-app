@@ -525,12 +525,12 @@ export default function AriseApp() {
     <div style={{ minHeight:"100vh",background:"#050508",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",fontFamily:"'Rajdhani',sans-serif",backgroundImage:"radial-gradient(ellipse at 50% 0%,#0d0d2b,#050508 60%)",padding:24 }}>
       <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
       <div style={{ textAlign:"center",marginBottom:40 }}>
-        <div style={{ fontSize:"0.65rem",letterSpacing:"0.4em",color:"#1e2a3a",marginBottom:14 }}>SYSTEM NOTIFICATION</div>
+        <div style={{ fontSize:"0.65rem",letterSpacing:"0.4em",color:"#94a3b8",marginBottom:14 }}>SYSTEM NOTIFICATION</div>
         <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"clamp(2.5rem,10vw,4.5rem)",fontWeight:900,background:"linear-gradient(135deg,#00ffff,#8b5cf6)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",lineHeight:1,marginBottom:8 }}>ARISE</div>
-        <div style={{ color:"#1e2a3a",fontSize:"0.78rem",letterSpacing:"0.25em" }}>YOU HAVE BEEN CHOSEN TO LEVEL UP</div>
+        <div style={{ color:"#94a3b8",fontSize:"0.78rem",letterSpacing:"0.25em" }}>YOU HAVE BEEN CHOSEN TO LEVEL UP</div>
       </div>
       <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #1a1a3e",borderRadius:16,padding:"28px 24px",width:"100%",maxWidth:380 }}>
-        <div style={{ color:"#4a5568",fontSize:"0.82rem",marginBottom:22,lineHeight:1.6 }}>Das System hat dich erkannt. Dein Erwachen beginnt jetzt. Wähle deinen Namen.</div>
+        <div style={{ color:"#94a3b8",fontSize:"0.82rem",marginBottom:22,lineHeight:1.6 }}>Das System hat dich erkannt. Dein Erwachen beginnt jetzt. Wähle deinen Namen.</div>
         <input value={nameInput} onChange={e=>setNameInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleCreate()} placeholder="Dein Name..." style={{ width:"100%",background:"rgba(0,255,255,0.03)",border:"1px solid #00ffff22",borderRadius:10,padding:"13px 15px",color:"#e2e8f0",fontSize:"1rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",marginBottom:14,letterSpacing:"0.05em" }}/>
         <button onClick={handleCreate} style={{ width:"100%",background:"linear-gradient(135deg,#00ffff18,#8b5cf625)",border:"1px solid #00ffff44",color:"#00ffff",borderRadius:10,padding:13,fontSize:"0.95rem",fontFamily:"'Orbitron',sans-serif",fontWeight:700,letterSpacing:"0.15em",cursor:"pointer" }}>SYSTEM INITIALISIEREN</button>
       </div>
@@ -659,9 +659,9 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
   const navItems = [
     {id:"profile",icon:"◈",label:"Status"},
     {id:"quests", icon:"◉",label:"Quests"},
-    {id:"goals",  icon:"🎯",label:"Ziele"},
-    {id:"review", icon:"📋",label:"Review"},
-    {id:"more",   icon:"⊕",label:"System"},
+    {id:"goals",  icon:"⌖",label:"Ziele"},
+    {id:"review", icon:"⟁",label:"Report"},
+    {id:"more",   icon:"⌬",label:"System"},
   ];
 
   // Build stat history from completed milestones
@@ -688,14 +688,14 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
     {showSplash && <SplashScreen rankColor={rc.primary}/>}
     <div style={{ minHeight:"100dvh",background:rc.bg,fontFamily:"'Rajdhani',sans-serif",color:"#e2e8f0",backgroundImage:`${rc.pattern}, radial-gradient(ellipse at 50% -5%,${rc.glow},transparent 55%)`,maxWidth:480,margin:"0 auto",display:"flex",flexDirection:"column",position:"relative",paddingTop:"env(safe-area-inset-top)",paddingLeft:"env(safe-area-inset-left)",paddingRight:"env(safe-area-inset-right)",transition:"background 1s ease" }}>
       <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
-      <style>{`@keyframes fadeInOut{0%{opacity:0;transform:scale(.85)}15%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0}} @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}} @keyframes glitch{0%,100%{transform:translate(0)}25%{transform:translate(-2px,1px)}75%{transform:translate(2px,-1px)}} @keyframes statModal{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}} @keyframes splashOut{from{opacity:1}to{opacity:0;pointer-events:none}} @keyframes splashPulse{0%{opacity:0;transform:scale(0.8)}60%{transform:scale(1.05)}100%{opacity:1;transform:scale(1)}} @keyframes splashFade{from{opacity:0}to{opacity:1}} @keyframes splashBar{from{width:0%}to{width:100%}} @keyframes sectionOpen{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}} *{-webkit-tap-highlight-color:transparent;} input,select,textarea{-webkit-appearance:none;background-color:rgba(255,255,255,0.04)!important;color:#e2e8f0!important;} input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 1000px #0d0d17 inset!important;-webkit-text-fill-color:#e2e8f0!important;} input::placeholder{color:#2d3748;} html,body{background:${rc.bg} !important; transition:background 1s ease;} @supports(padding:max(0px)){.safe-bottom{padding-bottom:max(18px,env(safe-area-inset-bottom))}}`}</style>
+      <style>{`@keyframes fadeInOut{0%{opacity:0;transform:scale(.85)}15%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0}} @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}} @keyframes glitch{0%,100%{transform:translate(0)}25%{transform:translate(-2px,1px)}75%{transform:translate(2px,-1px)}} @keyframes statModal{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}} @keyframes splashOut{from{opacity:1}to{opacity:0;pointer-events:none}} @keyframes splashPulse{0%{opacity:0;transform:scale(0.8)}60%{transform:scale(1.05)}100%{opacity:1;transform:scale(1)}} @keyframes splashFade{from{opacity:0}to{opacity:1}} @keyframes splashBar{from{width:0%}to{width:100%}} @keyframes sectionOpen{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}} *{-webkit-tap-highlight-color:transparent;} input,select,textarea{-webkit-appearance:none;background-color:rgba(255,255,255,0.04)!important;color:#e2e8f0!important;} input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 1000px #0d0d17 inset!important;-webkit-text-fill-color:#e2e8f0!important;} input::placeholder{color:#475569;} html,body{background:${rc.bg} !important; transition:background 1s ease;} @supports(padding:max(0px)){.safe-bottom{padding-bottom:max(18px,env(safe-area-inset-bottom))}}`}</style>
 
       {/* Level Up overlay */}
       {levelUpAnim && (
         <div style={{ position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.9)",animation:"fadeInOut 2.8s ease forwards",pointerEvents:"none" }}>
           <div style={{ textAlign:"center" }}>
             <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"clamp(2rem,10vw,3.5rem)",fontWeight:900,color:rc.primary,textShadow:`0 0 30px ${rc.primary}`,animation:"glitch 0.4s infinite",letterSpacing:"0.08em" }}>{levelUpAnim.rankUp?"RANK UP!":"LEVEL UP"}</div>
-            <div style={{ color:"#555",fontSize:"0.9rem",marginTop:8,letterSpacing:"0.25em" }}>{levelUpAnim.rank}-RANK · LV.{levelUpAnim.level}</div>
+            <div style={{ color:"#94a3b8",fontSize:"0.9rem",marginTop:8,letterSpacing:"0.25em" }}>{levelUpAnim.rank}-RANK · LV.{levelUpAnim.level}</div>
           </div>
         </div>
       )}
@@ -793,40 +793,40 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                   <div style={{ width:44,height:44,borderRadius:12,background:`${sc.color}18`,border:`1px solid ${sc.color}44`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.4rem" }}>{sc.icon}</div>
                   <div>
                     <div style={{ fontFamily:"'Orbitron',sans-serif",fontWeight:900,fontSize:"1.1rem",color:sc.color,textShadow:`0 0 10px ${sc.color}88` }}>{sc.label||selectedStat}</div>
-                    <div style={{ fontSize:"0.68rem",color:"#334155" }}>{sc.desc||""}</div>
+                    <div style={{ fontSize:"0.68rem",color:"#64748b" }}>{sc.desc||""}</div>
                   </div>
                 </div>
                 <div style={{ textAlign:"right" }}>
                   <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"1.8rem",fontWeight:900,color:sc.color,textShadow:`0 0 12px ${sc.color}`,lineHeight:1 }}>{currentVal}</div>
-                  <div style={{ fontSize:"0.6rem",color:"#1e293b",letterSpacing:"0.1em" }}>PUNKTE</div>
+                  <div style={{ fontSize:"0.6rem",color:"#64748b",letterSpacing:"0.1em" }}>PUNKTE</div>
                 </div>
               </div>
 
               {/* Chart or empty state */}
               {history.length >= 2 ? (
                 <div style={{ marginBottom:18 }}>
-                  <div style={{ fontSize:"0.56rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:8 }}>STAT-ENTWICKLUNG</div>
+                  <div style={{ fontSize:"0.56rem",letterSpacing:"0.2em",color:"#64748b",marginBottom:8 }}>STAT-ENTWICKLUNG</div>
                   <MiniChart data={history} color={sc.color} height={70}/>
                 </div>
               ) : history.length === 1 ? (
                 <div style={{ background:`${sc.color}08`,border:`1px solid ${sc.color}22`,borderRadius:10,padding:"12px",marginBottom:18,textAlign:"center" }}>
                   <div style={{ color:sc.color,fontSize:"0.8rem",fontWeight:700,marginBottom:2 }}>Erster Meilenstein erreicht</div>
-                  <div style={{ color:"#334155",fontSize:"0.72rem" }}>Schließe weitere Meilensteine ab um den Verlauf zu sehen</div>
+                  <div style={{ color:"#64748b",fontSize:"0.72rem" }}>Schließe weitere Meilensteine ab um den Verlauf zu sehen</div>
                 </div>
               ) : (
-                <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:10,padding:"16px",marginBottom:18,textAlign:"center" }}>
-                  <div style={{ color:"#1e293b",fontSize:"0.8rem",marginBottom:4 }}>No Milestones Unlocked Yet</div>
-                  <div style={{ color:"#111",fontSize:"0.7rem" }}>Schließe einen Meilenstein ab um deinen ersten Punkt zu verdienen</div>
+                <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.1)",borderRadius:10,padding:"16px",marginBottom:18,textAlign:"center" }}>
+                  <div style={{ color:"#64748b",fontSize:"0.8rem",marginBottom:4 }}>No Milestones Unlocked Yet</div>
+                  <div style={{ color:"#64748b",fontSize:"0.7rem" }}>Schließe einen Meilenstein ab um deinen ersten Punkt zu verdienen</div>
                 </div>
               )}
 
               {/* Completed milestones list */}
               {history.length > 0 && (
                 <div>
-                  <div style={{ fontSize:"0.56rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:8 }}>FREIGESCHALTETE MEILENSTEINE</div>
+                  <div style={{ fontSize:"0.56rem",letterSpacing:"0.2em",color:"#64748b",marginBottom:8 }}>FREIGESCHALTETE MEILENSTEINE</div>
                   <div style={{ display:"flex",flexDirection:"column",gap:6 }}>
                     {history.map((h,i)=>(
-                      <div key={i} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",background:"rgba(255,255,255,0.02)",border:"1px solid #0a0a14",borderRadius:8,padding:"9px 12px" }}>
+                      <div key={i} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.08)",borderRadius:8,padding:"9px 12px" }}>
                         <div style={{ flex:1,fontSize:"0.78rem",color:"#94a3b8",fontWeight:600 }}>{h.title}</div>
                         <span style={{ color:sc.color,fontSize:"0.76rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif",marginLeft:8,flexShrink:0 }}>+{h.pts}</span>
                       </div>
@@ -835,7 +835,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 </div>
               )}
 
-              <button onClick={()=>setSelectedStat(null)} style={{ width:"100%",marginTop:18,background:"rgba(255,255,255,0.04)",border:"1px solid #1a1a2e",color:"#334155",borderRadius:10,padding:"12px",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer",letterSpacing:"0.08em" }}>SCHLIESSEN</button>
+              <button onClick={()=>setSelectedStat(null)} style={{ width:"100%",marginTop:18,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(148,163,184,0.12)",color:"#64748b",borderRadius:10,padding:"12px",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer",letterSpacing:"0.08em" }}>SCHLIESSEN</button>
             </div>
           </div>
         );
@@ -845,7 +845,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
       <div style={{ padding:"16px 18px 13px",borderBottom:`1px solid ${rc.primary}18`,background:rc.headerBg,backdropFilter:"blur(14px)",position:"sticky",top:0,zIndex:100,transition:"background 1s ease" }}>
         <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10 }}>
           <div>
-            <div style={{ fontSize:"0.56rem",letterSpacing:"0.35em",color:"#1e293b",marginBottom:1 }}>HUNTER</div>
+            <div style={{ fontSize:"0.56rem",letterSpacing:"0.35em",color:"#94a3b8",marginBottom:1 }}>◈ HUNTER</div>
             <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"0.95rem",fontWeight:900,color:"#e2e8f0",letterSpacing:"0.06em" }}>{state.name}</div>
             {/* Active Title badge */}
             {state.player?.activeTitle && (() => {
@@ -866,25 +866,25 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 <span style={{ fontSize:"0.9rem" }}>🔥</span>
                 <div>
                   <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"0.78rem",fontWeight:900,color:"#f59e0b",lineHeight:1 }}>{state.currentStreak}</div>
-                  <div style={{ fontSize:"0.5rem",color:"#78350f",letterSpacing:"0.1em" }}>STREAK</div>
+                  <div style={{ fontSize:"0.5rem",color:"#d97706",letterSpacing:"0.1em" }}>STREAK</div>
                 </div>
               </div>
             )}
             <div style={{ textAlign:"right" }}>
-              <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"1.2rem",fontWeight:900,color:rc.primary,textShadow:`0 0 10px ${rc.primary}` }}>{state.rank}<span style={{ fontSize:"0.6rem",color:"#1e293b",marginLeft:3 }}>Rank</span></div>
-              <div style={{ fontSize:"0.6rem",color:"#334155" }}>Lv.{state.level} · {rc.label}</div>
+              <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"1.2rem",fontWeight:900,color:rc.primary,textShadow:`0 0 10px ${rc.primary}` }}>{state.rank}<span style={{ fontSize:"0.6rem",color:"#94a3b8",marginLeft:3 }}>Rank</span></div>
+              <div style={{ fontSize:"0.6rem",color:"#94a3b8" }}>Lv.{state.level} · {rc.label}</div>
             </div>
           </div>
         </div>
         <div>
           <div style={{ display:"flex",justifyContent:"space-between",marginBottom:3 }}>
-            <span style={{ fontSize:"0.58rem",color:"#1e293b",letterSpacing:"0.1em" }}>EXP</span>
+            <span style={{ fontSize:"0.58rem",color:"#64748b",letterSpacing:"0.1em" }}>EXP</span>
             <span style={{ fontSize:"0.58rem",color:rc.primary }}>{state.xp} / {xpNeeded}</span>
           </div>
           <div style={{ background:"rgba(255,255,255,0.04)",borderRadius:4,height:5,overflow:"hidden" }}>
             <div style={{ width:`${xpPct}%`,height:"100%",background:`linear-gradient(90deg,${rc.primary}44,${rc.primary})`,boxShadow:`0 0 8px ${rc.primary}88`,borderRadius:4,transition:"width 0.8s ease" }}/>
           </div>
-          <div style={{ fontSize:"0.56rem",color:"#334155",marginTop:3,transition:"all 0.3s" }}>
+          <div style={{ fontSize:"0.56rem",color:"#64748b",marginTop:3,transition:"all 0.3s" }}>
             {view==="quests"  && `Daily: ${todayDone}/${rotatedDaily.length} cleared · ${totalMilestonesDone} Milestones`}
             {view==="profile" && `Lv.${globalLvl}/${TOTAL_LEVELS} Global · ${(state.totalXP||0).toLocaleString()} Total XP`}
             {view==="goals"   && `${(state.goals||[]).filter(g=>g.status==="active").length} active · ${(state.goals||[]).filter(g=>g.status==="completed").length} completed`}
@@ -927,23 +927,23 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                   <div style={{ fontFamily:"'Orbitron',sans-serif",fontWeight:900,fontSize:"1.5rem",color:rc.primary,textShadow:`0 0 18px ${rc.primary}88`,lineHeight:1 }}>
                     {state.rank}-Rank
                   </div>
-                  <div style={{ fontSize:"0.7rem",color:"#4a5568",marginTop:3 }}>
+                  <div style={{ fontSize:"0.7rem",color:"#94a3b8",marginTop:3 }}>
                     {rc.label} · Lv.{state.level}/{LEVELS_PER_RANK}
                   </div>
                 </div>
                 <div style={{ textAlign:"right" }}>
-                  <div style={{ fontSize:"0.52rem",color:"#1e293b",letterSpacing:"0.08em",marginBottom:2 }}>GLOBAL</div>
+                  <div style={{ fontSize:"0.52rem",color:"#64748b",letterSpacing:"0.08em",marginBottom:2 }}>GLOBAL</div>
                   <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"1.2rem",fontWeight:900,color:rc.primary,lineHeight:1 }}>
-                    {globalLvl}<span style={{ fontSize:"0.6rem",color:"#334155" }}>/{TOTAL_LEVELS}</span>
+                    {globalLvl}<span style={{ fontSize:"0.6rem",color:"#64748b" }}>/{TOTAL_LEVELS}</span>
                   </div>
-                  <div style={{ fontSize:"0.52rem",color:"#1e293b",marginTop:2 }}>{(state.totalXP||0).toLocaleString()} XP</div>
+                  <div style={{ fontSize:"0.52rem",color:"#64748b",marginTop:2 }}>{(state.totalXP||0).toLocaleString()} XP</div>
                 </div>
               </div>
 
               {/* EXP bar */}
               <div style={{ marginBottom:12 }}>
                 <div style={{ display:"flex",justifyContent:"space-between",marginBottom:3 }}>
-                  <span style={{ fontSize:"0.54rem",color:"#1e293b",letterSpacing:"0.12em" }}>EXP TO NEXT LEVEL</span>
+                  <span style={{ fontSize:"0.54rem",color:"#64748b",letterSpacing:"0.12em" }}>EXP TO NEXT LEVEL</span>
                   <span style={{ fontSize:"0.58rem",color:rc.primary,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{state.xp} / {xpNeeded}</span>
                 </div>
                 <div style={{ background:"rgba(255,255,255,0.05)",borderRadius:4,height:5,overflow:"hidden" }}>
@@ -979,18 +979,18 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                   ].map(({ label, path }) => {
                     const p = path ? PATHS[path] : null;
                     return (
-                      <div key={label} style={{ background:p?`${p.color}0c`:"rgba(255,255,255,0.02)",border:`1px solid ${p?p.color+"33":"#0d0d1a"}`,borderRadius:10,padding:"10px 12px" }}>
-                        <div style={{ fontSize:"0.5rem",letterSpacing:"0.14em",color:"#334155",marginBottom:4 }}>{label}</div>
+                      <div key={label} style={{ background:p?`${p.color}0c`:"rgba(255,255,255,0.02)",border:`1px solid ${p?p.color+"33":"rgba(148,163,184,0.1)"}`,borderRadius:10,padding:"10px 12px" }}>
+                        <div style={{ fontSize:"0.5rem",letterSpacing:"0.14em",color:"#64748b",marginBottom:4 }}>{label}</div>
                         {p ? (
                           <div style={{ display:"flex",alignItems:"center",gap:7 }}>
                             <span style={{ fontSize:"1.1rem" }}>{p.icon}</span>
                             <div>
                               <div style={{ fontSize:"0.8rem",fontWeight:700,color:p.color,fontFamily:"'Rajdhani',sans-serif" }}>{p.name}</div>
-                              <div style={{ fontSize:"0.58rem",color:"#334155",lineHeight:1.3,marginTop:1 }}>{p.focus}</div>
+                              <div style={{ fontSize:"0.58rem",color:"#64748b",lineHeight:1.3,marginTop:1 }}>{p.focus}</div>
                             </div>
                           </div>
                         ) : (
-                          <div style={{ color:"#1e293b",fontSize:"0.68rem" }}>—</div>
+                          <div style={{ color:"#64748b",fontSize:"0.68rem" }}>—</div>
                         )}
                       </div>
                     );
@@ -1011,7 +1011,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                   <div style={{ fontSize:"0.92rem",fontWeight:700,color:item.color,fontFamily:"'Rajdhani',sans-serif",lineHeight:1.1 }}>
                     {item.val}{item.suffix}
                   </div>
-                  <div style={{ fontSize:"0.52rem",color:"#1e293b",letterSpacing:"0.07em",marginTop:2 }}>{item.label}</div>
+                  <div style={{ fontSize:"0.52rem",color:"#64748b",letterSpacing:"0.07em",marginTop:2 }}>{item.label}</div>
                 </div>
               ))}
             </div>
@@ -1024,15 +1024,15 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             )}
 
             {/* ── KERN-STATS ── */}
-            <div style={{ fontSize:"0.54rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:8 }}>
-              HUNTER STATS <span style={{ color:"#111",fontSize:"0.48rem",letterSpacing:"0.1em" }}>· TIPPEN FÜR DETAILS</span>
+            <div style={{ fontSize:"0.54rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:8 }}>
+              HUNTER STATS <span style={{ color:"#64748b",fontSize:"0.48rem",letterSpacing:"0.1em" }}>· TIPPEN FÜR DETAILS</span>
             </div>
             <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:10 }}>
               {STATS_CONFIG.filter(s=>!["SOC","REL","APP"].includes(s.key)).map(sc=>(
                 <StatBar key={sc.key} label={sc.key} icon={sc.icon} value={state.stats[sc.key]||0} max={Math.max(10,(state.stats[sc.key]||0)*1.8+5)} color={sc.color} onClick={()=>setSelectedStat(sc.key)}/>
               ))}
             </div>
-            <div style={{ fontSize:"0.54rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:8 }}>CHARISMA</div>
+            <div style={{ fontSize:"0.54rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:8 }}>CHARISMA</div>
             <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:14 }}>
               {["SOC","REL","APP"].map(k=>(
                 <StatBar key={k} label={k} icon={SUB_STATS[k].icon} value={state.stats[k]||0} max={Math.max(10,(state.stats[k]||0)*1.8+5)} color={SUB_STATS[k].color} small onClick={()=>setSelectedStat(k)}/>
@@ -1050,8 +1050,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               const maxAff = sorted[0][1];
               return (
                 <div style={{ marginBottom:14 }}>
-                  <div style={{ fontSize:"0.54rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:8 }}>PATH AFFINITY</div>
-                  <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:10,padding:"11px 12px",display:"flex",flexDirection:"column",gap:7 }}>
+                  <div style={{ fontSize:"0.54rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:8 }}>PATH AFFINITY</div>
+                  <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.1)",borderRadius:10,padding:"11px 12px",display:"flex",flexDirection:"column",gap:7 }}>
                     {sorted.slice(0,5).map(([pathId, val]) => {
                       const p = PATHS[pathId];
                       const pct = Math.min((val / Math.max(maxAff, 1)) * 100, 100);
@@ -1059,7 +1059,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                         <div key={pathId}>
                           <div style={{ display:"flex",justifyContent:"space-between",marginBottom:3 }}>
                             <span style={{ fontSize:"0.68rem",color:p?.color||"#aaa" }}>{p?.icon} {p?.name}</span>
-                            <span style={{ fontSize:"0.66rem",color:"#334155",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{val}</span>
+                            <span style={{ fontSize:"0.66rem",color:"#64748b",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{val}</span>
                           </div>
                           <div style={{ background:"rgba(255,255,255,0.04)",borderRadius:3,height:3 }}>
                             <div style={{ width:`${pct}%`,height:"100%",background:`linear-gradient(90deg,${p?.color||"#aaa"}55,${p?.color||"#aaa"})`,borderRadius:3,transition:"width 0.6s ease",boxShadow:`0 0 5px ${p?.color||"#aaa"}66` }}/>
@@ -1082,7 +1082,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               );
               return (
                 <div style={{ marginBottom:14 }}>
-                  <div style={{ fontSize:"0.54rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:8 }}>TITEL ({playerTitles.length})</div>
+                  <div style={{ fontSize:"0.54rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:8 }}>TITEL ({playerTitles.length})</div>
                   <div style={{ display:"flex",flexWrap:"wrap",gap:6 }}>
                     {normalizedTitles.map(titleId => {
                       const t = TITLE_MAP[titleId] || TITLES.find(tt => tt.title === titleId) || { color:"#f59e0b",icon:"★",title:titleId };
@@ -1093,7 +1093,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                           const s2 = { ...state, player: { ...state.player, activeTitle: titleId }};
                           setState(s2); saveData("arise_v3", s2);
                           showNotif(`${t.icon} Aktiver Titel: ${label}`, t.color);
-                        }} style={{ background:isActive?`${t.color}22`:"rgba(255,255,255,0.03)",border:`1px solid ${isActive?t.color+"55":"#1a1a2e"}`,color:isActive?t.color:"#4a5568",borderRadius:20,padding:"4px 11px",fontSize:"0.66rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.04em",display:"flex",alignItems:"center",gap:4,transition:"all 0.15s" }}>
+                        }} style={{ background:isActive?`${t.color}22`:"rgba(255,255,255,0.03)",border:`1px solid ${isActive?t.color+"55":"rgba(148,163,184,0.12)"}`,color:isActive?t.color:"#94a3b8",borderRadius:20,padding:"4px 11px",fontSize:"0.66rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.04em",display:"flex",alignItems:"center",gap:4,transition:"all 0.15s" }}>
                           <span style={{ fontSize:"0.75rem" }}>{t.icon}</span>{label}
                           {isActive && <span style={{ fontSize:"0.55rem",color:t.color }}>✓</span>}
                         </button>
@@ -1107,7 +1107,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             {/* ── ACHIEVEMENTS PREVIEW ── */}
             {unlockedAchievements.length > 0 && (
               <div style={{ marginBottom:14 }}>
-                <div style={{ fontSize:"0.54rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:8 }}>ACHIEVEMENTS ({unlockedAchievements.length}/{ACHIEVEMENTS.length})</div>
+                <div style={{ fontSize:"0.54rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:8 }}>ACHIEVEMENTS ({unlockedAchievements.length}/{ACHIEVEMENTS.length})</div>
                 <div style={{ display:"flex",flexWrap:"wrap",gap:6 }}>
                   {unlockedAchievements.map(a=>(
                     <div key={a.id} style={{ background:"rgba(245,158,11,0.07)",border:"1px solid #f59e0b1a",borderRadius:8,padding:"5px 10px",display:"flex",alignItems:"center",gap:6 }}>
@@ -1157,7 +1157,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                   ].map(item => (
                     <div key={item.label} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:9,padding:"9px 11px" }}>
                       <div style={{ display:"flex",justifyContent:"space-between",marginBottom:5 }}>
-                        <span style={{ fontSize:"0.58rem",color:"#334155",letterSpacing:"0.08em" }}>{item.label}</span>
+                        <span style={{ fontSize:"0.58rem",color:"#64748b",letterSpacing:"0.08em" }}>{item.label}</span>
                         <span style={{ fontSize:"0.68rem",color:item.pct===100?"#22c55e":item.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{item.done}/{item.total}</span>
                       </div>
                       <div style={{ background:"rgba(255,255,255,0.05)",borderRadius:3,height:3,overflow:"hidden" }}>
@@ -1175,15 +1175,15 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 <div style={{ flex:1 }}>
                   <div style={{ fontSize:"0.7rem",color:recoveryHint.urgent?"#22c55e":"#64748b",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.06em" }}>{recoveryHint.text}</div>
                 </div>
-                <span style={{ fontSize:"0.6rem",color:"#334155" }}>→</span>
+                <span style={{ fontSize:"0.6rem",color:"#64748b" }}>→</span>
               </div>
             )}
             {/* Today filter + sort */}
             <div style={{ display:"flex",gap:7,marginBottom:10,alignItems:"center" }}>
-              <button onClick={()=>setShowTodayOnly(v=>!v)} style={{ background:showTodayOnly?`${rc.primary}22`:"transparent",border:`1px solid ${showTodayOnly?rc.primary+"55":"#111"}`,color:showTodayOnly?rc.primary:"#334155",borderRadius:8,padding:"6px 12px",fontSize:"0.68rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.08em",transition:"all 0.2s",whiteSpace:"nowrap" }}>
+              <button onClick={()=>setShowTodayOnly(v=>!v)} style={{ background:showTodayOnly?`${rc.primary}22`:"transparent",border:`1px solid ${showTodayOnly?rc.primary+"55":"rgba(148,163,184,0.12)"}`,color:showTodayOnly?rc.primary:"#64748b",borderRadius:8,padding:"6px 12px",fontSize:"0.68rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.08em",transition:"all 0.2s",whiteSpace:"nowrap" }}>
                 {showTodayOnly?"● HEUTE OFFEN":"HEUTE OFFEN"}
               </button>
-              <button onClick={()=>setSortBy(v=>v==="xp"?"default":"xp")} style={{ background:sortBy==="xp"?`${rc.primary}22`:"transparent",border:`1px solid ${sortBy==="xp"?rc.primary+"55":"#111"}`,color:sortBy==="xp"?rc.primary:"#334155",borderRadius:8,padding:"6px 12px",fontSize:"0.68rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.08em",transition:"all 0.2s",whiteSpace:"nowrap" }}>
+              <button onClick={()=>setSortBy(v=>v==="xp"?"default":"xp")} style={{ background:sortBy==="xp"?`${rc.primary}22`:"transparent",border:`1px solid ${sortBy==="xp"?rc.primary+"55":"rgba(148,163,184,0.12)"}`,color:sortBy==="xp"?rc.primary:"#64748b",borderRadius:8,padding:"6px 12px",fontSize:"0.68rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.08em",transition:"all 0.2s",whiteSpace:"nowrap" }}>
                 {sortBy==="xp"?"● NACH XP":"NACH XP"}
               </button>
               <button onClick={()=>setShowCustomForm(v=>!v)} style={{ marginLeft:"auto",background:"rgba(6,182,212,0.1)",border:"1px solid #06b6d422",color:"#06b6d4",borderRadius:8,padding:"6px 12px",fontSize:"0.68rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.06em",whiteSpace:"nowrap" }}>+ EIGENE</button>
@@ -1193,23 +1193,23 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             {showCustomForm && (
               <div style={{ background:"rgba(6,182,212,0.06)",border:"1px solid #06b6d422",borderRadius:11,padding:"14px",marginBottom:12,animation:"slideDown 0.2s ease" }}>
                 <div style={{ fontSize:"0.58rem",letterSpacing:"0.2em",color:"#06b6d4",marginBottom:10 }}>NEW CUSTOM ORDER</div>
-                <input value={customForm.title} onChange={e=>setCustomForm(p=>({...p,title:e.target.value}))} placeholder="Quest Title *" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid #1a1a2e",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",marginBottom:7 }}/>
-                <input value={customForm.desc} onChange={e=>setCustomForm(p=>({...p,desc:e.target.value}))} placeholder="Description (optional)" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid #1a1a2e",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",marginBottom:7 }}/>
+                <input value={customForm.title} onChange={e=>setCustomForm(p=>({...p,title:e.target.value}))} placeholder="Quest Title *" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(148,163,184,0.12)",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",marginBottom:7 }}/>
+                <input value={customForm.desc} onChange={e=>setCustomForm(p=>({...p,desc:e.target.value}))} placeholder="Description (optional)" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(148,163,184,0.12)",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",marginBottom:7 }}/>
                 <div style={{ display:"flex",gap:7,marginBottom:10 }}>
                   <div style={{ flex:1 }}>
-                    <div style={{ fontSize:"0.58rem",color:"#334155",marginBottom:3 }}>XP</div>
-                    <input value={customForm.xp} onChange={e=>setCustomForm(p=>({...p,xp:e.target.value}))} type="number" min="1" max="500" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid #1a1a2e",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}/>
+                    <div style={{ fontSize:"0.58rem",color:"#64748b",marginBottom:3 }}>XP</div>
+                    <input value={customForm.xp} onChange={e=>setCustomForm(p=>({...p,xp:e.target.value}))} type="number" min="1" max="500" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(148,163,184,0.12)",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}/>
                   </div>
                   <div style={{ flex:2 }}>
-                    <div style={{ fontSize:"0.58rem",color:"#334155",marginBottom:3 }}>Kategorie</div>
-                    <select value={customForm.cat} onChange={e=>setCustomForm(p=>({...p,cat:e.target.value}))} style={{ width:"100%",background:"#0d0d17",border:"1px solid #1a1a2e",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}>
+                    <div style={{ fontSize:"0.58rem",color:"#64748b",marginBottom:3 }}>Kategorie</div>
+                    <select value={customForm.cat} onChange={e=>setCustomForm(p=>({...p,cat:e.target.value}))} style={{ width:"100%",background:"#0a0a16",border:"1px solid rgba(148,163,184,0.12)",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}>
                       {Object.entries(CAT_LABELS).map(([k,v])=><option key={k} value={k}>{v}</option>)}
                     </select>
                   </div>
                 </div>
                 <div style={{ display:"flex",gap:7 }}>
                   <button onClick={addCustomQuest} style={{ flex:1,background:"linear-gradient(135deg,#06b6d418,#06b6d430)",border:"1px solid #06b6d444",color:"#06b6d4",borderRadius:8,padding:"9px",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer" }}>CREATE ORDER</button>
-                  <button onClick={()=>setShowCustomForm(false)} style={{ flex:1,background:"transparent",border:"1px solid #1a1a2e",color:"#334155",borderRadius:8,padding:"9px",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer" }}>CANCEL</button>
+                  <button onClick={()=>setShowCustomForm(false)} style={{ flex:1,background:"transparent",border:"1px solid rgba(148,163,184,0.12)",color:"#64748b",borderRadius:8,padding:"9px",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer" }}>CANCEL</button>
                 </div>
               </div>
             )}
@@ -1217,16 +1217,16 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             {/* Type filter */}
             <div style={{ display:"flex",gap:5,marginBottom:8,overflowX:"auto",paddingBottom:2 }}>
               {["all","daily","weekly","milestone","gate","recovery","personalized","custom","goal-linked"].map(f=>(
-                <button key={f} onClick={()=>setFilterType(f)} style={{ background:filterType===f?`${rc.primary}18`:"transparent",border:`1px solid ${filterType===f?rc.primary+"44":"#111"}`,color:filterType===f?rc.primary:"#222",borderRadius:7,padding:"5px 11px",fontSize:"0.64rem",letterSpacing:"0.08em",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,textTransform:"uppercase",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s" }}>
-                  {f==="all"?"All":f==="daily"?"Daily":f==="weekly"?"Weekly":f==="milestone"?"Milestones":f==="gate"?"◈ Gates":f==="recovery"?"Recovery":f==="personalized"?"★ Recommended":"Custom"}
+                <button key={f} onClick={()=>setFilterType(f)} style={{ background:filterType===f?`${rc.primary}18`:"transparent",border:`1px solid ${filterType===f?rc.primary+"44":"rgba(148,163,184,0.12)"}`,color:filterType===f?rc.primary:"#64748b",borderRadius:7,padding:"5px 11px",fontSize:"0.64rem",letterSpacing:"0.08em",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,textTransform:"uppercase",whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s" }}>
+                  {f==="all"?"All":f==="daily"?"◎ Daily":f==="weekly"?"◇ Weekly":f==="milestone"?"◆ Milestones":f==="gate"?"⧫ Gates":f==="recovery"?"⟡ Recovery":f==="personalized"?"◈ Recommended":"✦ Custom"}
                 </button>
               ))}
             </div>
             {/* Category filter */}
             <div style={{ display:"flex",gap:5,marginBottom:14,overflowX:"auto",paddingBottom:2 }}>
-              <button onClick={()=>setFilterCat("all")} style={{ background:filterCat==="all"?`${rc.primary}18`:"transparent",border:`1px solid ${filterCat==="all"?rc.primary+"33":"#0d0d17"}`,color:filterCat==="all"?rc.primary:"#1e293b",borderRadius:6,padding:"4px 9px",fontSize:"0.6rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,whiteSpace:"nowrap",flexShrink:0 }}>Alle</button>
+              <button onClick={()=>setFilterCat("all")} style={{ background:filterCat==="all"?`${rc.primary}18`:"transparent",border:`1px solid ${filterCat==="all"?rc.primary+"33":"rgba(148,163,184,0.1)"}`,color:filterCat==="all"?rc.primary:"#64748b",borderRadius:6,padding:"4px 9px",fontSize:"0.6rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,whiteSpace:"nowrap",flexShrink:0 }}>Alle</button>
               {availableCats.map(cat=>(
-                <button key={cat} onClick={()=>setFilterCat(cat)} style={{ background:filterCat===cat?`${rc.primary}18`:"transparent",border:`1px solid ${filterCat===cat?rc.primary+"33":"#0d0d17"}`,color:filterCat===cat?rc.primary:"#1e293b",borderRadius:6,padding:"4px 9px",fontSize:"0.6rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s" }}>{CAT_LABELS[cat]||cat}</button>
+                <button key={cat} onClick={()=>setFilterCat(cat)} style={{ background:filterCat===cat?`${rc.primary}18`:"transparent",border:`1px solid ${filterCat===cat?rc.primary+"33":"rgba(148,163,184,0.1)"}`,color:filterCat===cat?rc.primary:"#64748b",borderRadius:6,padding:"4px 9px",fontSize:"0.6rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s" }}>{CAT_LABELS[cat]||cat}</button>
               ))}
             </div>
 
@@ -1234,7 +1234,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             {filterType === "gate" ? (
               /* ── GATE-ONLY VIEW ── */
               <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
-                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:4 }}>GATE QUESTS</div>
+                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:4 }}>⧫ GATE QUESTS</div>
                 {GATES.map(gate => {
                   const stepsDone = getGateStepsDone(gate.id, gateProgress);
                   const completed = isGateCompleted(gate.id, gateProgress);
@@ -1256,7 +1256,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               </div>
             ) : (showTodayOnly || filterType!=="all" || filterCat!=="all") ? (
               <div style={{ display:"flex",flexDirection:"column",gap:8 }}>
-                {displayChallenges.length===0 && <div style={{ color:"#1e293b",textAlign:"center",padding:"40px 0",fontSize:"0.85rem" }}>{showTodayOnly?"⚡ All daily quests cleared.":"No quests match this filter."}</div>}
+                {displayChallenges.length===0 && <div style={{ color:"#64748b",textAlign:"center",padding:"40px 0",fontSize:"0.85rem" }}>{showTodayOnly?"⚡ All daily quests cleared.":"No quests match this filter."}</div>}
                 {[...displayChallenges].sort((a,b)=>{
                   const da=isQuestDone(a)?1:0;
                   const db=isQuestDone(b)?1:0;
@@ -1264,7 +1264,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 }).map(c=>(
                   <div key={c.id} style={{ position:"relative" }}>
                     <ChallengeCard challenge={c} done={isQuestDone(c)} onComplete={handleComplete} rankColor={rc.primary} goals={state.goals||[]}/>
-                    {c.type==="custom" && !isQuestDone(c) && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#334155",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
+                    {c.type==="custom" && !isQuestDone(c) && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#64748b",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
                   </div>
                 ))}
               </div>
@@ -1295,15 +1295,15 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 )}
 
                 {[
-                  { key:"daily",     label:"DAILY SYSTEM QUESTS", icon:"◈", items:currentDB.daily,   color:"#3b82f6", recommended:false },
-                  { key:"weekly",    label:"WEEKLY ORDERS", icon:"◉", items:currentDB.weekly,  color:"#8b5cf6", recommended:false },
-                  { key:"milestone", label:"AWAKENING MILESTONES", icon:"★", items:allMilestones,     color:"#f59e0b", recommended:false },
-                  { key:"custom",    label:"CUSTOM ORDERS", icon:"✦", items:customQuests,      color:"#06b6d4", recommended:false },
+                  { key:"daily",     label:"DAILY SYSTEM QUESTS",   icon:"◎", items:currentDB.daily,   color:"#3b82f6", recommended:false },
+                  { key:"weekly",    label:"WEEKLY ORDERS",           icon:"◇", items:currentDB.weekly,  color:"#8b5cf6", recommended:false },
+                  { key:"milestone", label:"AWAKENING MILESTONES",    icon:"◆", items:allMilestones,     color:"#f59e0b", recommended:false },
+                  { key:"custom",    label:"CUSTOM ORDERS",           icon:"✦", items:customQuests,      color:"#06b6d4", recommended:false },
                   ...(personalizedQuests.length > 0 ? [
-                    { key:"personalized", label:"◈ SYSTEM RECOMMENDATION", icon:"★", items:personalizedQuests, color:"#a78bfa", recommended:true },
+                    { key:"personalized", label:"SYSTEM RECOMMENDATION", icon:"◈", items:personalizedQuests, color:"#a78bfa", recommended:true },
                   ] : []),
                   ...(recoveryQuests.length > 0 ? [
-                    { key:"recovery", label:"◈ RECOVERY PROTOCOL", icon:"💚", items:recoveryQuests, color:"#22c55e", recommended:true },
+                    { key:"recovery", label:"RECOVERY PROTOCOL", icon:"⟡", items:recoveryQuests, color:"#22c55e", recommended:true },
                   ] : []),
                 ].filter(s=>s.items.length>0).map(section=>{
                   const done=section.items.filter(c=>isQuestDone(c)).length;
@@ -1320,12 +1320,12 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                           <span style={{ background:`${section.color}18`,border:`1px solid ${section.color}33`,color:section.color,borderRadius:20,padding:"1px 6px",fontSize:"0.5rem",letterSpacing:"0.06em",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>EMPFOHLEN</span>
                         )}
                         <div style={{ flex:1,height:1,background:`${allDone?"#22c55e":section.color}22`,borderRadius:1 }}/>
-                        <span style={{ fontSize:"0.62rem",color:allDone?"#22c55e":"#334155",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{done}/{total}</span>
+                        <span style={{ fontSize:"0.62rem",color:allDone?"#22c55e":"#94a3b8",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{done}/{total}</span>
                         {/* Mini progress bar */}
                         <div style={{ width:28,height:3,background:"rgba(255,255,255,0.06)",borderRadius:2,overflow:"hidden" }}>
                           <div style={{ width:`${total>0?(done/total)*100:0}%`,height:"100%",background:allDone?"#22c55e":section.color,borderRadius:2,transition:"width 0.4s ease",boxShadow:done>0?`0 0 4px ${section.color}88`:"none" }}/>
                         </div>
-                        <span style={{ fontSize:"0.6rem",color:"#1e293b",transform:collapsed?"rotate(-90deg)":"rotate(0deg)",transition:"transform 0.2s",display:"inline-block" }}>▾</span>
+                        <span style={{ fontSize:"0.6rem",color:"#64748b",transform:collapsed?"rotate(-90deg)":"rotate(0deg)",transition:"transform 0.2s",display:"inline-block" }}>▾</span>
                       </button>
                       {/* Section items — done ones sink to bottom */}
                       {!collapsed && (
@@ -1337,7 +1337,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                           }).map(c=>(
                             <div key={c.id} style={{ position:"relative",transition:"order 0.4s ease" }}>
                               <ChallengeCard challenge={c} done={isQuestDone(c)} onComplete={handleComplete} rankColor={rc.primary} recommended={section.recommended && !isQuestDone(c)} goals={state.goals||[]}/>
-                              {c.type==="custom" && !isQuestDone(c) && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#334155",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
+                              {c.type==="custom" && !isQuestDone(c) && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#64748b",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
                             </div>
                           ))}
                         </div>
@@ -1399,7 +1399,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             );
 
             return (
-              <div style={{ background:"rgba(255,255,255,0.02)",border:`1px solid ${done?"#22c55e22":"#0d0d1a"}`,borderRadius:12,padding:"14px",marginBottom:10 }}>
+              <div style={{ background:"rgba(255,255,255,0.02)",border:`1px solid ${done?"#22c55e22":"rgba(148,163,184,0.1)"}`,borderRadius:12,padding:"14px",marginBottom:10 }}>
                 {/* Header */}
                 <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8 }}>
                   <div style={{ display:"flex",gap:8,alignItems:"center" }}>
@@ -1407,7 +1407,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                     <div>
                       <div style={{ fontSize:"0.82rem",color:done?"#22c55e":"#e2e8f0",fontWeight:700,fontFamily:"'Rajdhani',sans-serif" }}>{goal.title}</div>
                       <div style={{ display:"flex",gap:6,alignItems:"center",marginTop:2,flexWrap:"wrap" }}>
-                        <span style={{ fontSize:"0.58rem",color:"#334155" }}>{goal.currentValue}/{goal.targetValue} {goal.unit}</span>
+                        <span style={{ fontSize:"0.58rem",color:"#64748b" }}>{goal.currentValue}/{goal.targetValue} {goal.unit}</span>
                         {domainObj && <span style={{ fontSize:"0.54rem",color:domainObj.color }}>{domainObj.icon} {domainObj.label}</span>}
                         {pathObj   && <span style={{ fontSize:"0.54rem",color:pathObj.color }}>{pathObj.icon} {pathObj.name}</span>}
                       </div>
@@ -1441,7 +1441,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 {goalLogs.length > 0 && !done && (
                   <div style={{ marginBottom:8 }}>
                     {goalLogs.map(log => (
-                      <div key={log.id} style={{ fontSize:"0.62rem",color:"#334155",borderLeft:"2px solid #8b5cf622",paddingLeft:7,marginBottom:4,lineHeight:1.4 }}>
+                      <div key={log.id} style={{ fontSize:"0.62rem",color:"#64748b",borderLeft:"2px solid #8b5cf622",paddingLeft:7,marginBottom:4,lineHeight:1.4 }}>
                         <span style={{ color:"#8b5cf655" }}>{new Date(log.createdAt).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})}: </span>
                         {log.notes ? log.notes.slice(0,60) + (log.notes.length>60?"…":"") : Object.entries(log.metrics||{}).slice(0,2).map(([k,v])=>`${METRIC_LABELS[k]?.icon||""} ${v}`).join(" · ")}
                       </div>
@@ -1453,7 +1453,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 {!done && goal.status === "active" && (
                   <div style={{ display:"flex",gap:6 }}>
                     <button onClick={()=>updateGoalStatus(goal.id,"paused")}
-                      style={{ flex:1,background:"transparent",border:"1px solid #1a1a2e",color:"#334155",borderRadius:7,padding:"5px",fontSize:"0.62rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
+                      style={{ flex:1,background:"transparent",border:"1px solid rgba(148,163,184,0.12)",color:"#64748b",borderRadius:7,padding:"5px",fontSize:"0.62rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
                       ⏸ PAUSE
                     </button>
                     <button onClick={()=>deleteGoal(goal.id)}
@@ -1481,7 +1481,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
           return (
             <div>
               <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
-                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b" }}>ACTIVE OBJECTIVES ({activeGoals.length})</div>
+                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#94a3b8" }}>⌖ ACTIVE OBJECTIVES ({activeGoals.length})</div>
                 <button onClick={()=>setShowGoalForm(v=>!v)}
                   style={{ background:`${rc.primary}18`,border:`1px solid ${rc.primary}44`,color:rc.primary,borderRadius:8,padding:"5px 12px",fontSize:"0.68rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
                   {showGoalForm ? "✕ CANCEL" : "+ NEUES ZIEL"}
@@ -1489,8 +1489,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               </div>
 
               {showGoalForm && (
-                <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #1a1a2e",borderRadius:12,padding:"14px",marginBottom:14 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#334155",marginBottom:10 }}>DEFINE OBJECTIVE</div>
+                <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.12)",borderRadius:12,padding:"14px",marginBottom:14 }}>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#64748b",marginBottom:10 }}>DEFINE OBJECTIVE</div>
                   <div style={{ marginBottom:10 }}>
                     <div style={{ fontSize:"0.56rem",color:"#64748b",marginBottom:6 }}>Vorlage</div>
                     <div style={{ display:"flex",flexWrap:"wrap",gap:5 }}>
@@ -1498,7 +1498,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                         const active = goalForm.templateId === t.id;
                         return (
                           <button key={t.id} onClick={()=>setGoalForm(f=>({...f, templateId:t.id}))}
-                            style={{ background:active?`${rc.primary}18`:"rgba(255,255,255,0.02)",border:`1px solid ${active?rc.primary+"44":"#1a1a2e"}`,color:active?rc.primary:"#334155",borderRadius:20,padding:"4px 10px",fontSize:"0.64rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,display:"flex",alignItems:"center",gap:3 }}>
+                            style={{ background:active?`${rc.primary}18`:"rgba(255,255,255,0.02)",border:`1px solid ${active?rc.primary+"44":"rgba(148,163,184,0.12)"}`,color:active?rc.primary:"#64748b",borderRadius:20,padding:"4px 10px",fontSize:"0.64rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,display:"flex",alignItems:"center",gap:3 }}>
                             {t.icon} {t.title}
                           </button>
                         );
@@ -1509,7 +1509,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                     <div style={{ fontSize:"0.56rem",color:"#64748b",marginBottom:5 }}>Titel (optional)</div>
                     <input value={goalForm.title} onChange={e=>setGoalForm(f=>({...f,title:e.target.value}))}
                       placeholder={GOAL_TEMPLATES.find(t=>t.id===goalForm.templateId)?.exampleTitle || "Ziel..."}
-                      style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid #1a1a2e",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}
+                      style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid rgba(148,163,184,0.12)",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}
                     />
                   </div>
                   <div style={{ display:"flex",gap:8,marginBottom:10 }}>
@@ -1518,13 +1518,13 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                       <input type="number" min="1" value={goalForm.targetValue}
                         onChange={e=>setGoalForm(f=>({...f,targetValue:e.target.value}))}
                         placeholder={String(GOAL_TEMPLATES.find(t=>t.id===goalForm.templateId)?.targetValue || 10)}
-                        style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid #1a1a2e",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}
+                        style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid rgba(148,163,184,0.12)",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}
                       />
                     </div>
                     <div style={{ flex:1 }}>
                       <div style={{ fontSize:"0.56rem",color:"#64748b",marginBottom:5 }}>Deadline (optional)</div>
                       <input type="date" value={goalForm.deadline} onChange={e=>setGoalForm(f=>({...f,deadline:e.target.value}))}
-                        style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid #1a1a2e",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:"0.75rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",colorScheme:"dark" }}
+                        style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid rgba(148,163,184,0.12)",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:"0.75rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",colorScheme:"dark" }}
                       />
                     </div>
                   </div>
@@ -1536,8 +1536,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               )}
 
               {activeGoals.length === 0 && !showGoalForm && (
-                <div style={{ textAlign:"center",padding:"40px 20px",color:"#334155" }}>
-                  <div style={{ fontSize:"2rem",marginBottom:10 }}>🎯</div>
+                <div style={{ textAlign:"center",padding:"40px 20px",color:"#64748b" }}>
+                  <div style={{ fontSize:"2rem",marginBottom:10 }}>⌖</div>
                   <div style={{ fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,marginBottom:6 }}>Keine aktiven Ziele</div>
                   <div style={{ fontSize:"0.68rem",lineHeight:1.5 }}>Erstelle ein Ziel — dann zahlen deine Quests direkt darauf ein.</div>
                 </div>
@@ -1547,26 +1547,26 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
 
               {goals.filter(g=>g.status==="paused").length > 0 && (
                 <div style={{ marginTop:16 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:8 }}>PAUSED</div>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#94a3b8",marginBottom:8 }}>PAUSED</div>
                   {goals.filter(g=>g.status==="paused").map(g => <GoalCard key={g.id} goal={g} />)}
                 </div>
               )}
 
               {doneGoals.length > 0 && (
                 <div style={{ marginTop:16 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:8 }}>COMPLETED ({doneGoals.length})</div>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#94a3b8",marginBottom:8 }}>COMPLETED ({doneGoals.length})</div>
                   {doneGoals.map(g => <GoalCard key={g.id} goal={g} />)}
                 </div>
               )}
               {/* Recent Logs Preview in Goals tab */}
               {(state.progressLogs || []).length > 0 && (
                 <div style={{ marginTop:20 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#1e293b",marginBottom:10 }}>PROGRESS ARCHIVE ({(state.progressLogs||[]).length})</div>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#94a3b8",marginBottom:10 }}>✦ PROGRESS ARCHIVE ({(state.progressLogs||[]).length})</div>
                   {getRecentLogs(state.progressLogs, 5).map(log => (
-                    <div key={log.id} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:9,padding:"10px 12px",marginBottom:7,display:"flex",gap:10,alignItems:"flex-start" }}>
+                    <div key={log.id} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.1)",borderRadius:9,padding:"10px 12px",marginBottom:7,display:"flex",gap:10,alignItems:"flex-start" }}>
                       <div style={{ flex:1 }}>
                         <div style={{ fontSize:"0.72rem",color:"#94a3b8",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{log.title}</div>
-                        {log.notes && <div style={{ fontSize:"0.64rem",color:"#334155",marginTop:3,lineHeight:1.4 }}>{log.notes.slice(0,80)}{log.notes.length>80?"…":""}</div>}
+                        {log.notes && <div style={{ fontSize:"0.64rem",color:"#64748b",marginTop:3,lineHeight:1.4 }}>{log.notes.slice(0,80)}{log.notes.length>80?"…":""}</div>}
                         {Object.keys(log.metrics||{}).length > 0 && (
                           <div style={{ display:"flex",gap:8,marginTop:4,flexWrap:"wrap" }}>
                             {Object.entries(log.metrics).map(([k,v]) => (
@@ -1577,7 +1577,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                           </div>
                         )}
                       </div>
-                      <div style={{ fontSize:"0.56rem",color:"#1e293b",whiteSpace:"nowrap" }}>
+                      <div style={{ fontSize:"0.56rem",color:"#64748b",whiteSpace:"nowrap" }}>
                         {new Date(log.createdAt).toLocaleDateString("de-DE",{day:"2-digit",month:"2-digit"})}
                       </div>
                     </div>
@@ -1592,14 +1592,14 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
         {/* ── BODY ── */}
         {view==="body" && (
           <div>
-            <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:13 }}>KÖRPER-TRACKING</div>
+            <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#64748b",marginBottom:13 }}>KÖRPER-TRACKING</div>
 
             {/* Metric selector + chart */}
             {bodyEntries.length >= 2 && (
-              <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:12,padding:"13px",marginBottom:15 }}>
+              <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.1)",borderRadius:12,padding:"13px",marginBottom:15 }}>
                 <div style={{ display:"flex",gap:5,marginBottom:12,overflowX:"auto",paddingBottom:2 }}>
                   {bodyMetrics.map(m=>(
-                    <button key={m.k} onClick={()=>setBodyMetric(m.k)} style={{ background:bodyMetric===m.k?`${m.c}22`:"transparent",border:`1px solid ${bodyMetric===m.k?m.c+"55":"#111"}`,color:bodyMetric===m.k?m.c:"#222",borderRadius:6,padding:"4px 10px",fontSize:"0.62rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s" }}>{m.l}</button>
+                    <button key={m.k} onClick={()=>setBodyMetric(m.k)} style={{ background:bodyMetric===m.k?`${m.c}22`:"transparent",border:`1px solid ${bodyMetric===m.k?m.c+"55":"rgba(148,163,184,0.12)"}`,color:bodyMetric===m.k?m.c:"#64748b",borderRadius:6,padding:"4px 10px",fontSize:"0.62rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,whiteSpace:"nowrap",flexShrink:0,transition:"all 0.2s" }}>{m.l}</button>
                   ))}
                 </div>
                 <MiniChart data={bodyChartData} color={activeMetric.c} height={70} label={`${activeMetric.l.toUpperCase()} VERLAUF (${activeMetric.u})`}/>
@@ -1608,17 +1608,17 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
 
             {/* Delta cards */}
             {bodyEntries.length >= 2 && (
-              <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:10,padding:"11px 13px",marginBottom:15 }}>
-                <div style={{ fontSize:"0.56rem",letterSpacing:"0.15em",color:"#334155",marginBottom:8 }}>VERÄNDERUNG (letzte 2 Einträge)</div>
+              <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.1)",borderRadius:10,padding:"11px 13px",marginBottom:15 }}>
+                <div style={{ fontSize:"0.56rem",letterSpacing:"0.15em",color:"#64748b",marginBottom:8 }}>VERÄNDERUNG (letzte 2 Einträge)</div>
                 <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:7 }}>
                   {bodyMetrics.map(m=>{
                     const curr=parseFloat(bodyEntries[0][m.k]),prev=parseFloat(bodyEntries[1][m.k]);
                     if(isNaN(curr)||isNaN(prev)) return null;
                     const diff=curr-prev,better=(m.k==="weight"||m.k==="bf")?diff<0:diff>0;
-                    const color=diff===0?"#334155":better?"#22c55e":"#ef4444";
+                    const color=diff===0?"#475569":better?"#22c55e":"#ef4444";
                     return (
                       <div key={m.k} style={{ textAlign:"center" }}>
-                        <div style={{ fontSize:"0.54rem",color:"#1e293b" }}>{m.l}</div>
+                        <div style={{ fontSize:"0.54rem",color:"#64748b" }}>{m.l}</div>
                         <div style={{ fontSize:"0.88rem",fontWeight:700,color,fontFamily:"'Rajdhani',sans-serif",lineHeight:1.2 }}>{diff>0?"+":""}{diff%1===0?diff:diff.toFixed(1)}{m.u}</div>
                       </div>
                     );
@@ -1633,34 +1633,34 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:7,marginBottom:8 }}>
                 {bodyMetrics.map(m=>(
                   <div key={m.k}>
-                    <div style={{ fontSize:"0.58rem",color:"#334155",marginBottom:2 }}>{m.l}{m.u?` (${m.u})`:""}</div>
-                    <input value={bodyForm[m.k]} onChange={e=>setBodyForm(p=>({...p,[m.k]:e.target.value}))} placeholder="—" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid #1a1a2e",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}/>
+                    <div style={{ fontSize:"0.58rem",color:"#64748b",marginBottom:2 }}>{m.l}{m.u?` (${m.u})`:""}</div>
+                    <input value={bodyForm[m.k]} onChange={e=>setBodyForm(p=>({...p,[m.k]:e.target.value}))} placeholder="—" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(148,163,184,0.12)",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}/>
                   </div>
                 ))}
               </div>
-              <input value={bodyForm.note} onChange={e=>setBodyForm(p=>({...p,note:e.target.value}))} placeholder="Notiz (optional)" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid #1a1a2e",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",marginBottom:10 }}/>
+              <input value={bodyForm.note} onChange={e=>setBodyForm(p=>({...p,note:e.target.value}))} placeholder="Notiz (optional)" style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(148,163,184,0.12)",borderRadius:7,padding:"8px 10px",color:"#e2e8f0",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",marginBottom:10 }}/>
               <button onClick={saveBodyEntry} style={{ width:"100%",background:`linear-gradient(135deg,${rc.primary}18,${rc.primary}30)`,border:`1px solid ${rc.primary}44`,color:rc.primary,borderRadius:9,padding:"11px",fontSize:"0.8rem",fontFamily:"'Orbitron',sans-serif",fontWeight:700,letterSpacing:"0.1em",cursor:"pointer" }}>CHECK-IN SPEICHERN ◈</button>
             </div>
 
             {/* History */}
             {bodyEntries.length > 0 && (
               <div style={{ display:"flex",flexDirection:"column",gap:7 }}>
-                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:4 }}>CHECK-IN VERLAUF</div>
+                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#64748b",marginBottom:4 }}>CHECK-IN VERLAUF</div>
                 {bodyEntries.map((e,i)=>(
-                  <div key={e.ts} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0a0a14",borderRadius:9,padding:"10px 13px" }}>
+                  <div key={e.ts} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.1)",borderRadius:9,padding:"10px 13px" }}>
                     <div style={{ display:"flex",justifyContent:"space-between",marginBottom:6 }}>
-                      <span style={{ fontSize:"0.63rem",color:i===0?rc.primary:"#334155",fontWeight:i===0?700:400 }}>{i===0?"● AKTUELL":e.date}</span>
-                      {i===0 && <span style={{ fontSize:"0.56rem",color:"#1e293b" }}>{e.date}</span>}
+                      <span style={{ fontSize:"0.63rem",color:i===0?rc.primary:"#64748b",fontWeight:i===0?700:400 }}>{i===0?"● AKTUELL":e.date}</span>
+                      {i===0 && <span style={{ fontSize:"0.56rem",color:"#64748b" }}>{e.date}</span>}
                     </div>
                     <div style={{ display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:5 }}>
                       {bodyMetrics.filter(m=>e[m.k]).map(m=>(
                         <div key={m.k} style={{ textAlign:"center" }}>
-                          <div style={{ fontSize:"0.52rem",color:"#1e293b" }}>{m.l}</div>
+                          <div style={{ fontSize:"0.52rem",color:"#64748b" }}>{m.l}</div>
                           <div style={{ fontSize:"0.76rem",color:"#94a3b8",fontFamily:"'Rajdhani',sans-serif",fontWeight:600 }}>{e[m.k]}{m.u}</div>
                         </div>
                       ))}
                     </div>
-                    {e.note && <div style={{ fontSize:"0.66rem",color:"#334155",marginTop:5,fontStyle:"italic" }}>"{e.note}"</div>}
+                    {e.note && <div style={{ fontSize:"0.66rem",color:"#64748b",marginTop:5,fontStyle:"italic" }}>"{e.note}"</div>}
                   </div>
                 ))}
               </div>
@@ -1684,23 +1684,23 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 </div>
               ))}
             </div>
-            <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:10 }}>AWAKENING PFAD</div>
+            <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:10 }}>◈ AWAKENING PFAD</div>
             {RANKS.map(r=>{
               const idx=RANKS.indexOf(r),ci=RANKS.indexOf(state.rank),passed=idx<ci,active=idx===ci;
               const rC=RANK_COLORS[r];
               return (
-                <div key={r} style={{ background:active?`${rC.primary}0c`:"rgba(255,255,255,0.01)",border:`1px solid ${active?rC.primary+"2a":"#0a0a14"}`,borderRadius:9,padding:"10px 13px",marginBottom:6,opacity:passed?0.4:1 }}>
+                <div key={r} style={{ background:active?`${rC.primary}0c`:"rgba(255,255,255,0.01)",border:`1px solid ${active?rC.primary+"2a":"rgba(148,163,184,0.08)"}`,borderRadius:9,padding:"10px 13px",marginBottom:6,opacity:passed?0.4:1 }}>
                   <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center" }}>
                     <div style={{ display:"flex",alignItems:"center",gap:8 }}>
                       <span style={{ fontFamily:"'Orbitron',sans-serif",fontWeight:900,fontSize:"0.88rem",color:rC.primary,textShadow:active?`0 0 7px ${rC.primary}`:"none" }}>{r}</span>
                       <div>
-                        <div style={{ fontSize:"0.74rem",color:"#4a5568" }}>{rC.label}</div>
-                        <div style={{ fontSize:"0.58rem",color:"#1e293b" }}>{rC.desc}</div>
+                        <div style={{ fontSize:"0.74rem",color:"#94a3b8" }}>{rC.label}</div>
+                        <div style={{ fontSize:"0.58rem",color:"#64748b" }}>{rC.desc}</div>
                       </div>
                     </div>
-                    <span style={{ fontSize:"0.58rem",color:passed?"#22c55e":active?rC.primary:"#111",letterSpacing:"0.08em" }}>{passed?"✓ DONE":active?"◈ AKTIV":"LOCKED"}</span>
+                    <span style={{ fontSize:"0.58rem",color:passed?"#22c55e":active?rC.primary:"#475569",letterSpacing:"0.08em" }}>{passed?"✓ DONE":active?"◈ AKTIV":"LOCKED"}</span>
                   </div>
-                  {active && <div style={{ marginTop:5,fontSize:"0.64rem",color:"#1e293b" }}>Lv.{state.level}/{LEVELS_PER_RANK} · {state.xp}/{xpNeeded} XP · Global {globalLvl}/{TOTAL_LEVELS}</div>}
+                  {active && <div style={{ marginTop:5,fontSize:"0.64rem",color:"#64748b" }}>Lv.{state.level}/{LEVELS_PER_RANK} · {state.xp}/{xpNeeded} XP · Global {globalLvl}/{TOTAL_LEVELS}</div>}
                 </div>
               );
             })}
@@ -1733,7 +1733,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             <div>
               {/* Header */}
               <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
-                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b" }}>WEEKLY SYSTEM REPORT</div>
+                <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#94a3b8" }}>⟁ WEEKLY SYSTEM REPORT</div>
                 {!alreadyDone && (
                   <button onClick={()=>setShowReviewForm(v=>!v)}
                     style={{ background:"rgba(139,92,246,0.12)",border:"1px solid #8b5cf644",color:"#8b5cf6",borderRadius:8,padding:"5px 12px",fontSize:"0.68rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
@@ -1746,23 +1746,23 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               </div>
 
               {/* Diese Woche Stats — immer sichtbar */}
-              <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:12,padding:"14px",marginBottom:12 }}>
-                <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#334155",marginBottom:10 }}>CURRENT CYCLE</div>
+              <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.1)",borderRadius:12,padding:"14px",marginBottom:12 }}>
+                <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#94a3b8",marginBottom:10 }}>CURRENT CYCLE</div>
                 <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:12 }}>
                   <div style={{ background:"rgba(255,255,255,0.03)",borderRadius:8,padding:"10px",textAlign:"center" }}>
                     <div style={{ fontSize:"1.4rem",fontWeight:900,fontFamily:"'Orbitron',sans-serif",color:rc.primary,lineHeight:1 }}>{weekStats.count}</div>
-                    <div style={{ fontSize:"0.56rem",color:"#334155",marginTop:3 }}>Quests</div>
+                    <div style={{ fontSize:"0.56rem",color:"#64748b",marginTop:3 }}>Quests</div>
                   </div>
                   <div style={{ background:"rgba(255,255,255,0.03)",borderRadius:8,padding:"10px",textAlign:"center" }}>
                     <div style={{ fontSize:"1.4rem",fontWeight:900,fontFamily:"'Orbitron',sans-serif",color:"#22c55e",lineHeight:1 }}>{weekStats.totalXp}</div>
-                    <div style={{ fontSize:"0.56rem",color:"#334155",marginTop:3 }}>XP</div>
+                    <div style={{ fontSize:"0.56rem",color:"#64748b",marginTop:3 }}>XP</div>
                   </div>
                 </div>
 
                 {/* Top Domains */}
                 {weekStats.topDomains.length > 0 && (
                   <div style={{ marginBottom:10 }}>
-                    <div style={{ fontSize:"0.52rem",color:"#1e293b",marginBottom:6 }}>DOMINANT DOMAINS</div>
+                    <div style={{ fontSize:"0.52rem",color:"#94a3b8",marginBottom:6 }}>DOMINANT DOMAINS</div>
                     <div style={{ display:"flex",flexWrap:"wrap",gap:5 }}>
                       {weekStats.topDomains.map(({domain,count}) => (
                         <DomainPill key={domain} domain={domain} count={count}/>
@@ -1774,7 +1774,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 {/* Top Paths */}
                 {weekStats.topPaths.length > 0 && (
                   <div style={{ marginBottom:8 }}>
-                    <div style={{ fontSize:"0.52rem",color:"#1e293b",marginBottom:6 }}>ACTIVE PATHS</div>
+                    <div style={{ fontSize:"0.52rem",color:"#94a3b8",marginBottom:6 }}>ACTIVE PATHS</div>
                     <div style={{ display:"flex",flexWrap:"wrap",gap:5 }}>
                       {weekStats.topPaths.map(({path,count}) => {
                         const p = PATHS[path];
@@ -1790,21 +1790,21 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 )}
 
                 {weekStats.count === 0 && (
-                  <div style={{ color:"#1e293b",fontSize:"0.72rem",textAlign:"center" }}>No quests cleared this cycle.</div>
+                  <div style={{ color:"#64748b",fontSize:"0.72rem",textAlign:"center" }}>No quests cleared this cycle.</div>
                 )}
               </div>
 
               {/* Aktive Ziele Vorschau */}
               {activeGoals.length > 0 && (
-                <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:12,padding:"14px",marginBottom:12 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#334155",marginBottom:10 }}>ACTIVE OBJECTIVES</div>
+                <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.1)",borderRadius:12,padding:"14px",marginBottom:12 }}>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#94a3b8",marginBottom:10 }}>ACTIVE OBJECTIVES</div>
                   {activeGoals.slice(0,3).map(g => {
                     const pct = Math.min(Math.round((g.currentValue/g.targetValue)*100),100);
                     return (
                       <div key={g.id} style={{ marginBottom:8 }}>
                         <div style={{ display:"flex",justifyContent:"space-between",marginBottom:3 }}>
                           <span style={{ fontSize:"0.7rem",color:"#94a3b8",fontFamily:"'Rajdhani',sans-serif" }}>{g.icon} {g.title}</span>
-                          <span style={{ fontSize:"0.62rem",color:"#334155" }}>{pct}%</span>
+                          <span style={{ fontSize:"0.62rem",color:"#64748b" }}>{pct}%</span>
                         </div>
                         <div style={{ background:"rgba(255,255,255,0.05)",borderRadius:3,height:3,overflow:"hidden" }}>
                           <div style={{ width:`${pct}%`,height:"100%",background:`linear-gradient(90deg,${rc.primary}66,${rc.primary})`,borderRadius:3 }}/>
@@ -1833,12 +1833,12 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                         onChange={e=>setReviewForm(f=>({...f,[field.key]:e.target.value}))}
                         placeholder={field.placeholder}
                         rows={2}
-                        style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid #1a1a2e",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:"0.78rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",resize:"vertical",lineHeight:1.5 }}
+                        style={{ width:"100%",background:"rgba(255,255,255,0.03)",border:"1px solid rgba(148,163,184,0.12)",borderRadius:8,padding:"9px 11px",color:"#e2e8f0",fontSize:"0.78rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",resize:"vertical",lineHeight:1.5 }}
                       />
                     </div>
                   ))}
 
-                  <div style={{ fontSize:"0.56rem",color:"#334155",marginBottom:10 }}>
+                  <div style={{ fontSize:"0.56rem",color:"#64748b",marginBottom:10 }}>
                     Bonus: +{80 + (reviewForm.wentWell||reviewForm.wasHard||reviewForm.learned||reviewForm.nextFocus ? 20 : 0)} XP
                   </div>
 
@@ -1848,7 +1848,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                       ◈ SUBMIT REPORT
                     </button>
                     <button onClick={()=>{ saveWeeklyReview({}); }}
-                      style={{ background:"transparent",border:"1px solid #1a1a2e",color:"#334155",borderRadius:9,padding:"11px 14px",fontSize:"0.78rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
+                      style={{ background:"transparent",border:"1px solid rgba(148,163,184,0.12)",color:"#64748b",borderRadius:9,padding:"11px 14px",fontSize:"0.78rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
                       SKIP REFLECTION
                     </button>
                   </div>
@@ -1858,9 +1858,9 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               {/* Vergangene Reviews */}
               {allReviews.length > 0 && (
                 <div style={{ marginTop:8 }}>
-                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#1e293b",marginBottom:10 }}>PAST SYSTEM REPORTS ({allReviews.length})</div>
+                  <div style={{ fontSize:"0.52rem",letterSpacing:"0.18em",color:"#94a3b8",marginBottom:10 }}>✦ PAST SYSTEM REPORTS ({allReviews.length})</div>
                   {allReviews.slice(0,5).map(review => (
-                    <div key={review.id} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:10,padding:"12px",marginBottom:8 }}>
+                    <div key={review.id} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.1)",borderRadius:10,padding:"12px",marginBottom:8 }}>
                       <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6 }}>
                         <div style={{ fontSize:"0.7rem",color:"#94a3b8",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>Week {review.weekKey?.replace(/.*-W/,"")}</div>
                         <div style={{ display:"flex",gap:8 }}>
@@ -1869,7 +1869,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                         </div>
                       </div>
                       {review.reflection?.nextFocus && (
-                        <div style={{ fontSize:"0.66rem",color:"#4a5568",lineHeight:1.4 }}>
+                        <div style={{ fontSize:"0.66rem",color:"#94a3b8",lineHeight:1.4 }}>
                           <span style={{ color:"#8b5cf666" }}>Fokus: </span>
                           {review.reflection.nextFocus.slice(0,80)}{review.reflection.nextFocus.length>80?"…":""}
                         </div>
@@ -1880,8 +1880,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               )}
 
               {allReviews.length === 0 && !showReviewForm && (
-                <div style={{ textAlign:"center",padding:"30px 20px",color:"#334155" }}>
-                  <div style={{ fontSize:"2rem",marginBottom:10 }}>📋</div>
+                <div style={{ textAlign:"center",padding:"30px 20px",color:"#64748b" }}>
+                  <div style={{ fontSize:"2rem",marginBottom:10 }}>⟁</div>
                   <div style={{ fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,marginBottom:6 }}>No System Reports</div>
                   <div style={{ fontSize:"0.68rem",lineHeight:1.5 }}>Submit a weekly system report to track your awakening progress.</div>
                 </div>
@@ -1895,16 +1895,16 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
           <div>
 
             {/* Achievements */}
-            <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#1e293b",marginBottom:11 }}>ACHIEVEMENT LOG ({unlockedAchievements.length}/{ACHIEVEMENTS.length})</div>
+            <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:11 }}>◆ ACHIEVEMENT LOG ({unlockedAchievements.length}/{ACHIEVEMENTS.length})</div>
             <div style={{ display:"flex",flexDirection:"column",gap:6,marginBottom:22 }}>
               {ACHIEVEMENTS.map(a=>{
                 const unlocked=(state.unlockedAchievements||[]).includes(a.id);
                 return (
-                  <div key={a.id} style={{ background:unlocked?"rgba(245,158,11,0.06)":"rgba(255,255,255,0.015)",border:`1px solid ${unlocked?"#f59e0b33":"#0a0a14"}`,borderRadius:9,padding:"10px 13px",display:"flex",alignItems:"center",gap:12,opacity:unlocked?1:0.4 }}>
+                  <div key={a.id} style={{ background:unlocked?"rgba(245,158,11,0.06)":"rgba(255,255,255,0.015)",border:`1px solid ${unlocked?"#f59e0b33":"rgba(148,163,184,0.08)"}`,borderRadius:9,padding:"10px 13px",display:"flex",alignItems:"center",gap:12,opacity:unlocked?1:0.4 }}>
                     <span style={{ fontSize:"1.1rem",flexShrink:0 }}>{a.icon}</span>
                     <div style={{ flex:1 }}>
-                      <div style={{ fontSize:"0.8rem",fontWeight:700,color:unlocked?"#f59e0b":"#334155" }}>{a.title}</div>
-                      <div style={{ fontSize:"0.68rem",color:"#1e293b" }}>{a.desc}</div>
+                      <div style={{ fontSize:"0.8rem",fontWeight:700,color:unlocked?"#f59e0b":"#64748b" }}>{a.title}</div>
+                      <div style={{ fontSize:"0.68rem",color:"#64748b" }}>{a.desc}</div>
                     </div>
                     {unlocked && <span style={{ color:"#22c55e",fontSize:"0.9rem",flexShrink:0 }}>✓</span>}
                   </div>
@@ -1925,23 +1925,23 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             {/* Einstellungen — collapsible submenu */}
             <div style={{ marginBottom:8 }}>
               <button onClick={()=>toggleSection("settings")} style={{ width:"100%",background:"transparent",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:8,padding:"2px 0",marginBottom:collapsedSections["settings"]===false?10:0 }}>
-                <span style={{ color:rc.primary,fontSize:"0.7rem" }}>⚙</span>
+                <span style={{ color:rc.primary,fontSize:"0.7rem" }}>⌬</span>
                 <span style={{ fontFamily:"'Rajdhani',sans-serif",fontWeight:700,fontSize:"0.65rem",letterSpacing:"0.2em",color:rc.primary }}>SYSTEM CONFIGURATION</span>
                 <div style={{ flex:1,height:1,background:`${rc.primary}22`,borderRadius:1 }}/>
-                <span style={{ fontSize:"0.6rem",color:"#1e293b",transform:collapsedSections["settings"]===false?"rotate(0deg)":"rotate(-90deg)",transition:"transform 0.2s",display:"inline-block" }}>▾</span>
+                <span style={{ fontSize:"0.6rem",color:"#64748b",transform:collapsedSections["settings"]===false?"rotate(0deg)":"rotate(-90deg)",transition:"transform 0.2s",display:"inline-block" }}>▾</span>
               </button>
 
               {collapsedSections["settings"]===false && (
                 <div style={{ display:"flex",flexDirection:"column",gap:8,animation:"sectionOpen 0.2s ease" }}>
 
                   {/* Vibration toggle */}
-                  <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:11,padding:"14px 16px",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+                  <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.1)",borderRadius:11,padding:"14px 16px",display:"flex",justifyContent:"space-between",alignItems:"center" }}>
                     <div>
                       <div style={{ fontSize:"0.8rem",color:"#94a3b8",fontWeight:600 }}>Vibration</div>
-                      <div style={{ fontSize:"0.66rem",color:"#1e293b",marginTop:2 }}>Feedback beim Abschließen von Quests</div>
+                      <div style={{ fontSize:"0.66rem",color:"#64748b",marginTop:2 }}>Feedback beim Abschließen von Quests</div>
                     </div>
-                    <button onClick={()=>toggleHaptic(!hapticEnabled)} style={{ position:"relative",width:44,height:24,borderRadius:12,background:hapticEnabled?`${rc.primary}44`:"rgba(255,255,255,0.06)",border:`1px solid ${hapticEnabled?rc.primary+"66":"#1a1a2e"}`,cursor:"pointer",transition:"all 0.3s",padding:0,flexShrink:0 }}>
-                      <div style={{ position:"absolute",top:2,left:hapticEnabled?22:2,width:18,height:18,borderRadius:"50%",background:hapticEnabled?rc.primary:"#334155",transition:"all 0.25s ease",boxShadow:hapticEnabled?`0 0 6px ${rc.primary}`:"none" }}/>
+                    <button onClick={()=>toggleHaptic(!hapticEnabled)} style={{ position:"relative",width:44,height:24,borderRadius:12,background:hapticEnabled?`${rc.primary}44`:"rgba(255,255,255,0.06)",border:`1px solid ${hapticEnabled?rc.primary+"66":"rgba(148,163,184,0.15)"}`,cursor:"pointer",transition:"all 0.3s",padding:0,flexShrink:0 }}>
+                      <div style={{ position:"absolute",top:2,left:hapticEnabled?22:2,width:18,height:18,borderRadius:"50%",background:hapticEnabled?rc.primary:"#64748b",transition:"all 0.25s ease",boxShadow:hapticEnabled?`0 0 6px ${rc.primary}`:"none" }}/>
                     </button>
                   </div>
 
@@ -1954,7 +1954,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                     </button>
                     {showDemo && (
                       <div style={{ background:"rgba(0,0,0,0.3)",border:"1px solid #8b5cf622",borderRadius:"0 0 9px 9px",padding:"10px" }}>
-                        <div style={{ fontSize:"0.58rem",color:"#4a5568",marginBottom:10,lineHeight:1.5 }}>
+                        <div style={{ fontSize:"0.58rem",color:"#94a3b8",marginBottom:10,lineHeight:1.5 }}>
                           ⚠️ Lädt ein vorgefertigtes Testprofil. Aktueller Fortschritt wird überschrieben.
                         </div>
                         <div style={{ display:"flex",flexDirection:"column",gap:6 }}>
@@ -1965,8 +1965,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                                 <span style={{ fontSize:"1rem" }}>{profile.icon}</span>
                                 <span style={{ fontSize:"0.75rem",color:profile.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{profile.label}</span>
                               </div>
-                              <div style={{ fontSize:"0.62rem",color:"#334155",lineHeight:1.4,marginLeft:24 }}>{profile.desc}</div>
-                              <div style={{ fontSize:"0.58rem",color:"#1e293b",marginTop:5,marginLeft:24 }}>
+                              <div style={{ fontSize:"0.62rem",color:"#64748b",lineHeight:1.4,marginLeft:24 }}>{profile.desc}</div>
+                              <div style={{ fontSize:"0.58rem",color:"#64748b",marginTop:5,marginLeft:24 }}>
                                 <span style={{ color:`${profile.color}66` }}>Paths: </span>{profile.expectedPaths.join(", ")}
                               </div>
                             </button>
@@ -1993,10 +1993,10 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                   ) : (
                     <div style={{ background:"rgba(239,68,68,0.08)",border:"1px solid #ef444444",borderRadius:10,padding:"14px" }}>
                       <div style={{ color:"#ef4444",fontSize:"0.78rem",fontWeight:700,marginBottom:4,letterSpacing:"0.05em" }}>System wirklich zurücksetzen?</div>
-                      <div style={{ color:"#7f1d1d",fontSize:"0.72rem",marginBottom:12,lineHeight:1.5 }}>Rang, Level, XP, Stats, Körper-Daten — alle Fortschritte werden gelöscht.</div>
+                      <div style={{ color:"#ef4444aa",fontSize:"0.72rem",marginBottom:12,lineHeight:1.5 }}>Rang, Level, XP, Stats, Körper-Daten — alle Fortschritte werden gelöscht.</div>
                       <div style={{ display:"flex",gap:8 }}>
                         <button onClick={handleReset} style={{ flex:1,background:"linear-gradient(135deg,#ef444418,#ef444430)",border:"1px solid #ef444466",color:"#ef4444",borderRadius:8,padding:"11px",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer",letterSpacing:"0.06em" }}>JA, LÖSCHEN</button>
-                        <button onClick={()=>setConfirmReset(false)} style={{ flex:1,background:"transparent",border:"1px solid #1a1a2e",color:"#334155",borderRadius:8,padding:"11px",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer" }}>CANCEL</button>
+                        <button onClick={()=>setConfirmReset(false)} style={{ flex:1,background:"transparent",border:"1px solid rgba(148,163,184,0.12)",color:"#64748b",borderRadius:8,padding:"11px",fontSize:"0.82rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer" }}>CANCEL</button>
                       </div>
                     </div>
                   )}
@@ -2016,8 +2016,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             <button key={item.id} onClick={()=>{ setView(item.id); haptic("light"); }} style={{ flex:1,background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"6px 0",transition:"all 0.2s",position:"relative" }}>
               {/* Active top bar */}
               <div style={{ position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:active?28:0,height:2,background:rc.primary,borderRadius:"0 0 3px 3px",boxShadow:active?`0 0 8px ${rc.primary}`:"none",transition:"all 0.25s ease" }}/>
-              <span style={{ fontSize:"0.92rem",color:active?rc.primary:"#253040",textShadow:active?`0 0 10px ${rc.primary}`:"none",transition:"all 0.2s",marginTop:4 }}>{item.icon}</span>
-              <span style={{ fontSize:"0.5rem",letterSpacing:"0.12em",color:active?rc.primary:"#253040",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,transition:"all 0.2s" }}>{item.label}</span>
+              <span style={{ fontSize:"0.92rem",color:active?rc.primary:"#475569",textShadow:active?`0 0 10px ${rc.primary}`:"none",transition:"all 0.2s",marginTop:4 }}>{item.icon}</span>
+              <span style={{ fontSize:"0.5rem",letterSpacing:"0.12em",color:active?rc.primary:"#475569",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,transition:"all 0.2s" }}>{item.label}</span>
             </button>
           );
         })}

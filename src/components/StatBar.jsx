@@ -14,7 +14,7 @@ export const StatBar = ({ label, icon, value, max = 100, color, small = false, o
       onMouseLeave={e => { if (onClick) e.currentTarget.style.borderColor = color + "22"; }}
     >
       <div style={{ display:"flex", justifyContent:"space-between", marginBottom:4 }}>
-        <span style={{ fontSize:small ? "0.68rem" : "0.74rem", color:"#666" }}>{icon} {label}</span>
+        <span style={{ fontSize:small ? "0.68rem" : "0.74rem", color:"#94a3b8" }}>{icon} {label}</span>
         <span style={{ fontSize:small ? "0.72rem" : "0.8rem", color, fontWeight:700, fontFamily:"'Rajdhani',sans-serif" }}>{animated}</span>
       </div>
       <div style={{ background:"rgba(255,255,255,0.05)", borderRadius:3, height:3, overflow:"hidden" }}>

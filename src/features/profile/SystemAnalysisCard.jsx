@@ -26,7 +26,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
           )}
         </div>
 
-        <div style={{ fontSize:"0.76rem",color:"#64748b",lineHeight:1.55,marginBottom:sysAnalysis.dominantPaths.length>0?8:0 }}>
+        <div style={{ fontSize:"0.76rem",color:"#94a3b8",lineHeight:1.55,marginBottom:sysAnalysis.dominantPaths.length>0?8:0 }}>
           {msg || "Complete more quests for the system to recognize your path."}
         </div>
 
@@ -49,7 +49,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
         {sysAnalysis.balanceHints.length > 0 && (
           <div style={{ display:"flex",flexDirection:"column",gap:3,marginBottom:showSuggestion?8:0 }}>
             {sysAnalysis.balanceHints.map((hint,i) => (
-              <div key={i} style={{ fontSize:"0.64rem",color:"#475569",display:"flex",alignItems:"center",gap:5 }}>
+              <div key={i} style={{ fontSize:"0.64rem",color:"#94a3b8",display:"flex",alignItems:"center",gap:5 }}>
                 <span>{hint.icon}</span><span>{hint.text}</span>
               </div>
             ))}
@@ -84,14 +84,14 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
         {shadowUnlockable && (
           <div style={{ marginTop:10,display:"flex",alignItems:"center",gap:7 }}>
             <span style={{ fontSize:"1rem" }}>🌑</span>
-            <div style={{ fontSize:"0.67rem",color:"#00ffff55",lineHeight:1.4 }}>Shadow Monarch Path verfügbar — meistere alle Pfade.</div>
+            <div style={{ fontSize:"0.67rem",color:"#00ffff88",lineHeight:1.4 }}>Shadow Monarch Path verfügbar — meistere alle Pfade.</div>
           </div>
         )}
 
         {/* Goal Focus */}
         {sysAnalysis.activeGoalFocus && (
           <div style={{ marginTop:10,background:"rgba(245,158,11,0.06)",border:"1px solid #f59e0b22",borderRadius:8,padding:"9px 11px" }}>
-            <div style={{ fontSize:"0.52rem",color:"#f59e0b66",letterSpacing:"0.12em",marginBottom:4 }}>AKTIVES ZIEL</div>
+            <div style={{ fontSize:"0.52rem",color:"#f59e0b88",letterSpacing:"0.12em",marginBottom:4 }}>AKTIVES ZIEL</div>
             <div style={{ display:"flex",alignItems:"center",gap:6,marginBottom:4 }}>
               <span style={{ fontSize:"1rem" }}>{sysAnalysis.activeGoalFocus.icon || "🎯"}</span>
               <div style={{ flex:1 }}>
@@ -107,7 +107,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
 
         {/* Next Best Quest Reason */}
         {sysAnalysis.nextBestQuestReason && (
-          <div style={{ marginTop:8,fontSize:"0.64rem",color:"#475569",lineHeight:1.5,borderLeft:"2px solid #00ffff22",paddingLeft:8 }}>
+          <div style={{ marginTop:8,fontSize:"0.64rem",color:"#64748b",lineHeight:1.5,borderLeft:"2px solid #00ffff22",paddingLeft:8 }}>
             💡 {sysAnalysis.nextBestQuestReason}
           </div>
         )}

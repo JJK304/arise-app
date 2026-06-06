@@ -25,13 +25,13 @@ export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss
             <div style={{ fontSize:"0.88rem",color:"#e2e8f0",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{quest.title}</div>
           </div>
           <button onClick={onDismiss}
-            style={{ background:"transparent",border:"none",color:"#334155",fontSize:"1.1rem",cursor:"pointer",padding:4 }}>✕</button>
+            style={{ background:"transparent",border:"none",color:"#64748b",fontSize:"1.1rem",cursor:"pointer",padding:4 }}>✕</button>
         </div>
 
         {/* Metrics */}
         {fields.metrics.length > 0 && (
           <div style={{ marginBottom:12 }}>
-            <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#334155",marginBottom:8 }}>METRICS (optional)</div>
+            <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#64748b",marginBottom:8 }}>METRICS (optional)</div>
             <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
               {fields.metrics.map(key => {
                 const meta = METRIC_LABELS[key];
@@ -58,7 +58,7 @@ export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss
 
         {/* Notes */}
         <div style={{ marginBottom:14 }}>
-          <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#334155",marginBottom:6 }}>
+          <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#64748b",marginBottom:6 }}>
             {fields.notesLabel}{fields.notesRequired ? "" : " (optional)"}
           </div>
           <textarea
@@ -77,12 +77,12 @@ export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss
             ◈ SAVE LOG ENTRY
           </button>
           <button onClick={onDismiss}
-            style={{ background:"transparent",border:"1px solid #1a1a2e",color:"#334155",borderRadius:9,padding:"11px 14px",fontSize:"0.78rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
+            style={{ background:"transparent",border:"1px solid rgba(148,163,184,0.15)",color:"#64748b",borderRadius:9,padding:"11px 14px",fontSize:"0.78rem",cursor:"pointer",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
             SKIP
           </button>
         </div>
 
-        <div style={{ fontSize:"0.58rem",color:"#1e293b",textAlign:"center",marginTop:8 }}>
+        <div style={{ fontSize:"0.58rem",color:"#475569",textAlign:"center",marginTop:8 }}>
           +{xpHint} XP — Documented Progress Bonus
         </div>
       </div>

@@ -25,7 +25,7 @@ export const RadarChart = ({ stats, rankColor }) => {
   const dataPath = dataPoints.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ") + " Z";
   return (
     <div style={{ background:"rgba(255,255,255,0.02)", border:`1px solid ${rankColor}22`, borderRadius:14, padding:"14px 10px 8px" }}>
-      <div style={{ fontSize:"0.56rem", letterSpacing:"0.28em", color:"#1e293b", marginBottom:10 }}>STAT OVERVIEW</div>
+      <div style={{ fontSize:"0.56rem", letterSpacing:"0.28em", color:"#94a3b8", marginBottom:10 }}>◈ STAT OVERVIEW</div>
       <div style={{ display:"flex", justifyContent:"center" }}>
         <svg width={260} height={260} viewBox="0 0 260 260" style={{ overflow:"visible" }}>
           {gridLevels.map((pct, gi) => {
@@ -48,7 +48,7 @@ export const RadarChart = ({ stats, rankColor }) => {
             return (
               <g key={i}>
                 <text x={lx.toFixed(1)} y={(ly - 5).toFixed(1)} textAnchor="middle" dominantBaseline="middle" fontSize={9} fontWeight={700} letterSpacing={1} fill={ax.color} fontFamily="'Rajdhani',sans-serif">{ax.label}</text>
-                <text x={lx.toFixed(1)} y={(ly + 8).toFixed(1)} textAnchor="middle" dominantBaseline="middle" fontSize={9} fill={val > 0 ? "#e2e8f0" : "#1e293b"} fontFamily="'Rajdhani',sans-serif" fontWeight={700}>{val}</text>
+                <text x={lx.toFixed(1)} y={(ly + 8).toFixed(1)} textAnchor="middle" dominantBaseline="middle" fontSize={9} fill={val > 0 ? "#e2e8f0" : "#475569"} fontFamily="'Rajdhani',sans-serif" fontWeight={700}>{val}</text>
               </g>
             );
           })}
