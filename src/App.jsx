@@ -66,6 +66,14 @@ import { StatBar } from "./components/StatBar.jsx";
 import { ChallengeCard } from "./components/ChallengeCard.jsx";
 import { GateCard } from "./components/GateCard.jsx";
 
+import {
+  getTopSignalInterests,
+  getTopSignalPaths,
+  calculatePathSignal,
+  calculatePathSpecializationLevel,
+  getQuestPathId
+} from "./lib/signals.js";
+
 // Internal DB constants needed for reset
 const DB_NAME = "arise_db", DB_VERSION = 1, STORE = "data";
 const openDB = () => new Promise((res, rej) => {
