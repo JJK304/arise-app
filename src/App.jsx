@@ -6,7 +6,7 @@ import { STATS_CONFIG, SUB_STATS, CAT_LABELS } from "./data/stats.js";
 import { CHALLENGES_DB } from "./data/challenges.js";
 import { ACHIEVEMENTS } from "./data/achievements.js";
 import { findNewPathMilestones } from "./data/pathMilestones.js";
-import { getRankUpStatus } from "./lib/rankRequirements.js";
+import { getRankUpStatus, canRankUpTo } from "./lib/rankRequirements.js";
 import { defaultState } from "./data/defaultState.js";
 import { PATHS, getAffinityGain, suggestPaths, canUnlockShadow } from "./data/paths.js";
 import {
