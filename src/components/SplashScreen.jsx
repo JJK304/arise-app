@@ -2,7 +2,7 @@
 // SPLASH SCREEN
 // ============================================================
 export const SplashScreen = ({ rankColor }) => (
-  <div style={{ position:"fixed", inset:0, zIndex:2000, background:"#050508", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", animation:"splashOut 0.4s ease 1.4s forwards" }}>
+  <div style={{ position:"fixed", inset:0, zIndex:2000, background:"#050508", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", animation:"splashOut 0.4s ease 1.4s forwards", pointerEvents: "none", }}>
     <div style={{ fontSize:"0.55rem", letterSpacing:"0.45em", color:"#475569", marginBottom:16, animation:"splashFade 0.4s ease 0.1s both" }}>SYSTEM NOTIFICATION</div>
     <div style={{ fontFamily:"'Orbitron',sans-serif", fontSize:"clamp(3rem,12vw,5rem)", fontWeight:900, background:`linear-gradient(135deg,${rankColor},#8b5cf6)`, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", animation:"splashPulse 0.8s ease", letterSpacing:"0.05em" }}>ARISE</div>
     <div style={{ fontSize:"0.6rem", letterSpacing:"0.4em", color:"#475569", marginTop:8, animation:"splashFade 0.6s ease 0.3s both" }}>AWAKENING SYSTEM ONLINE</div>
