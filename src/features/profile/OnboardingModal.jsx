@@ -78,6 +78,12 @@ export function OnboardingModal({ onDismiss, onSetInterests, rc }) {
             text: "Ein Gate ist ein Skill-Check. Wenn du es clearst, öffnet oder verstärkt sich ein Fortschrittspfad. Gates sind kein Muss — aber sie geben stärkere Progression.",
           },
           {
+            icon: "⧫",
+            color: "#ef4444",
+            title: "Ascension",
+            text: "Spätere Ranks verlangen mehr als XP. Du brauchst Gates, Trials, echte Ziele, Milestones und sichtbaren Fortschritt — Daily-Spam allein reicht nicht.",
+          },
+          {
             icon: "◇",
             color: "#a78bfa",
             title: "Dein Path",
@@ -148,7 +154,7 @@ export function OnboardingModal({ onDismiss, onSetInterests, rc }) {
         </div>
 
         <div style={{
-          fontSize: "0.56rem", color: "#334155",
+          fontSize: "0.56rem", color: "#64748b",
           textAlign: "center", marginTop: 14, lineHeight: 1.5,
         }}>
           Onboarding jederzeit wieder aufrufbar unter<br />

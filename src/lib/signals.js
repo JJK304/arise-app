@@ -62,6 +62,7 @@ const W_GATE            = 2.5;  // Gate abgeschlossen
 const W_INTEREST        = 1.5;  // Explizites Interesse (nur Booster)
 const W_STAT            = 1.0;  // Stat-Punkte
 const W_CONSISTENCY     = 1.5;  // Konsistenz über mehrere Tage
+const W_REVIEW          = 1.0;  // Weekly Review mit passender Top-Domain
 
 const RECENT_DAYS       = 21;   // Lookback-Fenster
 
@@ -79,6 +80,13 @@ function behaviorWeight(completedAt) {
   if (age <= 14) return W_BEHAVIOR_MID;
   if (age <= 21) return W_BEHAVIOR_OLD;
   return 0;
+}
+
+// Etappe 5: Milestones/Weeklies sind stärkere Signale als Dailies
+function typeWeight(h) {
+  if (h?.type === "milestone") return 1.5;
+  if (h?.type === "weekly")    return 1.2;
+  return 1;
 }
 
 function recentHistory(questHistory, days = RECENT_DAYS) {
@@ -112,12 +120,13 @@ function questMatchesPath(h, pathId) {
 // ═══════════════════════════════════════════════════════════
 export function calculateInterestSignal(state, interestId) {
   const {
-    questHistory = [],
-    progressLogs = [],
-    goals        = [],
-    player       = {},
-    stats        = {},
-    gateProgress = {},
+    questHistory  = [],
+    progressLogs  = [],
+    goals         = [],
+    player        = {},
+    stats         = {},
+    gateProgress  = {},
+    weeklyReviews = [],
   } = state;
 
   const interest = INTERESTS[interestId];
@@ -130,53 +139,58 @@ export function calculateInterestSignal(state, interestId) {
 
   let score = 0;
 
-  // 1. Quest History — mit temporalem Decay
+  // 1. Quest History — mit temporalem Decay.
+  // Etappe 5: gestufte Matches — direkter interestId-Match zählt voll,
+  // Path-Match 50%, Domain/Cat-Match nur 30%. Vorher boostete JEDE
+  // Domain-Quest ALLE Interessen der Domain gleich stark (z. B. eine
+  // generische Mind-Quest alle 20 Lern-Interessen) — das verhinderte
+  // echte Differenzierung zwischen Interessen.
   const recent = recentHistory(questHistory);
-  const matchingQuests = recent.filter(h => {
-    // Direkter interestId-Match (stärkster)
-    if (h.interestId === interestId) return true;
-    // Domain-Match
-    if (h.domain === interest.domain) return true;
-    // Path-Match (für service/leadership die domain "social" haben)
-    if (relatedPaths.length > 0 && relatedPaths.some(p => questMatchesPath(h, p))) return true;
-    // Legacy cat-Match (exakt)
-    if (h.cat === interest.domain) return true;
-    return false;
-  });
+  const matchWeight = (h) => {
+    if (h.interestId === interestId) return 1.0;
+    if (relatedPaths.length > 0 && relatedPaths.some(p => questMatchesPath(h, p))) return 0.5;
+    if (h.domain === interest.domain || h.cat === interest.domain) return 0.3;
+    return 0;
+  };
+  const matchingQuests = recent.filter(h => matchWeight(h) > 0);
 
   if (matchingQuests.length > 0) {
-    // Gewichtete Summe mit Decay
+    // Gewichtete Summe mit Decay, Match-Stufe und Quest-Typ
     const weightedSum = matchingQuests.reduce((s, h) =>
-      s + behaviorWeight(h.completedAt), 0
+      s + behaviorWeight(h.completedAt) * matchWeight(h) * typeWeight(h), 0
     );
     score += Math.min(weightedSum, 15);
 
-    // Konsistenz-Bonus
-    const spread = activeDaySpread(matchingQuests);
+    // Konsistenz-Bonus nur bei direkter/Path-Aktivität (kein Domain-Streu-Bonus)
+    const focused = matchingQuests.filter(h => matchWeight(h) >= 0.5);
+    const spread = activeDaySpread(focused.length > 0 ? focused : matchingQuests);
     if (spread >= 3) score += W_CONSISTENCY;
     if (spread >= 7) score += W_CONSISTENCY * 1.5;
   }
 
-  // 2. Progress Logs
-  const matchingLogs = (progressLogs || []).filter(l =>
-    l.interestId === interestId ||
-    l.domain === interest.domain ||
-    relatedPaths.some(p => l.path === p)
-  );
-  score += Math.min(matchingLogs.length * W_LOG, 10);
+  // 2. Progress Logs (direkt voll, Domain/Path halb)
+  const logScore = (progressLogs || []).reduce((s, l) => {
+    if (l.interestId === interestId) return s + W_LOG;
+    if (l.domain === interest.domain || relatedPaths.some(p => l.path === p)) return s + W_LOG * 0.5;
+    return s;
+  }, 0);
+  score += Math.min(logScore, 10);
 
-  // 3. Goals
-  const matchingGoals = (goals || []).filter(g =>
-    g.domain === interest.domain ||
-    g.interestId === interestId ||
-    relatedPaths.some(p => g.path === p)
-  );
-  const activeGoals    = matchingGoals.filter(g => g.status === "active").length;
-  const completedGoals = matchingGoals.filter(g => g.status === "completed").length;
-  score += activeGoals    * W_GOAL;
-  score += completedGoals * W_GOAL_DONE;
+  // 3. Goals (direkt voll, Domain/Path halb)
+  const goalWeightFn = (g) => {
+    if (g.interestId === interestId) return 1;
+    if (g.domain === interest.domain || relatedPaths.some(p => g.path === p)) return 0.5;
+    return 0;
+  };
+  for (const g of goals || []) {
+    const w = goalWeightFn(g);
+    if (w === 0) continue;
+    if (g.status === "active")    score += W_GOAL * w;
+    if (g.status === "completed") score += W_GOAL_DONE * w;
+  }
 
-  // 4. Explizites Interesse (Booster, kein Hauptsignal)
+  // 4. Explizites Interesse (Booster, kein Hauptsignal —
+  //    Verhalten zählt stärker als manuelle Auswahl)
   if (interestIds.includes(interestId)) score += W_INTEREST;
 
   // 5. Verwandte Path-Affinity
@@ -191,6 +205,13 @@ export function calculateInterestSignal(state, interestId) {
     if (relatedPaths.some(p => gateId.includes(p))) score += W_GATE * 0.4;
   }
 
+  // 7. Weekly Reviews (Etappe 5): Domain unter Top-Domains der Review
+  const recentReviews = (weeklyReviews || []).slice(-4);
+  for (const r of recentReviews) {
+    const tops = (r?.topDomains || []).map(t => (typeof t === "string" ? t : t?.domain));
+    if (tops.includes(interest.domain)) score += W_REVIEW;
+  }
+
   return Math.round(score * 10) / 10;
 }
 
@@ -201,12 +222,13 @@ export function calculateInterestSignal(state, interestId) {
 // ═══════════════════════════════════════════════════════════
 export function calculatePathSignal(state, pathId) {
   const {
-    questHistory = [],
-    progressLogs = [],
-    goals        = [],
-    player       = {},
-    stats        = {},
-    gateProgress = {},
+    questHistory  = [],
+    progressLogs  = [],
+    goals         = [],
+    player        = {},
+    stats         = {},
+    gateProgress  = {},
+    weeklyReviews = [],
   } = state;
 
   const path = PATHS[pathId];
@@ -223,7 +245,10 @@ export function calculatePathSignal(state, pathId) {
 
   // 1. Quest History — mit temporalem Decay
   const recent = recentHistory(questHistory);
-  // Distinguish: direct path match (full weight) vs domain-only match (60%)
+  // Distinguish: direct path match (full weight) vs domain match.
+  // Etappe 3: Primär-Domain (Index 0) zählt 60%, Sekundär-Domains 20%,
+  // Cat-Match 50% — schärft die Abgrenzung überlappender Pfade.
+  const primaryDomain = pathDomains[0] || null;
   const directQuests = recent.filter(h => questMatchesPath(h, pathId));
   const domainQuests = recent.filter(h =>
     !questMatchesPath(h, pathId) && (
@@ -234,8 +259,13 @@ export function calculatePathSignal(state, pathId) {
   const matchingQuests = [...directQuests, ...domainQuests];
 
   if (matchingQuests.length > 0) {
-    const directSum = directQuests.reduce((s, h) => s + behaviorWeight(h.completedAt), 0);
-    const domainSum = domainQuests.reduce((s, h) => s + behaviorWeight(h.completedAt) * 0.6, 0);
+    const directSum = directQuests.reduce((s, h) => s + behaviorWeight(h.completedAt) * typeWeight(h), 0);
+    const domainSum = domainQuests.reduce((s, h) => {
+      let w = 0.2; // Sekundär-Domain
+      if (primaryDomain && questMatchesDomain(h, primaryDomain)) w = 0.6;       // Primär-Domain
+      else if (pathCats.some(c => h.cat === c || h.domain === c)) w = 0.5;      // Cat (Legacy)
+      return s + behaviorWeight(h.completedAt) * w * typeWeight(h);
+    }, 0);
     const weightedSum = directSum + domainSum;
     score += Math.min(weightedSum, 18);
 
@@ -245,29 +275,38 @@ export function calculatePathSignal(state, pathId) {
     if (spread >= 14) score += W_CONSISTENCY * 0.5; // Langzeit-Bonus
   }
 
-  // 2. Progress Logs
-  const matchingLogs = (progressLogs || []).filter(l =>
-    l.path === pathId ||
-    pathDomains.some(d => l.domain === d)
-  );
-  score += Math.min(matchingLogs.length * W_LOG, 12);
+  // 2. Progress Logs (Primär-Domain voll, Sekundär halb)
+  const logScore = (progressLogs || []).reduce((s, l) => {
+    if (l.path === pathId) return s + W_LOG;
+    if (primaryDomain && l.domain === primaryDomain) return s + W_LOG;
+    if (pathDomains.slice(1).includes(l.domain)) return s + W_LOG * 0.5;
+    return s;
+  }, 0);
+  score += Math.min(logScore, 12);
 
-  // 3. Goals
-  const matchingGoals = (goals || []).filter(g =>
-    g.path === pathId ||
-    pathDomains.some(d => g.domain === d)
-  );
-  const activeGoals    = matchingGoals.filter(g => g.status === "active").length;
-  const completedGoals = matchingGoals.filter(g => g.status === "completed").length;
-  score += activeGoals    * W_GOAL;
-  score += completedGoals * W_GOAL_DONE;
+  // 3. Goals (Primär-Domain voll, Sekundär halb)
+  const goalWeight = (g) => {
+    if (g.path === pathId) return 1;
+    if (primaryDomain && g.domain === primaryDomain) return 1;
+    if (pathDomains.slice(1).includes(g.domain)) return 0.5;
+    return 0;
+  };
+  for (const g of goals || []) {
+    const w = goalWeight(g);
+    if (w === 0) continue;
+    if (g.status === "active")    score += W_GOAL * w;
+    if (g.status === "completed") score += W_GOAL_DONE * w;
+  }
 
   // 4. Interests die auf diesen Path zeigen (Booster)
   const matchingInterests = interests.filter(id => {
     const interest = INTERESTS[id];
     return interest?.relatedPaths?.includes(pathId);
   });
-  score += Math.min(matchingInterests.length * W_INTEREST, 6);
+  // Etappe 14 (Szenario C): manuelle Auswahl ist nur ein einmaliger Booster —
+  // egal wie viele passende Interessen gewählt sind, Path-Level entsteht
+  // erst durch echte Aktivität (Quests, Logs, Goals, Gates).
+  score += Math.min(matchingInterests.length * W_INTEREST, W_INTEREST);
 
   // 5. Bestehende Affinity (normalisiert)
   const aff = affinities[pathId] || 0;
@@ -284,6 +323,14 @@ export function calculatePathSignal(state, pathId) {
   const statSum   = pathStats.reduce((s, k) => s + (stats[k] || 0), 0);
   score += Math.min(statSum / 5, W_STAT * 2);
 
+  // 8. Weekly Reviews (Etappe 5): Primär-Domain voll, Sekundär halb
+  const recentReviews = (weeklyReviews || []).slice(-4);
+  for (const r of recentReviews) {
+    const tops = (r?.topDomains || []).map(t => (typeof t === "string" ? t : t?.domain));
+    if (primaryDomain && tops.includes(primaryDomain)) score += W_REVIEW;
+    else if (pathDomains.slice(1).some(d => tops.includes(d))) score += W_REVIEW * 0.5;
+  }
+
   return Math.round(score * 10) / 10;
 }
 
@@ -296,9 +343,9 @@ export function calculatePathSignal(state, pathId) {
 // ═══════════════════════════════════════════════════════════
 export function calculateSpecializationLevel(state, interestId) {
   const signal = calculateInterestSignal(state, interestId);
-  if (signal >= 8)  return 3;  // stark — Gates/Trials/Milestones
-  if (signal >= 3)  return 2;
-  if (signal >= 1)  return 1;
+  if (signal >= 6)  return 3;  // stark — Gates/Trials/Milestones (Sprint: 6+ Signale)
+  if (signal >= 3)  return 2;  // aktiv — Spezialisierung (3–5)
+  if (signal >= 1)  return 1;  // schwach — gelegentliche leichte Quests (1–2)
   return 0;
 }
 
@@ -307,7 +354,7 @@ export function calculatePathSpecializationLevel(state, pathId) {
   const signal = calculatePathSignal(state, pathId);
   if (signal >= 15) return 3; // stark — Gates/Trials (ca. 4–5 fokussierte frische Quests)
   if (signal >= 8)  return 2; // aktiv — spezifische Quests (ca. 2–3 direkte Quests)
-  if (signal >= 1.5) return 1; // schwach — leichte Personalisierung (1 Interest oder 1 Quest)
+  if (signal >= 2)  return 1; // schwach — Aktivität nötig; Auswahl allein (1.5) reicht nicht
   return 0;                   // kein Signal
 }
 
@@ -433,6 +480,7 @@ export function getSignalSummary(state) {
     player:       state?.player  || {},
     stats:        state?.stats   || {},
     gateProgress: state?.gateProgress || {},
+    weeklyReviews: Array.isArray(state?.weeklyReviews) ? state.weeklyReviews : [],
   };
 
   const topPaths     = getTopSignalPaths(safeState, 5);
@@ -477,4 +525,105 @@ export function calculateInterestSignalBatch(state) {
     result[id] = calculateInterestSignal(state, id);
   }
   return result;
+}
+
+// ═══════════════════════════════════════════════════════════
+// getSignalBreakdown — Etappe 5: Erklärbarkeit
+// Zerlegt ein Path- oder Interest-Signal in nachvollziehbare
+// Einzelquellen für die System-Analyse / UI.
+// kind: "path" | "interest"
+// Rückgabe: { total, level, parts: [{ source, label, points }] }
+// ═══════════════════════════════════════════════════════════
+export function getSignalBreakdown(state, kind, id) {
+  const safe = {
+    questHistory:  Array.isArray(state?.questHistory)  ? state.questHistory  : [],
+    progressLogs:  Array.isArray(state?.progressLogs)  ? state.progressLogs  : [],
+    goals:         Array.isArray(state?.goals)         ? state.goals         : [],
+    player:        state?.player || {},
+    stats:         state?.stats  || {},
+    gateProgress:  state?.gateProgress || {},
+    weeklyReviews: Array.isArray(state?.weeklyReviews) ? state.weeklyReviews : [],
+  };
+
+  const isPath = kind === "path";
+  const total  = isPath ? calculatePathSignal(safe, id) : calculateInterestSignal(safe, id);
+  const level  = isPath
+    ? calculatePathSpecializationLevel(safe, id)
+    : calculateSpecializationLevel(safe, id);
+
+  const parts = [];
+  const push = (source, label, points) => {
+    if (points > 0) parts.push({ source, label, points: Math.round(points * 10) / 10 });
+  };
+
+  const def     = isPath ? PATHS[id] : INTERESTS[id];
+  if (!def) return { total: 0, level: 0, parts: [] };
+  const domains = isPath ? (def.domains || []) : [def.domain];
+  const rPaths  = isPath ? [id] : (def.relatedPaths || []);
+  const recent  = recentHistory(safe.questHistory);
+
+  // Verhalten
+  const behaviorQuests = recent.filter(h =>
+    h.interestId === id || rPaths.some(p => questMatchesPath(h, p)) ||
+    domains.some(d => questMatchesDomain(h, d))
+  );
+  if (behaviorQuests.length > 0) {
+    const days = activeDaySpread(behaviorQuests);
+    push("behavior", `${behaviorQuests.length} Quests an ${days} Tag${days > 1 ? "en" : ""}`, behaviorQuests.length);
+  }
+
+  // Logs
+  const logs = safe.progressLogs.filter(l =>
+    l.interestId === id || rPaths.some(p => l.path === p) || domains.some(d => l.domain === d)
+  );
+  push("logs", `${logs.length} Progress Log${logs.length !== 1 ? "s" : ""}`, logs.length);
+
+  // Goals
+  const gs = safe.goals.filter(g =>
+    g.interestId === id || rPaths.some(p => g.path === p) || domains.some(d => g.domain === d)
+  );
+  const gAct  = gs.filter(g => g.status === "active").length;
+  const gDone = gs.filter(g => g.status === "completed").length;
+  push("goals", `${gAct} aktive${gDone > 0 ? `, ${gDone} erreichte` : ""} Ziel(e)`, gAct + gDone);
+
+  // Explizite Interessen
+  const prefs = safe.player?.preferences || {};
+  if (!isPath && (prefs.interests || []).includes(id)) {
+    push("interest", "Explizit als Interesse gewählt", 1);
+  }
+  if (isPath) {
+    const ints = (prefs.interests || []).filter(i => INTERESTS[i]?.relatedPaths?.includes(id));
+    push("interest", ints.length > 0 ? `Interessen: ${ints.slice(0, 2).map(i => INTERESTS[i]?.label).join(", ")}` : "", ints.length);
+  }
+
+  // Gates
+  const gates = Object.entries(safe.gateProgress).filter(([gid, g]) =>
+    g?.completed && rPaths.some(p => gid.includes(p))
+  ).length;
+  push("gates", `${gates} Gate${gates !== 1 ? "s" : ""}/Trial${gates !== 1 ? "s" : ""} abgeschlossen`, gates);
+
+  // Reviews
+  const revs = safe.weeklyReviews.slice(-4).filter(r => {
+    const tops = (r?.topDomains || []).map(t => (typeof t === "string" ? t : t?.domain));
+    return domains.some(d => tops.includes(d));
+  }).length;
+  push("reviews", `${revs} Weekly Review${revs !== 1 ? "s" : ""} mit Fokus hier`, revs);
+
+  return { total, level, parts };
+}
+
+/**
+ * getQuestPathId — Etappe 13: Welchem Path "gehört" eine Quest?
+ * Für Signal-Feedback beim Abschluss: quest.path direkt, sonst
+ * der erste Path, dessen Primär-Domain der Quest-Domain entspricht.
+ */
+export function getQuestPathId(quest) {
+  if (!quest) return null;
+  if (quest.path && PATHS[quest.path]) return quest.path;
+  const d = quest.domain || quest.cat || null;
+  if (!d) return null;
+  for (const p of Object.values(PATHS)) {
+    if (!p.special && (p.domains || [])[0] === d) return p.id;
+  }
+  return null;
 }

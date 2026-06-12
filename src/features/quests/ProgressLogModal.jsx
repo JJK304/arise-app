@@ -38,6 +38,22 @@ export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss
               {fields.metrics.map(key => {
                 const meta = METRIC_LABELS[key];
                 if (!meta) return null;
+                if (meta.type === "text") {
+                  return (
+                    <div key={key} style={{ gridColumn: "1 / -1" }}>
+                      <label style={{ fontSize:"0.52rem",color:"#64748b",letterSpacing:"0.1em" }}>
+                        {meta.icon} {meta.label}
+                      </label>
+                      <input
+                        type="text" maxLength={200}
+                        value={logForm.metrics[key] || ""}
+                        onChange={e => setLogForm(f => ({ ...f, metrics: { ...f.metrics, [key]: e.target.value } }))}
+                        style={{ width:"100%",background:"#0b1020",border:"1px solid #1e293b",borderRadius:6,color:"#e2e8f0",fontSize:"0.7rem",padding:"6px 8px",marginTop:2 }}
+                      />
+                    </div>
+                  );
+                }
+                if (!meta) return null;
                 const isRange = meta.type === "range";
                 return (
                   <div key={key} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:9,padding:"10px" }}>

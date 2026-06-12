@@ -6,7 +6,7 @@
 //   Balance Areas, Inaktivität, Rank-Phase, Weekly Reviews.
 // ============================================================
 
-import { getTopSignalPaths, derivePathAffinityFromProgress, getSignalSummary } from "./signals.js";
+import { getTopSignalPaths, derivePathAffinityFromProgress, getSignalSummary, calculatePathSignal, getSignalBreakdown } from "./signals.js";
 
 
 const NEGLECT_THRESHOLD_DAYS = 5;
@@ -143,6 +143,7 @@ export function analyzeSystem(
     player: { affinities, preferences },
     stats:  context.stats || {},
     gateProgress,
+    weeklyReviews,
   };
 
   const result = {
@@ -337,15 +338,42 @@ export function analyzeSystem(
 
     // Signal-basierte Path-Empfehlung überschreibt History-basierte wenn stärker
     if (signalSummary.dominantPath && signalSummary.dominantPath.level >= 2) {
-      result.suggestedMainPath = signalSummary.dominantPath.pathId;
-      if (signalSummary.topPaths[1]?.level >= 1) {
-        result.suggestedSecondaryPath = signalSummary.topPaths[1].pathId;
+      // Etappe 5 — Hysterese: Ein vom Nutzer gewählter Main Path wird nicht
+      // aggressiv überschrieben. Ein anderer Path wird nur empfohlen, wenn
+      // sein Signal das des gewählten Paths um >= 25% übertrifft. Sonst
+      // bleibt der gewählte Path Main-Empfehlung, der wachsende Path wird
+      // Secondary (neue Richtungen können trotzdem jederzeit wachsen).
+      const chosenMain = (preferences?.activePaths || [])[0] || null;
+      const dominant   = signalSummary.dominantPath;
+      let mainPick     = dominant.pathId;
+      let secondaryPick = signalSummary.topPaths[1]?.level >= 1
+        ? signalSummary.topPaths[1].pathId : null;
+
+      if (chosenMain && chosenMain !== dominant.pathId) {
+        const chosenSignal = calculatePathSignal(state_obj, chosenMain);
+        if (dominant.score < chosenSignal * 1.25) {
+          mainPick      = chosenMain;
+          secondaryPick = dominant.pathId;
+        }
+      }
+
+      result.suggestedMainPath = mainPick;
+      if (secondaryPick && secondaryPick !== mainPick) {
+        result.suggestedSecondaryPath = secondaryPick;
       }
       // Update message with signal reason
       const mainName = PATHS_LABELS[result.suggestedMainPath] || result.suggestedMainPath;
-      const reason   = signalSummary.dominantPath.reason;
+      const reason   = mainPick === dominant.pathId
+        ? signalSummary.dominantPath.reason
+        : `Dein gewählter Pfad bleibt führend — ${PATHS_LABELS[dominant.pathId] || dominant.pathId} wächst als zweite Richtung`;
       result.suggestedMessage = `Signal erkannt: ${mainName}. ${reason}.`;
       result.systemMessage    = result.suggestedMessage;
+    }
+
+    // Etappe 6: Erklärbarkeit — Breakdown des dominanten Pfads für die UI
+    if (signalSummary.dominantPath) {
+      result.dominantBreakdown = getSignalBreakdown(state_obj, "path", signalSummary.dominantPath.pathId);
+      result.dominantBreakdown.pathId = signalSummary.dominantPath.pathId;
     }
   } catch(_) {
     // Signal system non-critical — fail silently
@@ -360,5 +388,5 @@ const PATHS_LABELS = {
   artisan: "Artisan", charmer: "Charmer", strategist: "Strategist", guardian: "Guardian",
   merchant: "Merchant", creator: "Creator", monk: "Monk", explorer: "Explorer",
   leader: "Leader", healer: "Healer",
-  shadow: "Shadow Monarch",
+  shadow: "Shadow Ascendant",
 };

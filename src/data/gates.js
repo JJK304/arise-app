@@ -19,7 +19,7 @@ export const GATES = [
   {
     id: "gate_scholar_1", tier: 1,
     title: "Scholar Gate I — Theory Breaker",
-    path: "scholar", domain: "mind", icon: "🧠", color: "#3b82f6",
+    path: "scholar", domain: "mind", icon: "◈", color: "#3b82f6",
     unlockCondition: null,
     steps: [
       "45 Min. Deep Work ohne Ablenkung absolvieren",
@@ -32,7 +32,7 @@ export const GATES = [
   {
     id: "gate_scholar_2", tier: 2,
     title: "Scholar Gate II — Deep Thinker",
-    path: "scholar", domain: "mind", icon: "🧠", color: "#3b82f6",
+    path: "scholar", domain: "mind", icon: "◈", color: "#3b82f6",
     unlockCondition: "gate_scholar_1",
     steps: [
       "3-Stunden-Fokus-Session: kein Handy, keine Unterbrechungen",
@@ -46,7 +46,7 @@ export const GATES = [
   {
     id: "gate_scholar_3", tier: 3,
     title: "Scholar Gate III — Knowledge Sovereign",
-    path: "scholar", domain: "mind", icon: "🧠", color: "#3b82f6",
+    path: "scholar", domain: "mind", icon: "◈", color: "#3b82f6",
     unlockCondition: "gate_scholar_2",
     steps: [
       "Vollständige Prüfungssimulation unter echten Bedingungen",
@@ -64,7 +64,7 @@ export const GATES = [
   {
     id: "gate_engineer_1", tier: 1,
     title: "Engineer Gate I — Circuit Initiate",
-    path: "engineer", domain: "craft", icon: "🔧", color: "#f97316",
+    path: "engineer", domain: "craft", icon: "⌬", color: "#f97316",
     unlockCondition: null,
     steps: [
       "Bauteil oder Technologie auswählen und recherchieren",
@@ -78,7 +78,7 @@ export const GATES = [
   {
     id: "gate_engineer_2", tier: 2,
     title: "Engineer Gate II — Prototype Builder",
-    path: "engineer", domain: "craft", icon: "🔧", color: "#f97316",
+    path: "engineer", domain: "craft", icon: "⌬", color: "#f97316",
     unlockCondition: "gate_engineer_1",
     steps: [
       "Projektidee definieren: Ziel, Input, Output, Constraints",
@@ -92,7 +92,7 @@ export const GATES = [
   {
     id: "gate_engineer_3", tier: 3,
     title: "Engineer Gate III — System Architect",
-    path: "engineer", domain: "craft", icon: "🔧", color: "#f97316",
+    path: "engineer", domain: "craft", icon: "⌬", color: "#f97316",
     unlockCondition: "gate_engineer_2",
     steps: [
       "Vollständiges Projekt von Idee bis fertigem Ergebnis abschließen",
@@ -110,7 +110,7 @@ export const GATES = [
   {
     id: "gate_fighter_1", tier: 1,
     title: "Fighter Gate I — Iron Will",
-    path: "fighter", domain: "body", icon: "⚔️", color: "#ef4444",
+    path: "fighter", domain: "body", icon: "◈", color: "#ef4444",
     unlockCondition: null,
     steps: [
       "Vollständige Gym-Session: Push, Pull oder Legs",
@@ -124,7 +124,7 @@ export const GATES = [
   {
     id: "gate_fighter_2", tier: 2,
     title: "Fighter Gate II — Strength Protocol",
-    path: "fighter", domain: "body", icon: "⚔️", color: "#ef4444",
+    path: "fighter", domain: "body", icon: "◈", color: "#ef4444",
     unlockCondition: "gate_fighter_1",
     steps: [
       "3 Trainingstage in einer Woche absolvieren (Push/Pull/Legs)",
@@ -138,7 +138,7 @@ export const GATES = [
   {
     id: "gate_fighter_3", tier: 3,
     title: "Fighter Gate III — Body of the Warrior",
-    path: "fighter", domain: "body", icon: "⚔️", color: "#ef4444",
+    path: "fighter", domain: "body", icon: "◈", color: "#ef4444",
     unlockCondition: "gate_fighter_2",
     steps: [
       "4-Wochen-Trainingsroutine vollständig einhalten (min. 3x/Woche)",
@@ -156,7 +156,7 @@ export const GATES = [
   {
     id: "gate_runner_1", tier: 1,
     title: "Runner Gate I — First Mile",
-    path: "runner", domain: "body", icon: "⚡", color: "#f59e0b",
+    path: "runner", domain: "body", icon: "◈", color: "#f59e0b",
     unlockCondition: null,
     steps: [
       "5 km ohne Stopp laufen",
@@ -168,7 +168,7 @@ export const GATES = [
   {
     id: "gate_runner_2", tier: 2,
     title: "Runner Gate II — Endurance Block",
-    path: "runner", domain: "body", icon: "⚡", color: "#f59e0b",
+    path: "runner", domain: "body", icon: "◈", color: "#f59e0b",
     unlockCondition: "gate_runner_1",
     steps: [
       "3 Laufeinheiten in einer Woche absolvieren",
@@ -182,7 +182,7 @@ export const GATES = [
   {
     id: "gate_runner_3", tier: 3,
     title: "Runner Gate III — The Long Run",
-    path: "runner", domain: "body", icon: "⚡", color: "#f59e0b",
+    path: "runner", domain: "body", icon: "◈", color: "#f59e0b",
     unlockCondition: "gate_runner_2",
     steps: [
       "Halbmarathon-Distanz (21 km) in einem Monat aufgebaut",
@@ -200,7 +200,7 @@ export const GATES = [
   {
     id: "gate_artisan_1", tier: 1,
     title: "Artisan Gate I — Creative Spark",
-    path: "artisan", domain: "creativity", icon: "🎨", color: "#a78bfa",
+    path: "artisan", domain: "creativity", icon: "✦", color: "#a78bfa",
     unlockCondition: null,
     steps: [
       "30 Min. konzentriertes Üben (Instrument, Zeichnen, Komposition oder Kochen)",
@@ -213,7 +213,7 @@ export const GATES = [
   {
     id: "gate_artisan_2", tier: 2,
     title: "Artisan Gate II — Craft Ritual",
-    path: "artisan", domain: "creativity", icon: "🎨", color: "#a78bfa",
+    path: "artisan", domain: "creativity", icon: "✦", color: "#a78bfa",
     unlockCondition: "gate_artisan_1",
     steps: [
       "5 aufeinanderfolgende Tage täglich 20+ Min. üben",
@@ -227,7 +227,7 @@ export const GATES = [
   {
     id: "gate_artisan_3", tier: 3,
     title: "Artisan Gate III — Master of the Craft",
-    path: "artisan", domain: "creativity", icon: "🎨", color: "#a78bfa",
+    path: "artisan", domain: "creativity", icon: "✦", color: "#a78bfa",
     unlockCondition: "gate_artisan_2",
     steps: [
       "3 fertige kreative Werke in verschiedenen Techniken erstellen",
@@ -245,7 +245,7 @@ export const GATES = [
   {
     id: "gate_charmer_1", tier: 1,
     title: "Charmer Gate I — Social Initiate",
-    path: "charmer", domain: "social", icon: "👑", color: "#ec4899",
+    path: "charmer", domain: "social", icon: "✧", color: "#ec4899",
     unlockCondition: null,
     steps: [
       "Echtes Gespräch mit einer unbekannten Person starten",
@@ -257,7 +257,7 @@ export const GATES = [
   {
     id: "gate_charmer_2", tier: 2,
     title: "Charmer Gate II — The Presence",
-    path: "charmer", domain: "social", icon: "👑", color: "#ec4899",
+    path: "charmer", domain: "social", icon: "✧", color: "#ec4899",
     unlockCondition: "gate_charmer_1",
     steps: [
       "5 Social Challenges in einer Woche abschließen",
@@ -271,7 +271,7 @@ export const GATES = [
   {
     id: "gate_charmer_3", tier: 3,
     title: "Charmer Gate III — Social Sovereign",
-    path: "charmer", domain: "social", icon: "👑", color: "#ec4899",
+    path: "charmer", domain: "social", icon: "✧", color: "#ec4899",
     unlockCondition: "gate_charmer_2",
     steps: [
       "Öffentliche Präsentation oder Rede halten (min. 5 Min.)",
@@ -289,7 +289,7 @@ export const GATES = [
   {
     id: "gate_strategist_1", tier: 1,
     title: "Strategist Gate I — The First Plan",
-    path: "strategist", domain: "discipline", icon: "♟️", color: "#0ea5e9",
+    path: "strategist", domain: "discipline", icon: "⟁", color: "#0ea5e9",
     unlockCondition: null,
     steps: [
       "Detaillierten Wochenplan erstellen (alle Bereiche: Lernen, Sport, Soziales)",
@@ -302,7 +302,7 @@ export const GATES = [
   {
     id: "gate_strategist_2", tier: 2,
     title: "Strategist Gate II — System Thinker",
-    path: "strategist", domain: "discipline", icon: "♟️", color: "#0ea5e9",
+    path: "strategist", domain: "discipline", icon: "⟁", color: "#0ea5e9",
     unlockCondition: "gate_strategist_1",
     steps: [
       "Persönliches Produktivitätssystem entwickeln und dokumentieren",
@@ -316,7 +316,7 @@ export const GATES = [
   {
     id: "gate_strategist_3", tier: 3,
     title: "Strategist Gate III — Architect of Progress",
-    path: "strategist", domain: "discipline", icon: "♟️", color: "#0ea5e9",
+    path: "strategist", domain: "discipline", icon: "⟁", color: "#0ea5e9",
     unlockCondition: "gate_strategist_2",
     steps: [
       "3-Monats-Roadmap für ein persönliches Lebensziel erstellen",
@@ -334,7 +334,7 @@ export const GATES = [
   {
     id: "gate_guardian_1", tier: 1,
     title: "Guardian Gate I — Order Reset",
-    path: "guardian", domain: "home", icon: "🏠", color: "#84cc16",
+    path: "guardian", domain: "home", icon: "⬢", color: "#84cc16",
     unlockCondition: null,
     steps: [
       "Gesamte Wohnung oder Zimmer vollständig aufräumen und organisieren",
@@ -347,7 +347,7 @@ export const GATES = [
   {
     id: "gate_guardian_2", tier: 2,
     title: "Guardian Gate II — Weekly Structure",
-    path: "guardian", domain: "home", icon: "🏠", color: "#84cc16",
+    path: "guardian", domain: "home", icon: "⬢", color: "#84cc16",
     unlockCondition: "gate_guardian_1",
     steps: [
       "5 aufeinanderfolgende Tage täglich aufräumen (< 10 Min. reichen)",
@@ -361,7 +361,7 @@ export const GATES = [
   {
     id: "gate_guardian_3", tier: 3,
     title: "Guardian Gate III — Stable Foundation",
-    path: "guardian", domain: "home", icon: "🏠", color: "#84cc16",
+    path: "guardian", domain: "home", icon: "⬢", color: "#84cc16",
     unlockCondition: "gate_guardian_2",
     steps: [
       "30-Tage-Ordnungsroutine einhalten (täglich aufräumen)",
@@ -370,7 +370,7 @@ export const GATES = [
       "Jemanden in deiner Ordnungsstrategie unterstützen",
       "Wohnraum gestalten: bewusste Entscheidung über Umgebung",
     ],
-    reward: { xp: 950, affinity: { guardian: 20 }, title: "stable_foundation", titleLabel: "Stable Foundation" },
+    reward: { xp: 900, affinity: { guardian: 20 }, title: "stable_foundation", titleLabel: "Stable Foundation" },
   },
 
   // ════════════════════════════════════════════════════════
@@ -379,7 +379,7 @@ export const GATES = [
   {
     id: "gate_merchant_1", tier: 1,
     title: "Merchant Gate I — First Ledger",
-    path: "merchant", domain: "finance", icon: "💰", color: "#22c55e",
+    path: "merchant", domain: "finance", icon: "◆", color: "#22c55e",
     unlockCondition: null,
     steps: [
       "Alle Ausgaben des letzten Monats aufschreiben",
@@ -392,7 +392,7 @@ export const GATES = [
   {
     id: "gate_merchant_2", tier: 2,
     title: "Merchant Gate II — Financial Strategist",
-    path: "merchant", domain: "finance", icon: "💰", color: "#22c55e",
+    path: "merchant", domain: "finance", icon: "◆", color: "#22c55e",
     unlockCondition: "gate_merchant_1",
     steps: [
       "4 Wochen Budget konsequent tracken",
@@ -406,7 +406,7 @@ export const GATES = [
   {
     id: "gate_merchant_3", tier: 3,
     title: "Merchant Gate III — The Deal",
-    path: "merchant", domain: "finance", icon: "💰", color: "#22c55e",
+    path: "merchant", domain: "finance", icon: "◆", color: "#22c55e",
     unlockCondition: "gate_merchant_2",
     steps: [
       "3-Monats-Finanzplan mit konkreten Spar- und Investmentzielen",
@@ -424,7 +424,7 @@ export const GATES = [
   {
     id: "gate_creator_1", tier: 1,
     title: "Creator Gate I — First Post",
-    path: "creator", domain: "creativity", icon: "🎬", color: "#e879f9",
+    path: "creator", domain: "creativity", icon: "✦", color: "#e879f9",
     unlockCondition: null,
     steps: [
       "Content-Idee entwickeln (Post, Video, Design, Text)",
@@ -437,7 +437,7 @@ export const GATES = [
   {
     id: "gate_creator_2", tier: 2,
     title: "Creator Gate II — Content Streak",
-    path: "creator", domain: "creativity", icon: "🎬", color: "#e879f9",
+    path: "creator", domain: "creativity", icon: "✦", color: "#e879f9",
     unlockCondition: "gate_creator_1",
     steps: [
       "7 Tage in Folge täglichen Content erstellen (auch kleine Formate)",
@@ -451,7 +451,7 @@ export const GATES = [
   {
     id: "gate_creator_3", tier: 3,
     title: "Creator Gate III — The Voice",
-    path: "creator", domain: "creativity", icon: "🎬", color: "#e879f9",
+    path: "creator", domain: "creativity", icon: "✦", color: "#e879f9",
     unlockCondition: "gate_creator_2",
     steps: [
       "30-Tage Content Challenge: täglich etwas produzieren",
@@ -469,7 +469,7 @@ export const GATES = [
   {
     id: "gate_monk_1", tier: 1,
     title: "Monk Gate I — Still Mind",
-    path: "monk", domain: "recovery", icon: "🧘", color: "#10b981",
+    path: "monk", domain: "recovery", icon: "◎", color: "#10b981",
     unlockCondition: null,
     steps: [
       "7 aufeinanderfolgende Tage meditieren (je mind. 5 Min.)",
@@ -481,7 +481,7 @@ export const GATES = [
   {
     id: "gate_monk_2", tier: 2,
     title: "Monk Gate II — Recovery Ritual",
-    path: "monk", domain: "recovery", icon: "🧘", color: "#10b981",
+    path: "monk", domain: "recovery", icon: "◎", color: "#10b981",
     unlockCondition: "gate_monk_1",
     steps: [
       "14 Tage Schlafroutine: gleiche Zeit, kein Handy im Bett",
@@ -495,7 +495,7 @@ export const GATES = [
   {
     id: "gate_monk_3", tier: 3,
     title: "Monk Gate III — Inner Fortress",
-    path: "monk", domain: "recovery", icon: "🧘", color: "#10b981",
+    path: "monk", domain: "recovery", icon: "◎", color: "#10b981",
     unlockCondition: "gate_monk_2",
     steps: [
       "30-Tage Meditation Streak (kein Aussetzer)",
@@ -513,7 +513,7 @@ export const GATES = [
   {
     id: "gate_explorer_1", tier: 1,
     title: "Explorer Gate I — New Horizon",
-    path: "explorer", domain: "adventure", icon: "🌍", color: "#f59e0b",
+    path: "explorer", domain: "adventure", icon: "⟡", color: "#f59e0b",
     unlockCondition: null,
     steps: [
       "Einen neuen Ort oder eine neue Aktivität ausprobieren",
@@ -525,7 +525,7 @@ export const GATES = [
   {
     id: "gate_explorer_2", tier: 2,
     title: "Explorer Gate II — Comfort Zone Breaker",
-    path: "explorer", domain: "adventure", icon: "🌍", color: "#f59e0b",
+    path: "explorer", domain: "adventure", icon: "⟡", color: "#f59e0b",
     unlockCondition: "gate_explorer_1",
     steps: [
       "5 neue Orte oder Aktivitäten in einem Monat erleben",
@@ -539,7 +539,7 @@ export const GATES = [
   {
     id: "gate_explorer_3", tier: 3,
     title: "Explorer Gate III — World Walker",
-    path: "explorer", domain: "adventure", icon: "🌍", color: "#f59e0b",
+    path: "explorer", domain: "adventure", icon: "⟡", color: "#f59e0b",
     unlockCondition: "gate_explorer_2",
     steps: [
       "Mehrtägige Reise oder Abenteuer-Erfahrung (Wandern, Reise, Kurs)",
@@ -557,7 +557,7 @@ export const GATES = [
   {
     id: "gate_leader_1", tier: 1,
     title: "Leader Gate I — First Decision",
-    path: "leader", domain: "social", icon: "🦁", color: "#d97706",
+    path: "leader", domain: "social", icon: "◉", color: "#d97706",
     unlockCondition: null,
     steps: [
       "Eine Entscheidung treffen die andere betrifft — und dazu stehen",
@@ -570,7 +570,7 @@ export const GATES = [
   {
     id: "gate_leader_2", tier: 2,
     title: "Leader Gate II — The Motivator",
-    path: "leader", domain: "social", icon: "🦁", color: "#d97706",
+    path: "leader", domain: "social", icon: "◉", color: "#d97706",
     unlockCondition: "gate_leader_1",
     steps: [
       "Ein Projekt oder eine Gruppe über 2+ Wochen aktiv leiten",
@@ -584,7 +584,7 @@ export const GATES = [
   {
     id: "gate_leader_3", tier: 3,
     title: "Leader Gate III — Architect of People",
-    path: "leader", domain: "social", icon: "🦁", color: "#d97706",
+    path: "leader", domain: "social", icon: "◉", color: "#d97706",
     unlockCondition: "gate_leader_2",
     steps: [
       "Langfristiges Projekt oder Vorhaben mit anderen erfolgreich abschließen",
@@ -602,7 +602,7 @@ export const GATES = [
   {
     id: "gate_healer_1", tier: 1,
     title: "Healer Gate I — First Aid",
-    path: "healer", domain: "recovery", icon: "💚", color: "#34d399",
+    path: "healer", domain: "recovery", icon: "⌁", color: "#34d399",
     unlockCondition: null,
     steps: [
       "7 Tage eigene Schlafqualität tracken und einen Verbesserungsschritt umsetzen",
@@ -614,7 +614,7 @@ export const GATES = [
   {
     id: "gate_healer_2", tier: 2,
     title: "Healer Gate II — Steady Support",
-    path: "healer", domain: "recovery", icon: "💚", color: "#34d399",
+    path: "healer", domain: "recovery", icon: "⌁", color: "#34d399",
     unlockCondition: "gate_healer_1",
     steps: [
       "14 Tage tägliche Recovery-Routine einhalten (Schlaf, Atemübung oder Bewegung)",
@@ -628,7 +628,7 @@ export const GATES = [
   {
     id: "gate_healer_3", tier: 3,
     title: "Healer Gate III — The Resilient",
-    path: "healer", domain: "recovery", icon: "💚", color: "#34d399",
+    path: "healer", domain: "recovery", icon: "⌁", color: "#34d399",
     unlockCondition: "gate_healer_2",
     steps: [
       "30-Tage Recovery-Protokoll: täglich mindestens eine bewusste Erholungseinheit",
@@ -648,7 +648,7 @@ export const GATES = [
   {
     id: "gate_discovery_focus", tier: 1,
     title: "Focus Gate I — First Deep Work",
-    path: "strategist", domain: "discipline", icon: "🎯", color: "#0ea5e9",
+    path: "strategist", domain: "discipline", icon: "⌖", color: "#0ea5e9",
     unlockCondition: null,
     discovery: true,
     steps: [
@@ -656,12 +656,12 @@ export const GATES = [
       "Ablenkungen für eine Session vollständig eliminieren",
       "Reflexion: Welche Themen ziehen deine Aufmerksamkeit am stärksten?",
     ],
-    reward: { xp: 280, affinity: { strategist: 6, scholar: 4 }, title: "focused_mind", titleLabel: "Focused Mind" },
+    reward: { xp: 300, affinity: { strategist: 6, scholar: 4 }, title: "focused_mind", titleLabel: "Focused Mind" },
   },
   {
     id: "gate_discovery_body", tier: 1,
     title: "Body Gate I — Activation Protocol",
-    path: "fighter", domain: "body", icon: "⚡", color: "#ef4444",
+    path: "fighter", domain: "body", icon: "◈", color: "#ef4444",
     unlockCondition: null,
     discovery: true,
     steps: [
@@ -674,7 +674,7 @@ export const GATES = [
   {
     id: "gate_discovery_creation", tier: 1,
     title: "Creation Gate I — First Output",
-    path: "artisan", domain: "creativity", icon: "✨", color: "#a78bfa",
+    path: "artisan", domain: "creativity", icon: "◇", color: "#a78bfa",
     unlockCondition: null,
     discovery: true,
     steps: [
@@ -687,7 +687,7 @@ export const GATES = [
   {
     id: "gate_discovery_social", tier: 1,
     title: "Social Gate I — First Connection",
-    path: "charmer", domain: "social", icon: "🤝", color: "#ec4899",
+    path: "charmer", domain: "social", icon: "◉", color: "#ec4899",
     unlockCondition: null,
     discovery: true,
     steps: [
@@ -700,7 +700,7 @@ export const GATES = [
   {
     id: "gate_discovery_discipline", tier: 1,
     title: "Discipline Gate I — System Start",
-    path: "guardian", domain: "discipline", icon: "🛡️", color: "#84cc16",
+    path: "guardian", domain: "discipline", icon: "⬢", color: "#84cc16",
     unlockCondition: null,
     discovery: true,
     steps: [
@@ -713,7 +713,7 @@ export const GATES = [
   {
     id: "gate_discovery_recovery", tier: 1,
     title: "Recovery Gate I — Rest Protocol",
-    path: "monk", domain: "recovery", icon: "💚", color: "#10b981",
+    path: "monk", domain: "recovery", icon: "⌁", color: "#10b981",
     unlockCondition: null,
     discovery: true,
     steps: [
@@ -726,7 +726,7 @@ export const GATES = [
   {
     id: "gate_discovery_skill", tier: 1,
     title: "Skill Gate I — First Dedication",
-    path: "scholar", domain: "mind", icon: "🔑", color: "#3b82f6",
+    path: "scholar", domain: "mind", icon: "⌖", color: "#3b82f6",
     unlockCondition: null,
     discovery: true,
     steps: [
@@ -749,7 +749,7 @@ export const GATES = [
   {
     id: "trial_scholar_1", tier: 1, trial: true,
     title: "Scholar Trial I — Explain & Apply",
-    path: "scholar", domain: "mind", icon: "🧠", color: "#3b82f6",
+    path: "scholar", domain: "mind", icon: "◈", color: "#3b82f6",
     unlockCondition: "gate_scholar_1",
     steps: [
       "Fokus-Session abschließen (min. 25 Min.) und Notizen erstellen",
@@ -761,7 +761,7 @@ export const GATES = [
   {
     id: "trial_scholar_2", tier: 2, trial: true,
     title: "Scholar Trial II — Deep Synthesis",
-    path: "scholar", domain: "mind", icon: "🧠", color: "#3b82f6",
+    path: "scholar", domain: "mind", icon: "◈", color: "#3b82f6",
     unlockCondition: "trial_scholar_1",
     steps: [
       "5 Deep-Work-Sessions zu einem Thema (je 45+ Min.) abschließen",
@@ -774,7 +774,7 @@ export const GATES = [
   {
     id: "trial_scholar_3", tier: 3, trial: true,
     title: "Scholar Trial III — Mastery Proof",
-    path: "scholar", domain: "mind", icon: "🧠", color: "#3b82f6",
+    path: "scholar", domain: "mind", icon: "◈", color: "#3b82f6",
     unlockCondition: "trial_scholar_2",
     steps: [
       "Komplexes Thema von Grund auf selbst erarbeiten und verstehen",
@@ -782,14 +782,14 @@ export const GATES = [
       "Prüfungssimulation oder anspruchsvolle Aufgabe meistern",
       "Reflexion: Was fehlt noch? Roadmap für nächste Stufe.",
     ],
-    reward: { xp: 1500, affinity: { scholar: 18 }, title: "knowledge_proven", titleLabel: "Knowledge Proven" },
+    reward: { xp: 1200, affinity: { scholar: 18 }, title: "knowledge_proven", titleLabel: "Knowledge Proven" },
   },
 
   // ── Engineer Trials ───────────────────────────────────
   {
     id: "trial_engineer_1", tier: 1, trial: true,
     title: "Engineer Trial I — Build & Debug",
-    path: "engineer", domain: "craft", icon: "🔧", color: "#f97316",
+    path: "engineer", domain: "craft", icon: "⌬", color: "#f97316",
     unlockCondition: "gate_engineer_1",
     steps: [
       "Problem definieren und Lösungsansatz skizzieren",
@@ -801,7 +801,7 @@ export const GATES = [
   {
     id: "trial_engineer_2", tier: 2, trial: true,
     title: "Engineer Trial II — Prototype & Improve",
-    path: "engineer", domain: "craft", icon: "🔧", color: "#f97316",
+    path: "engineer", domain: "craft", icon: "⌬", color: "#f97316",
     unlockCondition: "trial_engineer_1",
     steps: [
       "Prototyp iterativ verbessern (min. 3 Iterationen)",
@@ -809,12 +809,12 @@ export const GATES = [
       "Verbesserung testen und Ergebnis dokumentieren",
       "Was würde ich beim nächsten Mal anders machen?",
     ],
-    reward: { xp: 950, affinity: { engineer: 12 }, title: "iterative_builder", titleLabel: "Iterative Builder" },
+    reward: { xp: 900, affinity: { engineer: 12 }, title: "iterative_builder", titleLabel: "Iterative Builder" },
   },
   {
     id: "trial_engineer_3", tier: 3, trial: true,
     title: "Engineer Trial III — Ship It",
-    path: "engineer", domain: "craft", icon: "🔧", color: "#f97316",
+    path: "engineer", domain: "craft", icon: "⌬", color: "#f97316",
     unlockCondition: "trial_engineer_2",
     steps: [
       "Funktionierendes Projekt vollständig abschließen",
@@ -829,7 +829,7 @@ export const GATES = [
   {
     id: "trial_fighter_1", tier: 1, trial: true,
     title: "Fighter Trial I — Form Check",
-    path: "fighter", domain: "body", icon: "⚔️", color: "#ef4444",
+    path: "fighter", domain: "body", icon: "◈", color: "#ef4444",
     unlockCondition: "gate_fighter_1",
     steps: [
       "Training abschließen und Technik / Form dokumentieren",
@@ -841,7 +841,7 @@ export const GATES = [
   {
     id: "trial_fighter_2", tier: 2, trial: true,
     title: "Fighter Trial II — Performance Block",
-    path: "fighter", domain: "body", icon: "⚔️", color: "#ef4444",
+    path: "fighter", domain: "body", icon: "◈", color: "#ef4444",
     unlockCondition: "trial_fighter_1",
     steps: [
       "3-Wochen Trainingsblock abschließen (min. 3 Einheiten/Woche)",
@@ -854,7 +854,7 @@ export const GATES = [
   {
     id: "trial_fighter_3", tier: 3, trial: true,
     title: "Fighter Trial III — Warrior Standard",
-    path: "fighter", domain: "body", icon: "⚔️", color: "#ef4444",
+    path: "fighter", domain: "body", icon: "◈", color: "#ef4444",
     unlockCondition: "trial_fighter_2",
     steps: [
       "Messbarer Leistungsfortschritt über 6 Wochen dokumentieren",
@@ -869,7 +869,7 @@ export const GATES = [
   {
     id: "trial_creator_1", tier: 1, trial: true,
     title: "Creator Trial I — Finish Something",
-    path: "creator", domain: "creativity", icon: "🎬", color: "#e879f9",
+    path: "creator", domain: "creativity", icon: "✦", color: "#e879f9",
     unlockCondition: "gate_creator_1",
     steps: [
       "Kleines Werk fertigstellen — ein Post, eine Skizze, ein Track, ein Video",
@@ -881,7 +881,7 @@ export const GATES = [
   {
     id: "trial_creator_2", tier: 2, trial: true,
     title: "Creator Trial II — Feedback Loop",
-    path: "creator", domain: "creativity", icon: "🎬", color: "#e879f9",
+    path: "creator", domain: "creativity", icon: "✦", color: "#e879f9",
     unlockCondition: "trial_creator_1",
     steps: [
       "Werk erstellen und echtes Feedback von außen einholen",
@@ -894,7 +894,7 @@ export const GATES = [
   {
     id: "trial_creator_3", tier: 3, trial: true,
     title: "Creator Trial III — Publish or Archive",
-    path: "creator", domain: "creativity", icon: "🎬", color: "#e879f9",
+    path: "creator", domain: "creativity", icon: "✦", color: "#e879f9",
     unlockCondition: "trial_creator_2",
     steps: [
       "Fertiges Werk veröffentlichen oder bewusst archivieren",
@@ -909,7 +909,7 @@ export const GATES = [
   {
     id: "trial_merchant_1", tier: 1, trial: true,
     title: "Merchant Trial I — Map Your Finances",
-    path: "merchant", domain: "finance", icon: "💰", color: "#22c55e",
+    path: "merchant", domain: "finance", icon: "◆", color: "#22c55e",
     unlockCondition: "gate_merchant_1",
     steps: [
       "Alle Einnahmen und Ausgaben des letzten Monats aufschlüsseln",
@@ -921,7 +921,7 @@ export const GATES = [
   {
     id: "trial_merchant_2", tier: 2, trial: true,
     title: "Merchant Trial II — Execute a Plan",
-    path: "merchant", domain: "finance", icon: "💰", color: "#22c55e",
+    path: "merchant", domain: "finance", icon: "◆", color: "#22c55e",
     unlockCondition: "trial_merchant_1",
     steps: [
       "4 Wochen Budget konsequent tracken und auswerten",
@@ -934,7 +934,7 @@ export const GATES = [
   {
     id: "trial_merchant_3", tier: 3, trial: true,
     title: "Merchant Trial III — Deal Closed",
-    path: "merchant", domain: "finance", icon: "💰", color: "#22c55e",
+    path: "merchant", domain: "finance", icon: "◆", color: "#22c55e",
     unlockCondition: "trial_merchant_2",
     steps: [
       "Großes Finanzziel erreicht oder Karriereschritt abgeschlossen",
@@ -949,7 +949,7 @@ export const GATES = [
   {
     id: "trial_charmer_1", tier: 1, trial: true,
     title: "Charmer Trial I — Communicate & Reflect",
-    path: "charmer", domain: "social", icon: "👑", color: "#ec4899",
+    path: "charmer", domain: "social", icon: "✧", color: "#ec4899",
     unlockCondition: "gate_charmer_1",
     steps: [
       "Drei echte Gespräche führen — bewusst mit Aufmerksamkeit",
@@ -961,7 +961,7 @@ export const GATES = [
   {
     id: "trial_charmer_2", tier: 2, trial: true,
     title: "Charmer Trial II — Presence Check",
-    path: "charmer", domain: "social", icon: "👑", color: "#ec4899",
+    path: "charmer", domain: "social", icon: "✧", color: "#ec4899",
     unlockCondition: "trial_charmer_1",
     steps: [
       "5 soziale Situationen bewusst gestalten (nicht passiv mitmachen)",
@@ -976,7 +976,7 @@ export const GATES = [
   {
     id: "trial_monk_1", tier: 1, trial: true,
     title: "Monk Trial I — Recover & Stabilize",
-    path: "monk", domain: "recovery", icon: "🧘", color: "#10b981",
+    path: "monk", domain: "recovery", icon: "◎", color: "#10b981",
     unlockCondition: "gate_monk_1",
     steps: [
       "7 Tage Schlafroutine einhalten und dokumentieren",
@@ -988,7 +988,7 @@ export const GATES = [
   {
     id: "trial_monk_2", tier: 2, trial: true,
     title: "Monk Trial II — The Still Point",
-    path: "monk", domain: "recovery", icon: "🧘", color: "#10b981",
+    path: "monk", domain: "recovery", icon: "◎", color: "#10b981",
     unlockCondition: "trial_monk_1",
     steps: [
       "14 Tage täglich meditieren oder Atemübung (min. 5 Min.)",
@@ -1003,7 +1003,7 @@ export const GATES = [
   {
     id: "trial_explorer_1", tier: 1, trial: true,
     title: "Explorer Trial I — Act Outside Comfort Zone",
-    path: "explorer", domain: "adventure", icon: "🌍", color: "#f59e0b",
+    path: "explorer", domain: "adventure", icon: "⟡", color: "#f59e0b",
     unlockCondition: "gate_explorer_1",
     steps: [
       "Eine Aktivität tun die dir Unbehagen bereitet",
@@ -1015,7 +1015,7 @@ export const GATES = [
   {
     id: "trial_explorer_2", tier: 2, trial: true,
     title: "Explorer Trial II — The Expedition",
-    path: "explorer", domain: "adventure", icon: "🌍", color: "#f59e0b",
+    path: "explorer", domain: "adventure", icon: "⟡", color: "#f59e0b",
     unlockCondition: "trial_explorer_1",
     steps: [
       "In einem Monat 3 neue Erfahrungen bewusst suchen",
@@ -1030,7 +1030,7 @@ export const GATES = [
   {
     id: "trial_leader_1", tier: 1, trial: true,
     title: "Leader Trial I — Decide & Guide",
-    path: "leader", domain: "social", icon: "🦁", color: "#d97706",
+    path: "leader", domain: "social", icon: "◉", color: "#d97706",
     unlockCondition: "gate_leader_1",
     steps: [
       "Eine wichtige Entscheidung für andere treffen und begründen",
@@ -1042,7 +1042,7 @@ export const GATES = [
   {
     id: "trial_leader_2", tier: 2, trial: true,
     title: "Leader Trial II — The Long Game",
-    path: "leader", domain: "social", icon: "🦁", color: "#d97706",
+    path: "leader", domain: "social", icon: "◉", color: "#d97706",
     unlockCondition: "trial_leader_1",
     steps: [
       "Projekt oder Gruppe über 3+ Wochen aktiv führen",
@@ -1057,7 +1057,7 @@ export const GATES = [
   {
     id: "trial_healer_1", tier: 1, trial: true,
     title: "Healer Trial I — Support & Reflect",
-    path: "healer", domain: "recovery", icon: "💚", color: "#34d399",
+    path: "healer", domain: "recovery", icon: "⌁", color: "#34d399",
     unlockCondition: "gate_healer_1",
     steps: [
       "Person aktiv unterstützen und danach reflektieren",
@@ -1069,7 +1069,7 @@ export const GATES = [
   {
     id: "trial_healer_2", tier: 2, trial: true,
     title: "Healer Trial II — Resilience Built",
-    path: "healer", domain: "recovery", icon: "💚", color: "#34d399",
+    path: "healer", domain: "recovery", icon: "⌁", color: "#34d399",
     unlockCondition: "trial_healer_1",
     steps: [
       "14 Tage tägliche Recovery-Routine ohne Aussetzer",
@@ -1084,7 +1084,7 @@ export const GATES = [
   {
     id: "trial_artisan_1", tier: 1, trial: true,
     title: "Artisan Trial I — First Craft",
-    path: "artisan", domain: "creativity", icon: "🎨", color: "#a78bfa",
+    path: "artisan", domain: "creativity", icon: "✦", color: "#a78bfa",
     unlockCondition: "gate_artisan_1",
     steps: [
       "Kleines handwerkliches oder kreatives Werk vollständig fertigstellen",
@@ -1096,7 +1096,7 @@ export const GATES = [
   {
     id: "trial_artisan_2", tier: 2, trial: true,
     title: "Artisan Trial II — Mastery of Medium",
-    path: "artisan", domain: "creativity", icon: "🎨", color: "#a78bfa",
+    path: "artisan", domain: "creativity", icon: "✦", color: "#a78bfa",
     unlockCondition: "trial_artisan_1",
     steps: [
       "Anspruchsvolleres Werk in gewähltem Medium fertigstellen",
@@ -1111,7 +1111,7 @@ export const GATES = [
   {
     id: "trial_runner_1", tier: 1, trial: true,
     title: "Runner Trial I — Distance Check",
-    path: "runner", domain: "body", icon: "⚡", color: "#f59e0b",
+    path: "runner", domain: "body", icon: "◈", color: "#f59e0b",
     unlockCondition: "gate_runner_1",
     steps: [
       "3 Lauf-Sessions in einer Woche abschließen",
@@ -1125,7 +1125,7 @@ export const GATES = [
   {
     id: "trial_strategist_1", tier: 1, trial: true,
     title: "Strategist Trial I — Plan & Execute",
-    path: "strategist", domain: "discipline", icon: "♟️", color: "#0ea5e9",
+    path: "strategist", domain: "discipline", icon: "⟁", color: "#0ea5e9",
     unlockCondition: "gate_strategist_1",
     steps: [
       "Wochenplan erstellen und zu 80%+ einhalten",
@@ -1139,7 +1139,7 @@ export const GATES = [
   {
     id: "trial_guardian_1", tier: 1, trial: true,
     title: "Guardian Trial I — Hold the Structure",
-    path: "guardian", domain: "home", icon: "🏠", color: "#84cc16",
+    path: "guardian", domain: "home", icon: "⬢", color: "#84cc16",
     unlockCondition: "gate_guardian_1",
     steps: [
       "14 Tage täglich aufräumen (< 10 Min. reichen)",
@@ -1157,7 +1157,7 @@ export const GATES = [
   {
     id: "gate_discovery_adventure", tier: 1,
     title: "Adventure Gate I — First Step Outside",
-    path: "explorer", domain: "adventure", icon: "🌍", color: "#f59e0b",
+    path: "explorer", domain: "adventure", icon: "⟡", color: "#f59e0b",
     discovery: true,
     steps: [
       "Eine Aktivität außerhalb der gewohnten Routine ausprobieren",
@@ -1168,13 +1168,78 @@ export const GATES = [
   {
     id: "gate_discovery_service", tier: 1,
     title: "Service Gate I — First Support",
-    path: "healer", domain: "social", icon: "🤲", color: "#22c55e",
+    path: "healer", domain: "social", icon: "⌁", color: "#22c55e",
     discovery: true,
     steps: [
       "Jemandem heute aktiv und ohne Erwartung helfen",
       "Kurz reflektieren: Wie hat es sich angefühlt?",
     ],
     reward: { xp: 180, affinity: { healer: 5, leader: 3 }, title: "first_support", titleLabel: "First Support" },
+  },
+  {
+    id: "gate_discovery_focus", tier: 1,
+    title: "Focus Gate I — Mind Lock Protocol",
+    path: "strategist", domain: "discipline", icon: "◎", color: "#0ea5e9",
+    unlockCondition: null,
+    discovery: true,
+    steps: [
+      "3 Fokus-Sessions à 20+ Minuten ohne Unterbrechung abschließen",
+      "Notieren, was dich am stärksten ablenkt — und einen Gegenzug festlegen",
+      "Reflexion: Wann am Tag ist dein Fokus am stärksten?",
+    ],
+    reward: { xp: 220, affinity: { strategist: 4, scholar: 3, monk: 3 }, title: "mind_locked", titleLabel: "Mind Locked" },
+  },
+  {
+    id: "gate_discovery_leadership", tier: 1,
+    title: "Leadership Gate I — First Command",
+    path: "leader", domain: "social", icon: "◉", color: "#d97706",
+    unlockCondition: null,
+    discovery: true,
+    steps: [
+      "Eine Entscheidung treffen, die du sonst aufgeschoben hättest — und umsetzen",
+      "Einmal Verantwortung für etwas übernehmen, das andere betrifft",
+      "Reflexion: Wo könntest du öfter vorangehen statt abzuwarten?",
+    ],
+    reward: { xp: 220, affinity: { leader: 5, charmer: 2 }, title: "first_command", titleLabel: "First Command" },
+  },
+  {
+    id: "gate_discovery_craft", tier: 1,
+    title: "Craft Gate I — Maker Protocol",
+    path: "artisan", domain: "craft", icon: "⌖", color: "#a78bfa",
+    unlockCondition: null,
+    discovery: true,
+    steps: [
+      "Etwas mit den eigenen Händen erschaffen, reparieren oder kochen",
+      "Das Ergebnis kurz festhalten (Foto oder Notiz)",
+      "Reflexion: Was würdest du beim nächsten Mal besser machen?",
+    ],
+    reward: { xp: 230, affinity: { artisan: 4, engineer: 4 }, title: "maker_awakened", titleLabel: "Maker Awakened" },
+  },
+  {
+    id: "gate_discovery_home", tier: 1,
+    title: "Home Gate I — Foundation Protocol",
+    path: "guardian", domain: "home", icon: "⬢", color: "#84cc16",
+    unlockCondition: null,
+    discovery: true,
+    steps: [
+      "Einen Bereich deines Umfelds vollständig in Ordnung bringen",
+      "Eine kleine Routine festlegen, damit er so bleibt",
+      "Reflexion: Welcher Bereich kostet dich am meisten Energie?",
+    ],
+    reward: { xp: 210, affinity: { guardian: 5, strategist: 2 }, title: "foundation_laid", titleLabel: "Foundation Laid" },
+  },
+  {
+    id: "gate_discovery_resource", tier: 1,
+    title: "Resource Gate I — Asset Protocol",
+    path: "merchant", domain: "finance", icon: "◆", color: "#22c55e",
+    unlockCondition: null,
+    discovery: true,
+    steps: [
+      "Deine Ausgaben der letzten 7 Tage ehrlich erfassen",
+      "Eine konkrete Verbesserung festlegen (sparen, kündigen, verhandeln)",
+      "Reflexion: Wofür willst du deine Ressourcen wirklich einsetzen?",
+    ],
+    reward: { xp: 210, affinity: { merchant: 5, strategist: 2 }, title: "asset_awakened", titleLabel: "Asset Awakened" },
   },
 
   // ════════════════════════════════════════════════════════
@@ -1187,7 +1252,7 @@ export const GATES = [
   {
     id: "trial_runner_2", tier: 2, trial: true,
     title: "Runner Trial II — Endurance Push",
-    path: "runner", domain: "body", icon: "⚡", color: "#f59e0b",
+    path: "runner", domain: "body", icon: "◈", color: "#f59e0b",
     unlockCondition: "trial_runner_1",
     steps: [
       "5 Lauf-Sessions in 2 Wochen abschließen",
@@ -1200,7 +1265,7 @@ export const GATES = [
   {
     id: "trial_runner_3", tier: 3, trial: true,
     title: "Runner Trial III — The Long Run",
-    path: "runner", domain: "body", icon: "⚡", color: "#f59e0b",
+    path: "runner", domain: "body", icon: "◈", color: "#f59e0b",
     unlockCondition: "trial_runner_2",
     steps: [
       "10km oder persönliche Bestdistanz am Stück abschließen",
@@ -1215,7 +1280,7 @@ export const GATES = [
   {
     id: "trial_strategist_2", tier: 2, trial: true,
     title: "Strategist Trial II — Systems Thinking",
-    path: "strategist", domain: "discipline", icon: "♟️", color: "#0ea5e9",
+    path: "strategist", domain: "discipline", icon: "⟁", color: "#0ea5e9",
     unlockCondition: "trial_strategist_1",
     steps: [
       "Persönliches Produktivitätssystem aufbauen und 2 Wochen testen",
@@ -1228,7 +1293,7 @@ export const GATES = [
   {
     id: "trial_strategist_3", tier: 3, trial: true,
     title: "Strategist Trial III — Execute & Adapt",
-    path: "strategist", domain: "discipline", icon: "♟️", color: "#0ea5e9",
+    path: "strategist", domain: "discipline", icon: "⟁", color: "#0ea5e9",
     unlockCondition: "trial_strategist_2",
     steps: [
       "Langfristiges Ziel (4+ Wochen) vollständig abschließen",
@@ -1243,7 +1308,7 @@ export const GATES = [
   {
     id: "trial_guardian_2", tier: 2, trial: true,
     title: "Guardian Trial II — Stable Foundation",
-    path: "guardian", domain: "home", icon: "🏠", color: "#84cc16",
+    path: "guardian", domain: "home", icon: "⬢", color: "#84cc16",
     unlockCondition: "trial_guardian_1",
     steps: [
       "30 Tage täglich minimale Ordnungsroutine eingehalten",
@@ -1256,7 +1321,7 @@ export const GATES = [
   {
     id: "trial_guardian_3", tier: 3, trial: true,
     title: "Guardian Trial III — The Guardian",
-    path: "guardian", domain: "home", icon: "🏠", color: "#84cc16",
+    path: "guardian", domain: "home", icon: "⬢", color: "#84cc16",
     unlockCondition: "trial_guardian_2",
     steps: [
       "Vollständiges Ordnungs- und Finanzsystem für 8 Wochen eingehalten",
@@ -1271,7 +1336,7 @@ export const GATES = [
   {
     id: "trial_artisan_3", tier: 3, trial: true,
     title: "Artisan Trial III — The Craftsman",
-    path: "artisan", domain: "creativity", icon: "🎨", color: "#a78bfa",
+    path: "artisan", domain: "creativity", icon: "✦", color: "#a78bfa",
     unlockCondition: "trial_artisan_2",
     steps: [
       "Umfangreiches Werk oder Projekt vollständig abschließen",
@@ -1286,7 +1351,7 @@ export const GATES = [
   {
     id: "trial_charmer_3", tier: 3, trial: true,
     title: "Charmer Trial III — The Presence",
-    path: "charmer", domain: "social", icon: "👑", color: "#ec4899",
+    path: "charmer", domain: "social", icon: "✧", color: "#ec4899",
     unlockCondition: "trial_charmer_2",
     steps: [
       "10 bewusste soziale Interaktionen über 4 Wochen dokumentiert",
@@ -1301,7 +1366,7 @@ export const GATES = [
   {
     id: "trial_explorer_3", tier: 3, trial: true,
     title: "Explorer Trial III — Beyond the Map",
-    path: "explorer", domain: "adventure", icon: "🗺️", color: "#10b981",
+    path: "explorer", domain: "adventure", icon: "⟡", color: "#10b981",
     unlockCondition: "trial_explorer_2",
     steps: [
       "Mehrtägiges Abenteuer oder neue Umgebung erlebt",
@@ -1316,7 +1381,7 @@ export const GATES = [
   {
     id: "trial_healer_3", tier: 3, trial: true,
     title: "Healer Trial III — Resilient Support",
-    path: "healer", domain: "recovery", icon: "💚", color: "#22c55e",
+    path: "healer", domain: "recovery", icon: "⌁", color: "#22c55e",
     unlockCondition: "trial_healer_2",
     steps: [
       "30-Tage Recovery-Protokoll vollständig eingehalten",
@@ -1331,7 +1396,7 @@ export const GATES = [
   {
     id: "trial_leader_3", tier: 3, trial: true,
     title: "Leader Trial III — The Leader",
-    path: "leader", domain: "social", icon: "🏛️", color: "#6366f1",
+    path: "leader", domain: "social", icon: "◉", color: "#6366f1",
     unlockCondition: "trial_leader_2",
     steps: [
       "Gruppe oder Projekt über 4+ Wochen aktiv geführt",
@@ -1339,14 +1404,14 @@ export const GATES = [
       "Jemanden über längere Zeit gecoacht oder begleitet",
       "Reflexion: Was macht mich als Leader aus — Stärken und Schwächen?",
     ],
-    reward: { xp: 1500, affinity: { leader: 20 }, title: "the_leader", titleLabel: "The Leader" },
+    reward: { xp: 1200, affinity: { leader: 20 }, title: "the_leader", titleLabel: "The Leader" },
   },
 
   // ── Monk Trial III ─────────────────────────────────────
   {
     id: "trial_monk_3", tier: 3, trial: true,
     title: "Monk Trial III — Inner Stillness",
-    path: "monk", domain: "recovery", icon: "🧘", color: "#8b5cf6",
+    path: "monk", domain: "recovery", icon: "◎", color: "#8b5cf6",
     unlockCondition: "trial_monk_2",
     steps: [
       "30-Tage Meditation oder Achtsamkeitsroutine eingehalten",
@@ -1363,7 +1428,7 @@ export const GATES = [
   {
     id: "gate_shadow_1", tier: 1,
     title: "Shadow Gate I — The Allrounder",
-    path: "shadow", domain: "discipline", icon: "🌑", color: "#00ffff",
+    path: "shadow", domain: "discipline", icon: "⧫", color: "#00ffff",
     unlockCondition: "shadow_unlock",  // Sonderregel: braucht Shadow-Unlock
     special: true,
     steps: [
@@ -1608,15 +1673,22 @@ export function getRecommendedGates(sysAnalysis, gateProgress = {}, state = null
   // From sysAnalysis (already includes signal data from analyzeSystem)
   const dominated = sysAnalysis?.dominantPaths || [];
   const suggested  = sysAnalysis?.suggestedMainPath;
-  const topSignals = (sysAnalysis?.topSignalPaths || []).map(sp => sp.pathId);
+  // Etappe 14 (Szenario B): nur Paths mit AKTIVER Spezialisierung (Level >= 2)
+  // bekommen Path-Gate-Empfehlungen — schwache Streusignale (Level 1 über
+  // Sekundär-Domains) reichen nicht. Leichte Signale → weiterhin Discovery.
+  const topSignals = (sysAnalysis?.topSignalPaths || [])
+    .filter(sp => (sp.level ?? 0) >= 2)
+    .map(sp => sp.pathId);
   targetPaths = new Set([...dominated, ...topSignals, suggested].filter(Boolean));
 
-  // Path Gates for user with some history
+  // Path Gates for user with some history.
+  // Etappe 7: OHNE Signale keine Path Gates — neuer Nutzer sieht
+  // maximal Discovery Gates. Spezifische Path Gates erst durch Signale.
   const pathGates = GATES.filter(g => {
     if (g.special || g.discovery) return false;
     if (isGateCompleted(g.id, gateProgress)) return false;
     if (!isGateUnlocked(g, gateProgress)) return false;
-    return targetPaths.size === 0 || targetPaths.has(g.path);
+    return targetPaths.has(g.path);
   });
 
   // Sort: tier ascending, then by path signal strength
@@ -1631,15 +1703,56 @@ export function getRecommendedGates(sysAnalysis, gateProgress = {}, state = null
   // Strategy: show discovery gates if < 2 completed gates, else path gates
   const MAX_SHOWN = 2;
   if (completedCount < 2) {
-    // Mix: 1 discovery + 1 path gate (if available)
+    // Mix: 1 discovery + 1 path gate (falls Signale existieren),
+    // sonst 2 Discovery Gates
     const result = [];
     if (discoveryGates.length > 0) result.push(discoveryGates[0]);
     const pathCandidate = pathGates.find(g => g.path !== result[0]?.path);
     if (pathCandidate && result.length < MAX_SHOWN) result.push(pathCandidate);
+    if (result.length < MAX_SHOWN && discoveryGates.length > 1) {
+      result.push(discoveryGates.find(g => !result.includes(g)));
+    }
     if (result.length === 0 && pathGates.length > 0) result.push(pathGates[0]);
-    return result;
+    return result.filter(Boolean);
   }
 
   // After 2+ gates: only path-specific gates
   return pathGates.slice(0, MAX_SHOWN);
+}
+
+// ═══════════════════════════════════════════════════════════
+// getVisibleGates — Etappe 7
+// Katalog-Sichtbarkeit: "Neuer Nutzer sieht maximal Discovery
+// Gates. Gates dürfen im Hintergrund existieren."
+// Sichtbar sind:
+//   - alle Discovery Gates
+//   - Path-Gates/Trials nur für Paths mit Signal (signalPaths,
+//     aktive Paths) ODER bereits begonnenem/abgeschlossenem
+//     Fortschritt in diesem Path.
+// ═══════════════════════════════════════════════════════════
+export function getVisibleGates(gateProgress = {}, opts = {}) {
+  const {
+    signalPaths = [],   // [{pathId, level}] oder ["pathId"]
+    activePaths = [],   // explizit gewählte Paths
+  } = opts;
+
+  const signalSet = new Set([
+    ...signalPaths.map(sp => (typeof sp === "string" ? sp : sp?.pathId)).filter(Boolean),
+    ...activePaths,
+  ]);
+
+  // Paths mit bereits begonnenem/abgeschlossenem Gate-Fortschritt bleiben sichtbar
+  const startedPaths = new Set();
+  for (const [gateId, prog] of Object.entries(gateProgress)) {
+    const hasProgress = prog?.completed || (prog?.steps || []).some(Boolean);
+    if (!hasProgress) continue;
+    const gate = GATES.find(g => g.id === gateId);
+    if (gate?.path) startedPaths.add(gate.path);
+  }
+
+  return GATES.filter(g => {
+    if (g.special) return false;
+    if (g.discovery) return true;
+    return signalSet.has(g.path) || startedPaths.has(g.path);
+  });
 }

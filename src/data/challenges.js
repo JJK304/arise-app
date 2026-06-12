@@ -4,6 +4,7 @@
 // milestones   → XP + statPts — echter Selbsttest mit klarer Frage
 // Prompt 10: Erweitert durch challengesExtra.js
 // ============================================================
+import { NEUTRAL_RANK_QUESTS } from "./neutralQuests.js";
 import { EXTRA_DAILIES, EXTRA_WEEKLIES, EXTRA_MILESTONES,
          EXTRA_DAILIES_D, EXTRA_WEEKLIES_C, EXTRA_MILESTONES_CB } from "./challengesExtra.js";
 
@@ -348,11 +349,11 @@ export const CHALLENGES_DB = {
   },
 
   // ══════════════════════════════════════════════════════════
-  // SSS-RANK — Shadow Monarch. Das Unmögliche.
+  // SSS-RANK — Ascendant. Das Unmögliche.
   // ══════════════════════════════════════════════════════════
   SSS:{
     daily:[
-      {id:"sss_d1", title:"Shadow Monarch Training",      desc:"3h Kraft + 20km + 500 Dips + 500 Liegestütze. Täglich.",             xp:640, stat:"STR", statPts:0, type:"daily", cat:"strength"},
+      {id:"sss_d1", title:"Ascendant Training",      desc:"3h Kraft + 20km + 500 Dips + 500 Liegestütze. Täglich.",             xp:640, stat:"STR", statPts:0, type:"daily", cat:"strength"},
       {id:"sss_d2", title:"Genius-Level Work",             desc:"10h Deep Work auf absolutem Weltklasse-Niveau. Echte Probleme, echte Lösungen.", xp:640, stat:"INT", statPts:0, type:"daily", cat:"mind"},
       {id:"sss_d3", title:"Erschaffen was bleibt",         desc:"Erschaffe heute etwas das andere dauerhaft verändern wird.",         xp:540, stat:"CRE", statPts:0, type:"daily", cat:"skill_creative"},
     ],
@@ -361,9 +362,9 @@ export const CHALLENGES_DB = {
       {id:"sss_w2", title:"Absolutes Maximum",             desc:"7 Tage: alle Stats perfekt – Körper, Geist, Kreativität, Soziales.", xp:6700, stat:"END", statPts:0, type:"weekly", cat:"discipline"},
     ],
     milestones:[
-      {id:"sss_m1", title:"I ALONE LEVEL UP",              desc:"SSS-Rank Lv.10. Das absolut Unmögliche. Shadow Monarch.",           xp:500000, stat:"END", statPts:999, type:"milestone", cat:"legacy"},
+      {id:"sss_m1", title:"ASCENSION COMPLETE",             desc:"SSS-Rank Lv.10. Das absolut Unmögliche. Shadow Ascendant.",           xp:500000, stat:"END", statPts:999, type:"milestone", cat:"legacy"},
       {id:"sss_m2", title:"Weltklasse-Expertise",          desc:"Tiefste Expertise auf einem Gebiet. Weltweit anerkannt oder nachgewiesen.", xp:160000, stat:"INT", statPts:640, type:"milestone", cat:"mind"},
-      {id:"sss_m3", title:"Körper des Shadow Monarch",     desc:"Absolute Perfektion: Kraft, Ausdauer, Ästhetik – alles maximal.",  xp:130000, stat:"STR", statPts:520, type:"milestone", cat:"strength"},
+      {id:"sss_m3", title:"Körper des Ascendant",     desc:"Absolute Perfektion: Kraft, Ausdauer, Ästhetik – alles maximal.",  xp:130000, stat:"STR", statPts:520, type:"milestone", cat:"strength"},
     ],
   },
 };
@@ -403,5 +404,13 @@ CHALLENGES_DB.C.weekly    = [...(CHALLENGES_DB.C.weekly||[]),...(EXTRA_WEEKLIES_
 // B-Rank: extra milestones
 CHALLENGES_DB.B = CHALLENGES_DB.B || { daily:[], weekly:[], milestones:[] };
 CHALLENGES_DB.B.milestones= [...(CHALLENGES_DB.B.milestones||[]),...(EXTRA_MILESTONES_CB?.B || [])];
+
+// ── Neutrale Rank-Quests einmergen (Etappe 2: Equal Start) ──
+// Sichert vollen neutralen Pool auf jedem Rank — ohne Themenbevorzugung.
+for (const rk of Object.keys(NEUTRAL_RANK_QUESTS)) {
+  CHALLENGES_DB[rk] = CHALLENGES_DB[rk] || { daily:[], weekly:[], milestones:[] };
+  CHALLENGES_DB[rk].daily  = [...(CHALLENGES_DB[rk].daily  || []), ...(NEUTRAL_RANK_QUESTS[rk].daily  || [])];
+  CHALLENGES_DB[rk].weekly = [...(CHALLENGES_DB[rk].weekly || []), ...(NEUTRAL_RANK_QUESTS[rk].weekly || [])];
+}
 
 

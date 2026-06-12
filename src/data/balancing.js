@@ -45,6 +45,13 @@ export const XP_BOUNDS = {
     tier2: { min: 600, max: 900  },
     tier3: { min: 900, max: 1200 },
     shadow:{ min: 500, max: 800  },  // Shadow Tier-1 Spezial
+    discovery: { min: 150, max: 300 }, // Leichte Einstiegs-Gates (Signal-Erkundung)
+  },
+  // Trials — prüfen echte Anwendung, daher höher als Gates
+  trial: {
+    tier1: { min: 400,  max: 600  },
+    tier2: { min: 700,  max: 1000 },
+    tier3: { min: 1200, max: 1600 },
   },
   // Goals
   goal: {

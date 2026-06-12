@@ -57,8 +57,12 @@ const W = {
 const SIGNAL_SPECIFICITY = { 0: 0, 1: 0.3, 2: 0.6, 3: 1.0 };
 
 // Max visible personalized quests per signal level
-const MAX_DAILY_BY_SIGNAL   = { 0: 0, 1: 2, 2: 4, 3: 5 };
-const MAX_WEEKLY_BY_SIGNAL  = { 0: 0, 1: 1, 2: 2, 3: 3 };
+// Etappe 6 — Sichtbarkeits-Limits nach Signal-Level (Sprint: Daily 3–5, Weekly 2–3).
+// WICHTIG: Level 0 = neuer Nutzer → bekommt 3 neutrale Dailies + 2 Weeklies.
+// (Vorher 0/0 — neuer Nutzer sah gar keine Quests.)
+const MAX_DAILY_BY_SIGNAL        = { 0: 3, 1: 4, 2: 4, 3: 5 };
+const MAX_WEEKLY_BY_SIGNAL       = { 0: 2, 1: 2, 2: 3, 3: 3 };
+const MAX_PERSONALIZED_BY_SIGNAL = { 0: 0, 1: 2, 2: 3, 3: 5 };
 
 // ══════════════════════════════════════════════════════════
 // Hilfsfunktionen
@@ -607,11 +611,12 @@ export function getVisibleContent(pools, state = {}, opts = {}) {
   // Adjust limits per signal level
   const visMaxDaily  = Math.min(maxDaily,        MAX_DAILY_BY_SIGNAL[signalLevel]  ?? maxDaily);
   const visMaxWeekly = Math.min(maxWeekly,       MAX_WEEKLY_BY_SIGNAL[signalLevel] ?? maxWeekly);
+  const visMaxPers   = Math.min(maxPersonalized, MAX_PERSONALIZED_BY_SIGNAL[signalLevel] ?? maxPersonalized);
 
   return {
     visibleDaily:        (pools.daily        || []).slice(0, visMaxDaily),
     visibleWeekly:       (pools.weekly       || []).slice(0, visMaxWeekly),
-    visiblePersonalized: (pools.personalized || []).slice(0, maxPersonalized),
+    visiblePersonalized: (pools.personalized || []).slice(0, visMaxPers),
     visibleRecovery:     (pools.recovery     || []).slice(0, maxRecovery),
     signalLevel,
     reason,
@@ -619,9 +624,42 @@ export function getVisibleContent(pools, state = {}, opts = {}) {
     totalVisible:
       Math.min((pools.daily  || []).length, visMaxDaily)  +
       Math.min((pools.weekly || []).length, visMaxWeekly) +
-      Math.min((pools.personalized || []).length, maxPersonalized) +
+      Math.min((pools.personalized || []).length, visMaxPers) +
       Math.min((pools.recovery || []).length, maxRecovery),
   };
+}
+
+// ═══════════════════════════════════════════════════════════
+// selectNextMilestones — Etappe 6
+// "Milestones: nur nächste relevante anzeigen."
+// Wählt aus dem Katalog die nächsten offenen Milestones:
+// niedrigster Rank zuerst, bevorzugt passend zu den stärksten
+// Signal-Paths (Stats/Domains), max. `max` sichtbar.
+// ═══════════════════════════════════════════════════════════
+export function selectNextMilestones(allMilestones, state = {}, completedIds = new Set(), max = 3) {
+  const open = (allMilestones || []).filter(m => !completedIds.has(m.id));
+  if (open.length <= max) return open;
+
+  // Relevanz: Stats/Domains der Top-Signal-Paths
+  let prefStats = new Set();
+  let prefDomains = new Set();
+  try {
+    for (const sp of getTopSignalPaths(state, 3)) {
+      const p = PATHS[sp.pathId];
+      for (const s of p?.stats   || []) prefStats.add(s);
+      for (const d of p?.domains || []) prefDomains.add(d);
+    }
+  } catch (_) {}
+
+  const scored = open.map((m, idx) => {
+    let s = 0;
+    if (prefStats.has(m.subStat || m.stat)) s += 2;
+    if (prefDomains.has(m.domain) || prefDomains.has(m.cat)) s += 1;
+    return { m, s, idx }; // idx erhält Rank-Reihenfolge (Katalog ist rank-sortiert)
+  });
+  // Erst Relevanz, dann Katalog-Reihenfolge (≈ niedrigster Rank zuerst)
+  scored.sort((a, b) => (b.s - a.s) || (a.idx - b.idx));
+  return scored.slice(0, max).map(e => e.m);
 }
 
 // ══════════════════════════════════════════════════════════
@@ -790,8 +828,8 @@ export function getNextBestQuests(preferences, context = {}) {
       { goals: [topGoal], questHistory: context.questHistory || [], currentStreak, neglectedDomains },
       2
     );
-    if (quests.length > 0) return quests.slice(0, 2);
+    if (quests.length > 0) return quests.slice(0, 1); // Etappe 6: Next Best Quest max. 1
   }
 
-  return generatePersonalizedQuests(preferences, context, 2);
+  return generatePersonalizedQuests(preferences, context, 1).slice(0, 1);
 }

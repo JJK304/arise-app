@@ -457,7 +457,7 @@ export const INTERESTS = {
   musik: {
     id: "musik", label: "Musik", icon: "🎵",
     domain: "creativity", group: "creative",
-    relatedPaths: ["artisan", "creator"],
+    relatedPaths: ["creator"],
     relatedStats: ["CRE"],
     tags: ["kreativität", "kunst", "ausdruck"],
     questTopic: "Musik", baseWeight: 1,
@@ -465,7 +465,7 @@ export const INTERESTS = {
   beatmaking: {
     id: "beatmaking", label: "Beatmaking / Produktion", icon: "🎛️",
     domain: "creativity", group: "creative",
-    relatedPaths: ["artisan", "creator"],
+    relatedPaths: ["creator"],
     relatedStats: ["CRE"],
     tags: ["kreativität", "musik", "technik"],
     questTopic: "Beatmaking", baseWeight: 1,
@@ -473,7 +473,7 @@ export const INTERESTS = {
   zeichnen: {
     id: "zeichnen", label: "Zeichnen", icon: "✏️",
     domain: "creativity", group: "creative",
-    relatedPaths: ["artisan", "creator"],
+    relatedPaths: ["creator"],
     relatedStats: ["CRE"],
     tags: ["kreativität", "kunst", "visual"],
     questTopic: "Zeichnen", baseWeight: 1,
@@ -481,7 +481,7 @@ export const INTERESTS = {
   malen: {
     id: "malen", label: "Malen", icon: "🎨",
     domain: "creativity", group: "creative",
-    relatedPaths: ["artisan", "creator"],
+    relatedPaths: ["creator"],
     relatedStats: ["CRE"],
     tags: ["kreativität", "kunst", "farbe"],
     questTopic: "Malen", baseWeight: 1,
@@ -489,7 +489,7 @@ export const INTERESTS = {
   design: {
     id: "design", label: "Design", icon: "🖼️",
     domain: "creativity", group: "creative",
-    relatedPaths: ["artisan", "creator", "engineer"],
+    relatedPaths: ["creator", "engineer"],
     relatedStats: ["CRE"],
     tags: ["kreativität", "visual", "gestaltung"],
     questTopic: "Design", baseWeight: 1,
@@ -505,7 +505,7 @@ export const INTERESTS = {
   fotografie: {
     id: "fotografie", label: "Fotografie", icon: "📷",
     domain: "creativity", group: "creative",
-    relatedPaths: ["artisan", "creator", "explorer"],
+    relatedPaths: ["creator", "explorer"],
     relatedStats: ["CRE"],
     tags: ["kreativität", "visual", "kunst"],
     questTopic: "Fotografie", baseWeight: 1,
@@ -1018,14 +1018,6 @@ export const INTERESTS = {
     tags: ["achtsamkeit", "erholung", "fokus"],
     questTopic: "Meditation", baseWeight: 1,
   },
-  atemübungen: {
-    id: "atemübungen", label: "Atemübungen", icon: "🫁",
-    domain: "recovery", group: "recovery",
-    relatedPaths: ["monk", "healer"],
-    relatedStats: ["VIT"],
-    tags: ["achtsamkeit", "erholung", "körper"],
-    questTopic: "Atemübung", baseWeight: 1,
-  },
   stressmanagement: {
     id: "stressmanagement", label: "Stressmanagement", icon: "🌿",
     domain: "recovery", group: "recovery",
@@ -1290,6 +1282,48 @@ export const INTERESTS = {
     tags: ["zuhause", "alltag", "organisation"],
     questTopic: "Einkaufen", baseWeight: 1,
   },
+
+  // ── Etappe 4: Ergänzungen für vollständige Sprint-Abdeckung ──
+  regeneration: {
+    id: "regeneration", label: "Regeneration", icon: "🔋",
+    domain: "recovery", group: "body",
+    relatedPaths: ["runner", "monk", "healer"],
+    relatedStats: ["VIT"],
+    tags: ["erholung", "koerper", "schlaf", "training"],
+    questTopic: "Regeneration", baseWeight: 1,
+  },
+  koerpergewicht: {
+    id: "koerpergewicht", label: "Körpergewicht & Körperkomposition", icon: "⚖️",
+    domain: "body", group: "body",
+    relatedPaths: ["fighter", "runner"],
+    relatedStats: ["VIT", "STR"],
+    tags: ["koerper", "ernaehrung", "messen", "fortschritt"],
+    questTopic: "Körperkomposition", baseWeight: 1,
+  },
+  business: {
+    id: "business", label: "Business & Unternehmertum", icon: "📈",
+    domain: "career", group: "career",
+    relatedPaths: ["merchant", "leader"],
+    relatedStats: ["INT", "CHA"],
+    tags: ["karriere", "geld", "projekte", "verantwortung"],
+    questTopic: "Business", baseWeight: 1,
+  },
+  atemuebungen: {
+    id: "atemuebungen", label: "Atemübungen", icon: "🌬️",
+    domain: "recovery", group: "recovery",
+    relatedPaths: ["monk", "healer"],
+    relatedStats: ["VIT"],
+    tags: ["erholung", "achtsamkeit", "stress", "ruhe"],
+    questTopic: "Atemübungen", baseWeight: 1,
+  },
+  datenblaetter: {
+    id: "datenblaetter", label: "Datenblätter & Spezifikationen", icon: "📄",
+    domain: "craft", group: "tech",
+    relatedPaths: ["engineer"],
+    relatedStats: ["INT", "CRA"],
+    tags: ["technik", "elektronik", "recherche", "praezision"],
+    questTopic: "Datenblätter", baseWeight: 1,
+  },
 };
 
 
@@ -1299,21 +1333,24 @@ export const INTEREST_LIST = Object.values(INTERESTS);
 
 // ── Interessen nach Gruppen ───────────────────────────────
 
+// Etappe 4: Gruppen alphabetisch nach Label sortiert — keine Kategorie
+// steht "zuerst" (vorher: Lernen/Technik oben → impliziter STEM-Bias).
+// Duplikate bereinigt (haushalt/ordnung nur noch in "Zuhause").
 export const INTEREST_GROUPS = {
-  mind:       { label: "🧠 Lernen & Wissen",       ids: ["physik","mathe","chemie","biologie","informatik","sprachen","lesen","schreiben","geschichte","philosophie","psychologie","wirtschaft","statistik","rhetorik","gedaechtnistraining","allgemeinbildung","deepwork","recherche","notizen","pruefungsvorbereitung"] },
-  tech:       { label: "🔧 Technik & Engineering",  ids: ["elektronik","programmieren","webentwicklung","app_entwicklung","robotik","arduino","raspberry_pi","automatisierung","datenanalyse","maschinelles_lernen","dreiddruck","prototyping","debugging","software_projekte","hardware_projekte","schaltplaene","dokumentation"] },
-  body:       { label: "💪 Körper & Fitness",        ids: ["krafttraining","calisthenics","kampfsport","laufen","schwimmen","radfahren","ausdauer","mobility","dehnen","yoga","ernaehrung","meal_prep","schlaf","muskelaufbau","koerperhaltung","spaziergaenge","sport"] },
-  creative:   { label: "🎨 Kreativität",             ids: ["musik","beatmaking","zeichnen","malen","design","ui_ux","fotografie","video","animation","kreatives_schreiben","storytelling","contentcreation","podcast","game_design","portfolio"] },
-  craft:      { label: "🍳 Handwerk & Praktisches",  ids: ["kochen","backen","handwerk","reparieren","bauen","diy","garten","naehen","holzarbeit","metallarbeit","wohnung_gestalten","werkzeug_lernen"] },
-  social:     { label: "🤝 Social & Auftreten",      ids: ["socialskills","kommunikation","small_talk","freunde","familie","dating","networking","praesentieren","koerpersprache","konfliktloesung","selbstbewusstsein"] },
-  appearance: { label: "👔 Aussehen & Auftreten",    ids: ["style","grooming","hautpflege","profilfoto"] },
-  career:     { label: "💼 Karriere",                ids: ["karriere","bewerbung","lebenslauf","nebenprojekt","verhandeln","produktivitaet","projektmanagement"] },
-  finance:    { label: "💰 Finanzen",                ids: ["finanzen","budgeting","sparen","investieren","finanzplanung","buerokratie","versicherungen","steuern"] },
-  discipline: { label: "🛡️ Disziplin & Alltag",     ids: ["routinen","ordnung","zeitmanagement","planung","wochenreview","journaling","digital_detox","aufraeuemen","minimalismus","haushalt","verantwortung","produktivitaetssysteme"] },
-  recovery:   { label: "💚 Erholung & Achtsamkeit",  ids: ["meditation","atemübungen","stressmanagement","schlafroutine","ruhezeit","dankbarkeit","mentale_gesundheit","achtsamkeit","selbstreflexion","natur"] },
   adventure:  { label: "🌍 Abenteuer & Wachstum",   ids: ["reisen","outdoor","wandern","neue_orte","events","kultur","komfortzone","neue_skills","freiwilligenarbeit"] },
+  appearance: { label: "👔 Aussehen & Auftreten",    ids: ["style","grooming","hautpflege","profilfoto"] },
+  discipline: { label: "🛡️ Disziplin & Planung",     ids: ["routinen","zeitmanagement","planung","wochenreview","journaling","digital_detox","minimalismus","verantwortung","produktivitaetssysteme"] },
+  recovery:   { label: "💚 Erholung & Achtsamkeit",  ids: ["meditation","atemuebungen","stressmanagement","schlafroutine","ruhezeit","dankbarkeit","mentale_gesundheit","achtsamkeit","selbstreflexion","natur"] },
+  finance:    { label: "💰 Finanzen",                ids: ["finanzen","budgeting","sparen","investieren","finanzplanung","buerokratie","versicherungen","steuern"] },
+  craft:      { label: "🍳 Handwerk & Praktisches",  ids: ["kochen","backen","handwerk","reparieren","bauen","diy","garten","naehen","holzarbeit","metallarbeit","wohnung_gestalten","werkzeug_lernen"] },
+  career:     { label: "💼 Karriere & Business",     ids: ["karriere","bewerbung","lebenslauf","nebenprojekt","business","verhandeln","produktivitaet","projektmanagement"] },
+  body:       { label: "💪 Körper & Fitness",        ids: ["krafttraining","calisthenics","kampfsport","laufen","schwimmen","radfahren","ausdauer","mobility","dehnen","yoga","ernaehrung","meal_prep","schlaf","regeneration","muskelaufbau","koerpergewicht","koerperhaltung","spaziergaenge","sport"] },
+  creative:   { label: "🎨 Kreativität",             ids: ["musik","beatmaking","zeichnen","malen","design","ui_ux","fotografie","video","animation","kreatives_schreiben","storytelling","contentcreation","podcast","game_design","portfolio"] },
+  mind:       { label: "🧠 Lernen & Wissen",         ids: ["physik","mathe","chemie","biologie","informatik","sprachen","lesen","schreiben","geschichte","philosophie","psychologie","wirtschaft","statistik","rhetorik","gedaechtnistraining","allgemeinbildung","deepwork","recherche","notizen","pruefungsvorbereitung"] },
   service:    { label: "🤲 Service & Leadership",    ids: ["helfen","mentoring","teamfuehrung","entscheidungen","zuhoeren","unterstuetzung","community","empathie","organisation_fuer_andere"] },
-  home:       { label: "🏠 Zuhause & Alltag",          ids: ["haushaltsorganisation","umgebung_gestalten","einkaufen","haushalt","ordnung"] },
+  social:     { label: "🤝 Social & Kommunikation",  ids: ["socialskills","kommunikation","small_talk","freunde","familie","dating","networking","praesentieren","koerpersprache","konfliktloesung","selbstbewusstsein"] },
+  tech:       { label: "🔧 Technik & Engineering",   ids: ["elektronik","programmieren","webentwicklung","app_entwicklung","robotik","arduino","raspberry_pi","automatisierung","datenanalyse","maschinelles_lernen","dreiddruck","prototyping","debugging","software_projekte","hardware_projekte","schaltplaene","datenblaetter","dokumentation"] },
+  home:       { label: "🏠 Zuhause & Alltag",        ids: ["haushalt","ordnung","aufraeuemen","haushaltsorganisation","umgebung_gestalten","einkaufen"] },
 };
 
 /**
@@ -1381,7 +1418,7 @@ export const LEGACY_INTEREST_MAP = {
   "digital_detox":        "digital_detox",
   "aufraeuemen":          "aufraeuemen",
   "minimalismus":         "minimalismus",
-  "atemübungen":          "atemübungen",
+  "atemübungen":          "atemuebungen",
   "natur":                "natur",
   "selbstreflexion":      "selbstreflexion",
   "achtsamkeit":          "achtsamkeit",

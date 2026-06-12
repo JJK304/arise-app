@@ -4,10 +4,14 @@
 // Next Best Quest und Shadow-Hinweis.
 // ============================================================
 import { PATHS } from "../../data/paths.js";
+import { getRankUpStatus } from "../../lib/rankRequirements.js";
 import { canUnlockShadow } from "../../data/paths.js";
 import { getNextPathMilestone } from "../../data/gates.js";
 
 export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState, showNotif }) {
+  // Etappe 8: Anforderungen für den nächsten Rank (jenseits von XP)
+  let rankUpStatus = null;
+  try { rankUpStatus = getRankUpStatus(state); } catch (_) {}
   const affinities      = state.player?.affinities || {};
   const mainPath        = state.player?.mainPath;
   const secPath         = state.player?.secondaryPath;
@@ -53,6 +57,17 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
                 {sysAnalysis.topSignalPaths[0].reason}
               </div>
             )}
+            {/* Etappe 6: nachvollziehbarer Signal-Breakdown des dominanten Pfads */}
+            {sysAnalysis.dominantBreakdown?.parts?.length > 0 && (
+              <div style={{ marginTop:6,padding:"6px 8px",background:"rgba(0,255,255,0.03)",border:"1px solid rgba(0,255,255,0.08)",borderRadius:6 }}>
+                <div style={{ fontSize:"0.48rem",letterSpacing:"0.14em",color:"#00ffff33",marginBottom:3 }}>WARUM DIESES SIGNAL</div>
+                {sysAnalysis.dominantBreakdown.parts.slice(0,4).map((part,i)=>(
+                  <div key={i} style={{ fontSize:"0.56rem",color:"#94a3b8",lineHeight:1.5,display:"flex",justifyContent:"space-between",gap:8 }}>
+                    <span>▸ {part.label}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         ) : sysAnalysis.dominantPaths?.length > 0 ? (
           <div style={{ display:"flex",gap:5,flexWrap:"wrap",marginBottom:sysAnalysis.balanceHints.length>0||showSuggestion?8:0 }}>
@@ -67,6 +82,21 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
             })}
           </div>
         ) : null}
+
+        {/* Etappe 8: Rank-Up-Anforderungen (mehr als XP) — immer sichtbar wenn offen */}
+        {rankUpStatus && !rankUpStatus.met && (
+          <div style={{ marginBottom:8,padding:"6px 8px",background:"rgba(245,158,11,0.04)",border:"1px solid rgba(245,158,11,0.14)",borderRadius:6 }}>
+            <div style={{ fontSize:"0.48rem",letterSpacing:"0.14em",color:"#f59e0b88",marginBottom:3 }}>
+              ⧫ RANK-UP {rankUpStatus.nextRank} — ANFORDERUNGEN
+            </div>
+            {rankUpStatus.checks.map(c => (
+              <div key={c.id} style={{ fontSize:"0.56rem",color:c.done?"#22c55e":"#94a3b8",lineHeight:1.55,display:"flex",justifyContent:"space-between",gap:8 }}>
+                <span>{c.done ? "✓" : "▢"} {c.label}</span>
+                <span style={{ color:c.done?"#22c55e":"#64748b",fontFamily:"'Orbitron',sans-serif",fontSize:"0.5rem" }}>{Math.min(c.have,c.need)}/{c.need}</span>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Balance Hints */}
         {sysAnalysis.balanceHints.length > 0 && (
@@ -132,7 +162,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
         {shadowUnlockable && (
           <div style={{ marginTop:10,display:"flex",alignItems:"center",gap:7 }}>
             <span style={{ fontSize:"1rem" }}>🌑</span>
-            <div style={{ fontSize:"0.67rem",color:"#00ffff88",lineHeight:1.4 }}>Shadow Monarch Path verfügbar — meistere alle Pfade.</div>
+            <div style={{ fontSize:"0.67rem",color:"#00ffff88",lineHeight:1.4 }}>Shadow Ascendant Path verfügbar — meistere alle Pfade.</div>
           </div>
         )}
 

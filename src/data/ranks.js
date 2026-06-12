@@ -58,7 +58,7 @@ export const RANK_COLORS = {
   },
   SSS: {
     primary: "#00ffff", secondary: "#67e8f9",
-    glow: "#00ffff55", label: "Shadow Monarch", desc: "Das Unmögliche. Du hast es geschafft.",
+    glow: "#00ffff55", label: "Ascendant", desc: "Das Unmögliche. Du bist über alle Pfade hinausgewachsen.",
     bg: "#000a0a", pattern: "radial-gradient(circle at 50% 0%, #001a1a 0%, transparent 60%), radial-gradient(circle at 100% 100%, #000f0f 0%, transparent 40%), radial-gradient(circle at 0% 100%, #001010 0%, transparent 35%)",
     accent: "#164e63", headerBg: "rgba(0,8,8,0.94)",
     border: "rgba(0,255,255,0.28)", text: "#ccffff", muted: "#67e8f988",

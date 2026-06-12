@@ -83,12 +83,20 @@ export function applyQuestCompletion(state, quest, options) {
 
   // ── Level-Up ──
   const levelUps = [];
+  let rankUpBlocked = null;
   let xpNeeded = XP_PER_LEVEL_FN(s.rank, s.level);
   while (s.xp >= xpNeeded) {
     s.xp -= xpNeeded;
     const gl = getGlobalLevel(s.rank, s.level);
     if (gl < TOTAL_LEVELS) {
       const next = getRankFromGlobal(gl + 1);
+      // Etappe 8: Rank-Ups brauchen mehr als XP. Bei unerfüllten
+      // Anforderungen staut XP an der Rank-Grenze (kein Verlust).
+      if (next.rank !== s.rank && !canRankUpTo(s, next.rank)) {
+        s.xp += xpNeeded; // zurückgeben — wartet an der Grenze
+        rankUpBlocked = next.rank;
+        break;
+      }
       levelUps.push({ rank: next.rank, level: next.level, rankUp: next.rank !== s.rank });
       s.rank = next.rank;
       s.level = next.level;
@@ -134,6 +142,7 @@ export function applyQuestCompletion(state, quest, options) {
     pathGains:         gains,
     newTitles:         newlyUnlocked,
     levelUps,
+    rankUpBlocked,
     goalNotifications,
   };
 
@@ -188,12 +197,20 @@ export function applyGateCompletion(state, gate, options) {
 
   // Level-Up
   const levelUps = [];
+  let rankUpBlocked = null;
   let xpNeeded = XP_PER_LEVEL_FN(s.rank, s.level);
   while (s.xp >= xpNeeded) {
     s.xp -= xpNeeded;
     const gl = getGlobalLevel(s.rank, s.level);
     if (gl < TOTAL_LEVELS) {
       const next = getRankFromGlobal(gl + 1);
+      // Etappe 8: Rank-Ups brauchen mehr als XP. Bei unerfüllten
+      // Anforderungen staut XP an der Rank-Grenze (kein Verlust).
+      if (next.rank !== s.rank && !canRankUpTo(s, next.rank)) {
+        s.xp += xpNeeded; // zurückgeben — wartet an der Grenze
+        rankUpBlocked = next.rank;
+        break;
+      }
       levelUps.push({ rank: next.rank, level: next.level, rankUp: next.rank !== s.rank });
       s.rank = next.rank;
       s.level = next.level;
@@ -203,7 +220,7 @@ export function applyGateCompletion(state, gate, options) {
 
   return {
     newState: s,
-    feedback: { xp, levelUps, titleId: gate.reward.title },
+    feedback: { xp, levelUps, rankUpBlocked, titleId: gate.reward.title },
     alreadyDone: false,
   };
 }

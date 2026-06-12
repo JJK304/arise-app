@@ -6,6 +6,9 @@
 // ============================================================
 import { getDayKey, getWeekKey } from "./dates.js";
 import { clampXp, XP_BOUNDS } from "../data/balancing.js";
+import { buildThemeContext, questThemeMatches } from "../data/questThemes.js";
+import { INTERESTS } from "../data/interests.js";
+import { PATHS } from "../data/paths.js";
 
 // ── Limiten ────────────────────────────────────────────────
 const MAX_DAILY      = 5;   // aus CHALLENGES_DB.daily
@@ -49,27 +52,102 @@ function deterministicShuffle(arr, rng) {
  * Prioritätsscore für einen Quest basierend auf Kontext.
  * Höherer Score → wird bevorzugt gewählt.
  */
+// ═══════════════════════════════════════════════════════════
+// scoreQuestCandidate — Etappe 6: Sprint-Scoring-Formel
+//   Active Goal Match:        35%
+//   Recent Behavior Match:    30%
+//   Explicit Interest Match:  20%
+//   Stat / Path Signal:       10%
+//   Balance Need:              5%
+// Jede Komponente wird auf 0..1 normalisiert und gewichtet.
+// Rückgabe: Score 0..100.
+// ═══════════════════════════════════════════════════════════
+export function scoreQuestCandidate(quest, context = {}) {
+  const {
+    interests        = [],
+    activePaths      = [],
+    activeGoals      = [],
+    neglectedDomains = [],
+    signalInterests  = [],
+    signalPaths      = [],
+    recentDomains    = {},   // { domain: count } der letzten 14 Tage
+  } = context;
+
+  // 1) Active Goal Match (35)
+  let goal = 0;
+  if (quest.goalId && activeGoals.some(g => g.id === quest.goalId)) goal = 1;
+  else if (quest.domain && activeGoals.some(g => g.domain === quest.domain)) goal = 0.6;
+  else if (quest.path   && activeGoals.some(g => g.path   === quest.path))   goal = 0.6;
+
+  // 2) Recent Behavior Match (30) — Anteil der Domain am jüngsten Verhalten
+  let behavior = 0;
+  const totalRecent = Object.values(recentDomains).reduce((s, n) => s + n, 0);
+  if (totalRecent > 0 && quest.domain && recentDomains[quest.domain]) {
+    behavior = Math.min(1, (recentDomains[quest.domain] / totalRecent) * 2.5);
+  }
+
+  // 3) Explicit Interest Match (20)
+  let interest = 0;
+  if (quest.interestId && interests.includes(quest.interestId)) interest = 1;
+  else if (quest.path && activePaths.includes(quest.path)) interest = 0.7;
+
+  // 4) Stat / Path Signal (10) — Verhaltens-Signale (Level 0..3)
+  let signal = 0;
+  const siMatch = quest.interestId &&
+    signalInterests.find(si => (si.interestId || si) === quest.interestId);
+  const spMatch = quest.path &&
+    signalPaths.find(sp => (sp.pathId || sp) === quest.path);
+  if (siMatch) signal = Math.max(signal, (siMatch.level ?? 1) / 3);
+  if (spMatch) signal = Math.max(signal, (spMatch.level ?? 1) / 3);
+
+  // 5) Balance Need (5)
+  let balance = 0;
+  if (quest.domain && neglectedDomains.includes(quest.domain)) balance = 1;
+  else if (quest.cat && neglectedDomains.includes(quest.cat))  balance = 0.7;
+
+  return goal * 35 + behavior * 30 + interest * 20 + signal * 10 + balance * 5;
+}
+
+// ── Quest-Grund (Etappe 6): nachvollziehbar, sprint-konform ──
+export function buildQuestReason(quest, context = {}) {
+  const {
+    interests = [], activeGoals = [], neglectedDomains = [],
+    signalInterests = [], signalPaths = [], recentDomains = {},
+  } = context;
+
+  if (quest.goalId) {
+    const g = activeGoals.find(g => g.id === quest.goalId);
+    if (g) return `wegen Ziel: ${g.title}`;
+  }
+  if (quest.domain) {
+    const g = activeGoals.find(g => g.domain === quest.domain);
+    if (g) return `wegen Ziel: ${g.title}`;
+  }
+  if (quest.interestId && interests.includes(quest.interestId)) {
+    const label = INTERESTS[quest.interestId]?.label || quest.interestId;
+    return `wegen Interesse: ${label}`;
+  }
+  if (quest.interestId && signalInterests.some(si => (si.interestId || si) === quest.interestId)) {
+    const label = INTERESTS[quest.interestId]?.label || quest.interestId;
+    return `deine letzten Quests zeigen ${label}`;
+  }
+  if (quest.path && signalPaths.some(sp => (sp.pathId || sp) === quest.path)) {
+    const name = PATHS[quest.path]?.name || quest.path;
+    return `dein ${name}-Signal wächst`;
+  }
+  const totalRecent = Object.values(recentDomains).reduce((s, n) => s + n, 0);
+  if (totalRecent > 0 && quest.domain && recentDomains[quest.domain] >= 2) {
+    return `deine letzten Quests zeigen Aktivität in diesem Bereich`;
+  }
+  if (quest.domain && neglectedDomains.includes(quest.domain)) {
+    return `Balance empfohlen: ${quest.domain}`;
+  }
+  return "allgemeine Starter-Quest";
+}
+
 function questScore(quest, context) {
-  let score = 0;
-  const { interests = [], activePaths = [], activeGoals = [], neglectedDomains = [] } = context;
-
-  // Goal-Bezug: höchste Priorität
-  if (quest.goalId && activeGoals.some(g => g.id === quest.goalId)) score += 15;
-
-  // Interest-Match
-  if (quest.interestId && interests.includes(quest.interestId)) score += 8;
-
-  // Path-Match
-  if (quest.path && activePaths.includes(quest.path)) score += 5;
-
-  // Vernachlässigte Domain
-  if (quest.domain && neglectedDomains.includes(quest.domain)) score += 6;
-  if (quest.cat   && neglectedDomains.includes(quest.cat))    score += 4;
-
-  // Empfohlen
-  if (quest.recommended) score += 3;
-
-  return score;
+  // Etappe 6: delegiert an die Sprint-Scoring-Formel
+  return scoreQuestCandidate(quest, context);
 }
 
 // ══════════════════════════════════════════════════════════
@@ -97,18 +175,24 @@ export function rotateQuestPool(pools, context = {}, dayKeyOverride, weekKeyOver
   const rngDay  = createRng(dayKey);
   const rngWeek = createRng(weekKey);
 
+  // ── Theme-Gating (Etappe 2: Equal Start) ──
+  // Spezifische Quests (Gym, Instrument, Kochen, Finanzen, …) sind nur
+  // wählbar, wenn Interesse, Path, Goal oder Verhaltens-Signal passt.
+  // Neutrale Quests sind immer wählbar.
+  const themeCtx = buildThemeContext(context);
+
   // ── Daily Pool ──
-  const dailyPool = (pools.daily || []).slice();
+  const dailyPool = (pools.daily || []).filter(q => questThemeMatches(q, themeCtx));
   // Sortiere nach Score + shuffle für Variation
-  const scoredDaily = dailyPool.map(q => ({ q, score: questScore(q, context) + rngDay() }));
+  const scoredDaily = dailyPool.map(q => ({ q, score: questScore(q, context) + rngDay() * 8 }));
   scoredDaily.sort((a, b) => b.score - a.score);
-  const selectedDaily = scoredDaily.slice(0, MAX_DAILY).map(s => s.q);
+  const selectedDaily = scoredDaily.slice(0, MAX_DAILY).map(s => ({ ...s.q, reason: buildQuestReason(s.q, context) }));
 
   // ── Weekly Pool ──
-  const weeklyPool = (pools.weekly || []).slice();
-  const scoredWeekly = weeklyPool.map(q => ({ q, score: questScore(q, context) + rngWeek() * 0.5 }));
+  const weeklyPool = (pools.weekly || []).filter(q => questThemeMatches(q, themeCtx));
+  const scoredWeekly = weeklyPool.map(q => ({ q, score: questScore(q, context) + rngWeek() * 8 }));
   scoredWeekly.sort((a, b) => b.score - a.score);
-  const selectedWeekly = scoredWeekly.slice(0, MAX_WEEKLY).map(s => s.q);
+  const selectedWeekly = scoredWeekly.slice(0, MAX_WEEKLY).map(s => ({ ...s.q, reason: buildQuestReason(s.q, context) }));
 
   // ── Personalized / Starter Quests ──
   // Diese kommen schon vorsortiert vom Generator

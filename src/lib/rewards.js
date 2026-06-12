@@ -5,6 +5,7 @@
 // XP-Grenzen aus balancing.js.
 // ============================================================
 import { RANKS, LEVELS_PER_RANK } from "../data/ranks.js";
+import { canRankUpTo } from "./rankRequirements.js";
 import { clampXp, XP_BOUNDS, DIFF_SCALE, LENGTH_SCALE, suggestXp } from "../data/balancing.js";
 
 // ── XP Scaling ─────────────────────────────────────────────
@@ -35,6 +36,11 @@ export function applyXpGain(state, xpAmount, XP_PER_LEVEL_FN, TOTAL_LEVELS, getR
     if (gl < TOTAL_LEVELS) {
       const next = getRankFromGlobal(gl + 1);
       const rankUp = next.rank !== s.rank;
+      // Etappe 8: Rank-Ups brauchen mehr als XP (XP staut an der Grenze)
+      if (rankUp && !canRankUpTo(s, next.rank)) {
+        s.xp += xpNeeded;
+        break;
+      }
       s.rank = next.rank;
       s.level = next.level;
       levelUps.push({ rank: s.rank, level: s.level, rankUp });

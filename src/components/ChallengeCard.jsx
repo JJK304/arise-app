@@ -150,7 +150,7 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
                 </span>
               )}
 
-              {challenge.reason && (challenge.personalized || challenge.source === "generated") && (
+              {challenge.reason && (
                 <span style={{ color:"#a78bfa55",fontSize:"0.52rem",fontFamily:"'Rajdhani',sans-serif" }}>
                   ↳ {challenge.reason}
                 </span>

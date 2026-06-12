@@ -5,6 +5,8 @@ import { RANKS, RANK_COLORS, XP_PER_LEVEL, TOTAL_LEVELS, LEVELS_PER_RANK } from 
 import { STATS_CONFIG, SUB_STATS, CAT_LABELS } from "./data/stats.js";
 import { CHALLENGES_DB } from "./data/challenges.js";
 import { ACHIEVEMENTS } from "./data/achievements.js";
+import { findNewPathMilestones } from "./data/pathMilestones.js";
+import { getRankUpStatus } from "./lib/rankRequirements.js";
 import { defaultState } from "./data/defaultState.js";
 import { PATHS, getAffinityGain, suggestPaths, canUnlockShadow } from "./data/paths.js";
 import {
@@ -15,7 +17,7 @@ import {
 import { INTEREST_GROUPS, INTERESTS, normalizeInterests } from "./data/interests.js";
 import { DOMAINS } from "./data/domains.js";
 import { GOAL_TEMPLATES } from "./data/goalTypes.js";
-import { GATES, isGateCompleted, getGateStepsDone, getRecommendedGates, isGateUnlocked } from "./data/gates.js";
+import { GATES, isGateCompleted, getGateStepsDone, getRecommendedGates, isGateUnlocked, getVisibleGates } from "./data/gates.js";
 import { getRecoveryQuests, getRecoveryHint, RECOVERY_QUESTS } from "./data/recoveryQuests.js";
 import { TITLES, TITLE_MAP, checkTitleUnlocks, normalizeTitles } from "./data/titles.js";
 
@@ -28,15 +30,18 @@ import {
 } from "./lib/history.js";
 import { useCountUp } from "./lib/useCountUp.js";
 import { migrateState, makeHistoryEntry } from "./lib/migration.js";
-import { generatePersonalizedQuests, generateStarterQuests, getNextBestQuests, getVisibleContent } from "./lib/questGenerator.js";
+import { generatePersonalizedQuests, generateStarterQuests, getNextBestQuests, getVisibleContent, selectNextMilestones } from "./lib/questGenerator.js";
 import { applyQuestCompletion, applyGateCompletion, canCompleteQuest } from "./lib/questCompletion.js";
 import { rotateQuestPool, canCompleteCustomQuest, calculateCustomQuestXpBounds } from "./lib/questRotation.js";
+import { getTopSignalInterests, calculatePathSignal, calculatePathSpecializationLevel, getQuestPathId } from "./lib/signals.js";
 import { createWeeklyReview, hasReviewThisWeek, getCurrentWeekReview, getWeekQuestStats, addWeeklyReview } from "./lib/weeklyReview.js";
 import { updateXpHistory } from "./lib/rewards.js";
 import { PreferencesSection } from "./features/settings/PreferencesSection.jsx";
 import { SystemAnalysisCard } from "./features/profile/SystemAnalysisCard.jsx";
 import { OnboardingModal } from "./features/profile/OnboardingModal.jsx";
 import { ProgressLogModal } from "./features/quests/ProgressLogModal.jsx";
+import { ClearedFeedback } from "./components/ClearedFeedback.jsx";
+import { shouldPromptProgressLog } from "./lib/progressLogs.js";
 import { DEMO_PROFILES } from "./data/demoProfiles.js";
 import { analyzeSystem } from "./lib/systemAnalysis.js";
 import {
@@ -55,6 +60,7 @@ import { saveData, loadData, LS } from "./storage/db.js";
 // Components
 import { MiniChart } from "./components/MiniChart.jsx";
 import { RadarChart } from "./components/RadarChart.jsx";
+import { LevelTree } from "./features/profile/LevelTree.jsx";
 import { SplashScreen } from "./components/SplashScreen.jsx";
 import { StatBar } from "./components/StatBar.jsx";
 import { ChallengeCard } from "./components/ChallengeCard.jsx";
@@ -108,6 +114,13 @@ export default function AriseApp() {
   // Demo profiles
   const [showDemo, setShowDemo] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [clearedCard, setClearedCard] = useState(null);
+  const clearedRef = useRef();
+  const showClearedCard = (card, ms = 3600) => {
+    setClearedCard(card);
+    clearTimeout(clearedRef.current);
+    clearedRef.current = setTimeout(() => setClearedCard(null), ms);
+  };
   const notifRef = useRef(null);
   const achievRef = useRef(null);
   const feedbackRef = useRef(null);
@@ -200,15 +213,23 @@ export default function AriseApp() {
     if (changed) { setState(u); saveData("arise_v3", u); }
   }, [state?.rank, state?.lastDailyReset, state?.lastWeeklyReset]);
 
-  // Check achievements
+  // Check achievements + Path-Milestones (Etappe 9)
   const checkAchievements = useCallback((s, body) => {
     const already = s.unlockedAchievements || [];
     const newly = ACHIEVEMENTS.filter(a => !already.includes(a.id) && a.check(s, body));
-    if(newly.length > 0) {
-      const updated = { ...s, unlockedAchievements: [...already, ...newly.map(a=>a.id)] };
+    // Path-Milestones: gleiche Mechanik, eigener Storage (nie doppelt)
+    const pmAlready = s.pathMilestonesUnlocked || [];
+    let newPm = [];
+    try { newPm = findNewPathMilestones(s, pmAlready); } catch (_) {}
+    if (newly.length > 0 || newPm.length > 0) {
+      const updated = {
+        ...s,
+        unlockedAchievements:   [...already, ...newly.map(a => a.id)],
+        pathMilestonesUnlocked: [...pmAlready, ...newPm.map(m => m.id)],
+      };
       saveData("arise_v3", updated);
       setState(updated);
-      setNewAchievements(newly);
+      setNewAchievements([...newly, ...newPm]);
       clearTimeout(achievRef.current);
       achievRef.current = setTimeout(() => setNewAchievements([]), 4000);
     }
@@ -255,26 +276,15 @@ export default function AriseApp() {
   //   normalen daily action-Quests
   //   starter quests
   //   recovery quests (bereits eigener Flow)
-  function shouldPromptProgressLog(quest, _state, feedback) {
-    if (!quest) return false;
-    if (quest.requiresLog) return true;
-    // Explicit action types that warrant a log
-    if (["reflection", "metric", "project"].includes(quest.actionType)) return true;
-    // Training quests (body domain) — optional log with metrics
-    if (quest.actionType === "training" && quest.domain === "body") return true;
-    // Gate steps and trials
-    if (quest.type === "gate_step") return true;
-    if (quest.trial) return true;
-    // Goal-linked quests where progress happened
-    if (feedback?.goalProgress?.length > 0 && quest.suggestLog) return true;
-    // Starter and generic quests — no log
-    if (quest.source === "starter" || !quest.personalized) return false;
-    // Personalized quests with goal link
-    if (quest.goalId && quest.domain) return true;
-    return false;
-  }
+  // Etappe 10: shouldPromptProgressLog lebt jetzt testbar in lib/progressLogs.js
 
   const handleComplete = (challenge) => {
+    // Etappe 13: Signal-Delta für Feedback messen (vorher)
+    const _qPath = getQuestPathId(challenge);
+    let _preLvl = 0, _preSig = 0;
+    try {
+      if (_qPath) { _preSig = calculatePathSignal(state, _qPath); _preLvl = calculatePathSpecializationLevel(state, _qPath); }
+    } catch (_) {}
     const { newState, feedback, alreadyDone } = applyQuestCompletion(state, challenge, completionOptions);
     if (alreadyDone) {
       showNotif("Quest already cleared", "#64748b");
@@ -291,14 +301,51 @@ export default function AriseApp() {
       }
     }
 
-    if (challenge.type === "milestone" && feedback.statPts > 0) {
-      showNotif(`★ STAT UP! +${feedback.statPts} ${feedback.statKey}`, "#f59e0b");
-    } else {
-      showNotif(`+${feedback.xp} XP`, "#3b82f6");
-    }
-
-    for (const gn of (feedback.goalNotifications || [])) {
-      setTimeout(() => showNotif(`🏆 ZIEL ERREICHT! +${gn.xp} XP`, "#f59e0b"), 600);
+    // Etappe 13: aggregierte QUEST-CLEARED-Karte statt Toast-Kaskade
+    {
+      const lines = [{ mark: "▸", text: `+${feedback.xp} XP`, color: "#3b82f6" }];
+      if (feedback.statPts > 0 && feedback.statKey) {
+        lines.push({ mark: "★", text: `+${feedback.statPts} ${feedback.statKey}`, color: "#f59e0b" });
+      }
+      // Signal-Delta (nachher)
+      try {
+        if (_qPath) {
+          const postSig = calculatePathSignal(newState, _qPath);
+          const postLvl = calculatePathSpecializationLevel(newState, _qPath);
+          const pName   = PATHS[_qPath]?.name || _qPath;
+          const pColor  = PATHS[_qPath]?.color || "#00ffff";
+          if (postLvl > _preLvl)            lines.push({ mark: "◈", text: `${pName} Signal increased`, color: pColor });
+          else if (_preSig === 0 && postSig > 0) lines.push({ mark: "◈", text: `${pName} Signal detected`, color: pColor });
+        }
+      } catch (_) {}
+      if ((feedback.goalProgress || []).length > 0) {
+        lines.push({ mark: "⌖", text: `Objective Progress +${feedback.goalProgress.length}`, color: "#22c55e" });
+      }
+      for (const gn of (feedback.goalNotifications || [])) {
+        lines.push({ mark: "✦", text: `ZIEL ERREICHT! +${gn.xp} XP`, color: "#f59e0b" });
+      }
+      showClearedCard({ kind: "QUEST CLEARED", subtitle: `${challenge.title} abgeschlossen`, color: "#00ffff", lines });
+      // Ascension Check: Rank-Grenze erreicht, Anforderungen offen
+      if (feedback.rankUpBlocked) {
+        setTimeout(() => {
+          try {
+            const st = getRankUpStatus(newState);
+            if (st && !st.met) {
+              const done    = st.checks.filter(c => c.done).slice(0, 2);
+              const missing = st.checks.filter(c => !c.done).slice(0, 3);
+              showClearedCard({
+                kind: "ASCENSION CHECK",
+                subtitle: `${st.nextRank}-Rank fast erreicht — XP wartet an der Grenze`,
+                color: RANK_COLORS[st.nextRank]?.primary || "#f59e0b",
+                lines: [
+                  ...done.map(c => ({ mark: "✓", text: c.label, color: "#22c55e" })),
+                  ...missing.map(c => ({ mark: "▢", text: `Fehlt: ${c.label} (${Math.min(c.have,c.need)}/${c.need})`, color: "#94a3b8" })),
+                ],
+              }, 4800);
+            }
+          } catch (_) {}
+        }, 2200);
+      }
     }
 
     if (feedback.newTitles?.length > 0) {
@@ -397,9 +444,9 @@ export default function AriseApp() {
     if (withBonus && log.xpBonus > 0) {
       s.xp      = (s.xp      || 0) + log.xpBonus;
       s.totalXP = (s.totalXP || 0) + log.xpBonus;
-      showNotif(`📝 Log gespeichert +${log.xpBonus} XP`, "#8b5cf6");
+      showNotif(`⌁ Log gespeichert +${log.xpBonus} XP`, "#8b5cf6");
     } else {
-      showNotif("📝 Log gespeichert", "#8b5cf6");
+      showNotif("⌁ Log gespeichert", "#8b5cf6");
     }
     setPendingLogQuest(null);
     setLogForm({ notes: "", metrics: {} });
@@ -455,7 +502,7 @@ export default function AriseApp() {
     setState(s); saveData("arise_v3", s);
     setReviewForm({ wentWell:"", wasHard:"", learned:"", nextFocus:"" });
     setShowReviewForm(false);
-    showNotif(`📋 Wochenreview gespeichert! +${review.xpBonus} XP`, "#8b5cf6");
+    showNotif(`◇ Wochenreview gespeichert! +${review.xpBonus} XP`, "#8b5cf6");
   };
 
   const addCustomQuest = () => {
@@ -591,7 +638,29 @@ export default function AriseApp() {
 
     setState(newState); saveData("arise_v3", newState);
     haptic("heavy");
-    showNotif(`◈ GATE CLEARED! +${feedback.xp} XP`, gate.color || "#f59e0b");
+    // Etappe 13: GATE-CLEARED-Karte mit Branch- und Trial-Info
+    {
+      const isTrial = String(gate.id).startsWith("trial_");
+      const pName   = PATHS[gate.path]?.name || gate.path;
+      const pColor  = PATHS[gate.path]?.color || gate.color || "#f59e0b";
+      const lines   = [{ mark: "▸", text: `+${feedback.xp} XP`, color: "#3b82f6" }];
+      lines.push({ mark: "◈", text: gate.discovery
+        ? `Branch unlocked: ${pName} Signal`
+        : `${pName} Signal verstärkt`, color: pColor });
+      try {
+        const nextTrial = GATES.find(g =>
+          g.path === gate.path && String(g.id).startsWith("trial_") &&
+          !isGateCompleted(g.id, newState.gateProgress || {}) &&
+          isGateUnlocked(g, newState.gateProgress || {})
+        );
+        if (nextTrial) lines.push({ mark: "⧫", text: `Next Trial available: ${nextTrial.title.split("—")[0].trim()}`, color: "#00ffff" });
+      } catch (_) {}
+      showClearedCard({
+        kind: isTrial ? "TRIAL CLEARED" : "GATE CLEARED",
+        subtitle: `${gate.title} abgeschlossen`,
+        color: pColor, lines,
+      }, 4200);
+    }
     setTimeout(() => checkAchievements(newState, bodyEntries), 100);
   };
 
@@ -620,6 +689,11 @@ export default function AriseApp() {
   const globalLvl = getGlobalLevel(state.rank, state.level);
   const currentDB = CHALLENGES_DB[state.rank]||{daily:[],weekly:[],milestones:[]};
   const allMilestones = Object.entries(CHALLENGES_DB).filter(([r])=>RANKS.indexOf(r)<=RANKS.indexOf(state.rank)).flatMap(([,v])=>v.milestones);
+  // Etappe 6: Hauptansicht zeigt nur die nächsten relevanten Milestones (Katalog via Filter erreichbar)
+  const _completedMilestoneIds = new Set([
+    ...(state.completedChallenges || []),
+    ...(state.questHistory || []).filter(h => h.type === "milestone").map(h => h.id),
+  ]);
 const customQuests = state.customQuests||[];
 
 // Unified done-check: uses completionStatus (new) + completedChallenges (legacy fallback)
@@ -679,7 +753,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
 
   // Gate-Daten
   const gateProgress      = state.gateProgress || {};
-  const recommendedGates  = getRecommendedGates(sysAnalysis, gateProgress);
+  const recommendedGates  = getRecommendedGates(sysAnalysis, gateProgress).slice(0, 2); // Etappe 6: max 1–2 sichtbar
 
   // Recovery-Quests
   const completedTodayIds = (state.completedChallenges || []);
@@ -690,11 +764,43 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
   const recoveryHint      = getRecoveryHint(sysAnalysis, completedTodayIds, state.currentStreak || 0);
 
   // ── Quest Rotation: stabile dayKey-/weekKey-gebundene Auswahl ──
+  // State-Objekt für Signal-/Sichtbarkeitsberechnung (vor Rotation gebraucht)
+  const _visState = {
+    questHistory: Array.isArray(state.questHistory) ? state.questHistory : [],
+    progressLogs: Array.isArray(state.progressLogs) ? state.progressLogs : [],
+    goals:        Array.isArray(state.goals)        ? state.goals        : [],
+    player:       state.player || {},
+    stats:        state.stats  || {},
+    gateProgress: state.gateProgress || {},
+    weeklyReviews: Array.isArray(state.weeklyReviews) ? state.weeklyReviews : [],
+  };
+  // Verhaltens-Signale: schalten thematische Quests frei (Etappe 2/5).
+  // Nur Level >= 1 (Score >= 1) — minimale Streusignale reichen nicht.
+  let _signalInterests = [];
+  let _signalPaths = [];
+  try {
+    _signalInterests = (getTopSignalInterests(_visState, 8) || []).filter(si => si.level >= 1);
+    _signalPaths     = (getTopSignalPaths(_visState, 3) || []).filter(sp => sp.level >= 1);
+  } catch (_) {}
+  // Jüngstes Verhalten (14 Tage) als Domain-Verteilung für das Scoring (Etappe 6)
+  const _recentDomains = {};
+  {
+    const cutoff = Date.now() - 14 * 86400000;
+    for (const h of _visState.questHistory) {
+      if (!h?.completedAt || new Date(h.completedAt) < cutoff) continue;
+      const d = h.domain || h.cat;
+      if (d) _recentDomains[d] = (_recentDomains[d] || 0) + 1;
+    }
+  }
+
   const rotationContext = {
     interests:        prefs.interests     || [],
     activePaths:      prefs.activePaths   || [],
     activeGoals:      (state.goals || []).filter(g => g.status === "active"),
     neglectedDomains: sysAnalysis.neglectedDomains?.map(n => n.domain) || [],
+    signalInterests:  _signalInterests,
+    signalPaths:      _signalPaths,
+    recentDomains:    _recentDomains,
   };
   const rotated = rotateQuestPool({
     daily:        currentDB.daily,
@@ -704,15 +810,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
   }, rotationContext);
 
   // Apply visible content limits based on signal level
-  const _visState = {
-    questHistory: Array.isArray(state.questHistory) ? state.questHistory : [],
-    progressLogs: Array.isArray(state.progressLogs) ? state.progressLogs : [],
-    goals:        Array.isArray(state.goals)        ? state.goals        : [],
-    player:       state.player || {},
-    stats:        state.stats  || {},
-    gateProgress: state.gateProgress || {},
-  };
   const visibleContent = getVisibleContent(rotated, _visState);
+  const nextMilestones = selectNextMilestones(allMilestones, _visState, _completedMilestoneIds, 3);
 
   // Rotate daily/weekly from DB — custom + milestones always shown fully
   const rotatedDaily   = visibleContent.visibleDaily;
@@ -914,6 +1013,9 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
         </div>
       )}
 
+      {/* ── CLEARED FEEDBACK CARD (Etappe 13) ── */}
+      {clearedCard && <ClearedFeedback card={clearedCard} />}
+
       {/* ── ONBOARDING MODAL ── */}
       {showOnboarding && (
         <OnboardingModal
@@ -1005,7 +1107,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
       })()}
 
       {/* Header */}
-      <div style={{ padding:"16px 18px 13px",borderBottom:`1px solid ${rc.primary}18`,background:rc.headerBg,backdropFilter:"blur(14px)",position:"sticky",top:0,zIndex:100,transition:"background 1s ease" }}>
+      <div style={{ padding:"16px 18px 13px",borderBottom:`1px solid ${rc.primary}18`,background:rc.headerBg,backdropFilter:"blur(14px)",position:"sticky",top:0,zIndex:100,transition:"background 1s ease, box-shadow 1s ease",boxShadow:`0 4px 26px ${rc.primary}10` }}>
         <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10 }}>
           <div>
             <div style={{ fontSize:"0.56rem",letterSpacing:"0.35em",color:"#94a3b8",marginBottom:1 }}>◈ HUNTER</div>
@@ -1398,7 +1500,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               /* ── GATE-ONLY VIEW ── */
               <div style={{ display:"flex",flexDirection:"column",gap:12 }}>
                 <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:4 }}>⧫ GATE QUESTS</div>
-                {GATES.map(gate => {
+                {getVisibleGates(gateProgress, { signalPaths: _signalPaths, activePaths: prefs.activePaths || [] }).map(gate => {
                   const stepsDone = getGateStepsDone(gate.id, gateProgress);
                   const completed = isGateCompleted(gate.id, gateProgress);
                   const isRec     = recommendedGates.some(g => g.id === gate.id);
@@ -1460,7 +1562,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 {[
                   { key:"daily",     label:"DAILY SYSTEM QUESTS",   icon:"◎", items:rotatedDaily,   color:"#3b82f6", recommended:false },
                   { key:"weekly",    label:"WEEKLY ORDERS",           icon:"◇", items:rotatedWeekly,  color:"#8b5cf6", recommended:false },
-                  { key:"milestone", label:"AWAKENING MILESTONES",    icon:"◆", items:allMilestones,     color:"#f59e0b", recommended:false },
+                  { key:"milestone", label:"AWAKENING MILESTONES",    icon:"◆", items:nextMilestones,    color:"#f59e0b", recommended:false },
                   { key:"custom",    label:"CUSTOM ORDERS",           icon:"✦", items:customQuests,      color:"#06b6d4", recommended:false },
                   ...(personalizedQuests.length > 0 ? [
                     { key:"personalized", label:"SYSTEM RECOMMENDATION", icon:"◈", items:personalizedQuests, color:"#a78bfa", recommended:true },
@@ -1532,7 +1634,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
             setState(s); saveData("arise_v3", s);
             setGoalForm({ templateId:"learning_goal", title:"", targetValue:"", deadline:"" });
             setShowGoalForm(false);
-            showNotif("🎯 Ziel erstellt", "#22c55e");
+            showNotif("⌖ Ziel erstellt", "#22c55e");
           };
 
           const updateGoalStatus = (goalId, status) => {
@@ -1566,7 +1668,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 {/* Header */}
                 <div style={{ display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8 }}>
                   <div style={{ display:"flex",gap:8,alignItems:"center" }}>
-                    <span style={{ fontSize:"1.2rem" }}>{goal.icon || tmpl?.icon || "⭐"}</span>
+                    <span style={{ fontSize:"1.2rem" }}>{goal.icon || tmpl?.icon || "★"}</span>
                     <div>
                       <div style={{ fontSize:"0.82rem",color:done?"#22c55e":"#e2e8f0",fontWeight:700,fontFamily:"'Rajdhani',sans-serif" }}>{goal.title}</div>
                       <div style={{ display:"flex",gap:6,alignItems:"center",marginTop:2,flexWrap:"wrap" }}>
@@ -1847,6 +1949,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                 </div>
               ))}
             </div>
+            {/* Etappe 11: visuelles Progressions-Feedback */}
+            <LevelTree state={state} />
             <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:10 }}>◈ AWAKENING PFAD</div>
             {RANKS.map(r=>{
               const idx=RANKS.indexOf(r),ci=RANKS.indexOf(state.rank),passed=idx<ci,active=idx===ci;
@@ -2120,7 +2224,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
                   <div style={{ marginBottom:8 }}>
                     <button onClick={()=>setShowDemo(v=>!v)}
                       style={{ width:"100%",background:"rgba(139,92,246,0.06)",border:"1px solid #8b5cf622",color:"#8b5cf666",borderRadius:9,padding:"10px 13px",fontSize:"0.72rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer",letterSpacing:"0.06em",display:"flex",alignItems:"center",justifyContent:"space-between" }}>
-                      <span>🧪 TEST-PROFILE (Szenarien)</span>
+                      <span>⌬ TEST-PROFILE (Szenarien)</span>
                       <span style={{ fontSize:"0.6rem" }}>{showDemo?"▲":"▼"}</span>
                     </button>
                     {showDemo && (
