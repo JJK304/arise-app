@@ -893,12 +893,11 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
       )}
 
       {/* Notification */}
-      {notification && <div style={{ position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.94)",border:`1px solid ${notification.color}44`,borderRadius:10,padding:"9px 18px",color:notification.color,fontFamily:"'Orbitron',sans-serif",fontSize:"0.72rem",letterSpacing:"0.08em",zIndex:500,whiteSpace:"nowrap",animation:"fadeInOut 3.5s ease" }}>{notification.msg}</div>}
+      {notification && <div style={{ position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.94)",border:`1px solid ${notification.color}44`,borderRadius:10,padding:"9px 18px",color:notification.color,fontFamily:"'Orbitron',sans-serif",fontSize:"0.72rem",letterSpacing:"0.08em",zIndex:500,whiteSpace:"nowrap",animation:"fadeInOut 3.5s ease",pointerEvents:"none" }}>{notification.msg}</div>}
 
       {/* Achievement popup */}
       {newAchievements.length > 0 && (
-        <div style={{ position:"fixed",top:60,left:"50%",transform:"translateX(-50%)",zIndex:499,animation:"slideDown 0.3s ease",display:"flex",flexDirection:"column",gap:6,minWidth:220 }}>
-          {newAchievements.map(a=>(
+            <div style={{ position:"fixed",top:60,left:"50%",transform:"translateX(-50%)",zIndex:499,animation:"slideDown 0.3s ease",display:"flex",flexDirection:"column",gap:6,minWidth:220,pointerEvents:"none" }}>          {newAchievements.map(a=>(
             <div key={a.id} style={{ background:"rgba(0,0,0,0.95)",border:"1px solid #f59e0b55",borderRadius:10,padding:"10px 16px",display:"flex",alignItems:"center",gap:10 }}>
               <span style={{ fontSize:"1.2rem" }}>{a.icon}</span>
               <div>
@@ -912,8 +911,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
 
       {/* New Titles popup */}
       {newTitles.length > 0 && (
-        <div style={{ position:"fixed",top:newAchievements.length>0?120:60,left:"50%",transform:"translateX(-50%)",zIndex:498,animation:"slideDown 0.3s ease",display:"flex",flexDirection:"column",gap:6,minWidth:220 }}>
-          {newTitles.map(t=>(
+            <div style={{ position:"fixed",top:newAchievements.length>0?120:60,left:"50%",transform:"translateX(-50%)",zIndex:498,animation:"slideDown 0.3s ease",display:"flex",flexDirection:"column",gap:6,minWidth:220,pointerEvents:"none" }}>          {newTitles.map(t=>(
             <div key={t.id} style={{ background:"rgba(0,0,0,0.95)",border:`1px solid ${t.color}55`,borderRadius:10,padding:"10px 16px",display:"flex",alignItems:"center",gap:10 }}>
               <span style={{ fontSize:"1.2rem" }}>{t.icon}</span>
               <div>
