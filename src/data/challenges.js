@@ -244,7 +244,7 @@ export const CHALLENGES_DB = {
       {id:"a_d10", title:"Gourmet-Gericht kochen",         desc:"Komplexe Saucen, Timing, mehrere Komponenten.",                     xp:82,  stat:"CRA", statPts:0, type:"daily", cat:"skill_practical"},
       {id:"a_d11", title:"Ernährungsplan 100%",            desc:"Kalorien, Protein, Mikros – alles heute perfekt.",                   xp:92,  stat:"VIT", statPts:0, type:"daily", cat:"health"},
       {id:"a_d12", title:"6 Uhr aufstehen",                desc:"6 Uhr. Täglich. Keine Ausnahme.",                                    xp:102, stat:"END", statPts:0, type:"daily", cat:"discipline"},
-      {id:"a_d13", title:"Abend-Reflexion (20 Min.)",      desc:"Was war gut? Was lernst du? Was planst du?",                        xp:78,  stat:"END", statPts:0, type:"daily", cat:"discipline"},
+      {id:"a_d13", title:"Abend-Log (20 Min.)",            desc:"Was war gut? Was gelernt? Was als Nächstes?",                        xp:78,  stat:"END", statPts:0, type:"daily", cat:"discipline"},
       {id:"a_d14", title:"Jemanden inspirieren",           desc:"Dein Verhalten oder Wissen motiviert heute jemanden.",               xp:88,  stat:"CHA", statPts:0, type:"daily", cat:"social"},
       {id:"a_d15", title:"Appearance: alles auf 10/10",    desc:"Frisur, Kleidung, Haut, Körperhaltung – perfekt.",                  xp:78,  stat:"CHA", statPts:0, type:"daily", cat:"appearance"},
     ],

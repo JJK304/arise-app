@@ -310,8 +310,8 @@ export const QUEST_TEMPLATES = [
   },
   {
     id: "tpl_meditation",
-    titleTemplate: "{duration} Min. Meditation / Atemübung",
-    descTemplate:  "Augen zu, atmen, Gedanken ziehen lassen.",
+    titleTemplate: "{duration} Min. Reset-Protokoll",
+    descTemplate:  "Augen zu, Atmung runterfahren, System neu kalibrieren.",
     type: "daily", domain: "recovery",
     paths: ["monk"],
     baseXp: 22, actionType: "recovery",
@@ -568,8 +568,8 @@ export const QUEST_TEMPLATES = [
   },
   {
     id: "tpl_leader_reflect",
-    titleTemplate: "Führungsreflexion",
-    descTemplate:  "Was lief gut? Wo habe ich Einfluss ausgeübt? Wo habe ich Verantwortung vermieden?",
+    titleTemplate: "Führungs-Log",
+    descTemplate:  "Auswertung: Was lief gut? Wo Einfluss ausgeübt? Wo Verantwortung vermieden?",
     type: "weekly", domain: "social",
     paths: ["leader", "strategist"],
     baseXp: 45, actionType: "reflection",
@@ -581,8 +581,8 @@ export const QUEST_TEMPLATES = [
   // ════════════════════════════════════════════════════════
   {
     id: "tpl_healer_listen",
-    titleTemplate: "Aktiv zuhören",
-    descTemplate:  "Mit jemandem sprechen ohne Ratschläge zu geben — nur zuhören und präsent sein.",
+    titleTemplate: "Empathie-Skill: Zuhören",
+    descTemplate:  "Mit jemandem sprechen, keine Ratschläge — nur empfangen und präsent bleiben.",
     type: "daily", domain: "recovery",
     paths: ["healer", "leader"],
     baseXp: 24, actionType: "action",
@@ -590,8 +590,8 @@ export const QUEST_TEMPLATES = [
   },
   {
     id: "tpl_healer_selfcare",
-    titleTemplate: "{duration} Min. bewusste Selbstfürsorge",
-    descTemplate:  "Etwas tun das dir gut tut — Bewegung, Ruhe, Essen, Pflege. Kein Schuldgefühl.",
+    titleTemplate: "{duration} Min. Regenerations-Protokoll",
+    descTemplate:  "Etwas tun das dem System gut tut — Bewegung, Ruhe, Essen, Pflege. Ohne Rechtfertigung.",
     type: "daily", domain: "recovery",
     paths: ["healer", "monk"],
     baseXp: 22, actionType: "action",
@@ -599,8 +599,8 @@ export const QUEST_TEMPLATES = [
   },
   {
     id: "tpl_healer_checkin",
-    titleTemplate: "Mentales Check-in",
-    descTemplate:  "Wie geht es dir wirklich? Ehrliche Bestandsaufnahme — Energie, Stimmung, Stress.",
+    titleTemplate: "Status-Scan",
+    descTemplate:  "System ehrlich auslesen — Energie, Stimmung, Stress erfassen.",
     type: "daily", domain: "recovery",
     paths: ["healer", "monk"],
     baseXp: 20, actionType: "reflection",
@@ -617,8 +617,8 @@ export const QUEST_TEMPLATES = [
   },
   {
     id: "tpl_healer_boundaries",
-    titleTemplate: "Grenze setzen",
-    descTemplate:  "Eine klare Grenze kommunizieren — was du brauchst, was nicht geht. Respektvoll.",
+    titleTemplate: "Skill: Grenze setzen",
+    descTemplate:  "Eine klare Grenze kommunizieren — was du brauchst, was nicht geht. Sachlich.",
     type: "weekly", domain: "recovery",
     paths: ["healer", "strategist"],
     baseXp: 45, actionType: "action",
@@ -626,8 +626,8 @@ export const QUEST_TEMPLATES = [
   },
   {
     id: "tpl_healer_recovery_plan",
-    titleTemplate: "Recovery-Plan für die Woche",
-    descTemplate:  "Wann regenerierst du dich diese Woche? Konkrete Zeiten planen und einhalten.",
+    titleTemplate: "Regenerations-Protokoll (Woche)",
+    descTemplate:  "Wann regeneriert das System diese Woche? Konkrete Zeiten planen und einhalten.",
     type: "weekly", domain: "recovery",
     paths: ["healer", "monk"],
     baseXp: 50, actionType: "action",
@@ -752,8 +752,8 @@ export const QUEST_TEMPLATES = [
   },
   {
     id: "tpl_service_listen",
-    titleTemplate: "Aktiv zuhören ohne zu urteilen",
-    descTemplate:  "Jemanden wirklich ausreden lassen und verstehen was er meint. Kein Ratschlag wenn nicht gewünscht.",
+    titleTemplate: "Empathie-Skill: Zuhören ohne Wertung",
+    descTemplate:  "Jemanden komplett ausreden lassen und erfassen was er meint. Kein Ratschlag ohne Anfrage.",
     type: "daily", domain: "social",
     paths: ["healer", "charmer"],
     baseXp: 25, actionType: "action",

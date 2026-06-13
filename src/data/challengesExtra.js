@@ -26,9 +26,9 @@ export const EXTRA_DAILIES = {
 
   // ── Recovery / Mindfulness ──
   recovery: [
-    { id:"xd_rec_1",  title:"10 Min. Meditation oder Atemübung",      desc:"Augen zu. Atmen. Gedanken ziehen lassen.",                        xp:22, stat:"VIT", statPts:0, type:"daily", cat:"health", domain:"recovery" },
+    { id:"xd_rec_1",  title:"10 Min. Reset-Protokoll",                desc:"Augen zu. Atmung runterfahren. Reset.",                        xp:22, stat:"VIT", statPts:0, type:"daily", cat:"health", domain:"recovery" },
     { id:"xd_rec_2",  title:"30 Min. ohne Bildschirm vor dem Schlafen", desc:"Handy weg, Buch statt Reel. Schlafqualität verbessern.",         xp:18, stat:"VIT", statPts:0, type:"daily", cat:"health", domain:"recovery" },
-    { id:"xd_rec_3",  title:"Dankbarkeitsnotiz: 3 Dinge aufschreiben", desc:"Was war heute gut? Drei Dinge — auch kleine.",                   xp:14, stat:"VIT", statPts:0, type:"daily", cat:"health", domain:"recovery" },
+    { id:"xd_rec_3",  title:"Tages-Log: 3 Erfolge notieren",           desc:"Was lief heute gut? Drei Einträge — auch kleine.",                   xp:14, stat:"VIT", statPts:0, type:"daily", cat:"health", domain:"recovery" },
     { id:"xd_rec_4",  title:"Natur: 20 Min. draußen ohne Handy",      desc:"Raus. Luft. Gedanken sacken lassen. Kein Podcast.",               xp:20, stat:"VIT", statPts:0, type:"daily", cat:"health", domain:"recovery" },
     { id:"xd_rec_5",  title:"Schlafroutine einhalten",                  desc:"Gleiche Zeit ins Bett. Kein Handy. Entspannungsritual.",          xp:16, stat:"VIT", statPts:0, type:"daily", cat:"health", domain:"recovery" },
   ],
@@ -71,7 +71,7 @@ export const EXTRA_WEEKLIES = {
     { id:"xw_e_1", title:"Woche review: Was lief gut / schlecht?",    desc:"15 Min. ruhige Reflexion: 3 Erfolge, 2 Misserfolge, 1 Fokus.",    xp:120, stat:"END", statPts:0, type:"weekly", cat:"discipline", domain:"discipline" },
     { id:"xw_e_2", title:"1 Recovery-Block machen",                    desc:"1h bewusstes Nichts-tun: kein Handy, kein Laptop, kein Content.", xp:100, stat:"VIT", statPts:0, type:"weekly", cat:"health",     domain:"recovery" },
     { id:"xw_e_3", title:"Zimmer oder Arbeitsplatz komplett aufräumen", desc:"Alles. Nicht nur halb — wirklich gründlich.",                    xp:90,  stat:"END", statPts:0, type:"weekly", cat:"discipline", domain:"home" },
-    { id:"xw_e_4", title:"5x täglich Dankbarkeitsnotiz diese Woche",  desc:"5 von 7 Tagen: 3 Dinge aufschreiben die gut liefen.",             xp:105, stat:"VIT", statPts:0, type:"weekly", cat:"health",     domain:"recovery" },
+    { id:"xw_e_4", title:"5x Tages-Log diese Woche",                  desc:"5 von 7 Tagen: 3 Erfolge loggen die gut liefen.",             xp:105, stat:"VIT", statPts:0, type:"weekly", cat:"health",     domain:"recovery" },
     { id:"xw_e_5", title:"Budget der Woche aufschreiben",              desc:"Einnahmen vs. Ausgaben — erste Bestandsaufnahme.",                xp:85,  stat:"INT", statPts:0, type:"weekly", cat:"discipline", domain:"finance" },
     { id:"xw_e_6", title:"2 Social Challenges diese Woche",            desc:"Zweimal aktiv auf andere zugehen oder ein Treffen organisieren.", xp:115, stat:"CHA", statPts:0, type:"weekly", cat:"social",     domain:"social" },
     { id:"xw_e_7", title:"Lernziel für nächste Woche setzen",          desc:"Konkret: was willst du lernen, wie viel, bis wann.",              xp:80,  stat:"INT", statPts:0, type:"weekly", cat:"mind",       domain:"mind" },
@@ -83,7 +83,7 @@ export const EXTRA_WEEKLIES = {
     { id:"xw_d_4", title:"1 Social Challenge + Reflexion",             desc:"Einmal auf jemanden zugehen und reflektieren wie es war.",        xp:130, stat:"CHA", statPts:0, type:"weekly", cat:"social",     domain:"social" },
     { id:"xw_d_5", title:"Budget 5 Tage tracken",                      desc:"Ausgaben 5 Tage aufschreiben. Muster erkennen.",                  xp:120, stat:"INT", statPts:0, type:"weekly", cat:"discipline", domain:"finance" },
     { id:"xw_d_6", title:"Pflegewoche: täglich vollständige Routine",  desc:"7 Tage: Pflege, Outfit, Auftreten bewusst gestalten.",            xp:140, stat:"APP", statPts:0, type:"weekly", cat:"appearance", domain:"appearance" },
-    { id:"xw_d_7", title:"1 Recovery-Block + 1 Meditationseinheit",   desc:"Je 30 Min. — einmal Ruhe, einmal aktive Achtsamkeit.",            xp:130, stat:"VIT", statPts:0, type:"weekly", cat:"health",     domain:"recovery" },
+    { id:"xw_d_7", title:"1 Recovery-Block + 1 Reset-Einheit",        desc:"Je 30 Min. — einmal Ruhe, einmal aktive Atem-Regeneration.",            xp:130, stat:"VIT", statPts:0, type:"weekly", cat:"health",     domain:"recovery" },
   ],
 };
 
@@ -101,7 +101,7 @@ export const EXTRA_MILESTONES = {
     { id:"xm_e_style1",  title:"Erste Style-Transformation",           desc:"Kleiderschrank sortiert, Pflegeroutine etabliert, Outfit bewusst gewählt — alles an einem Tag.", xp:320, stat:"APP", statPts:5, type:"milestone", cat:"appearance", domain:"appearance" },
     // Recovery
     { id:"xm_e_rec1",    title:"14 Tage Schlafroutine eingehalten",    desc:"14 Tage: gleiche Schlafenszeit, kein Handy im Bett, Ritual.",     xp:400, stat:"VIT", statPts:6,  type:"milestone", cat:"health",        domain:"recovery" },
-    { id:"xm_e_rec2",    title:"7 Tage Dankbarkeitsjournal",           desc:"7 Tage täglich 3 Dinge aufgeschrieben die gut liefen.",           xp:280, stat:"VIT", statPts:4,  type:"milestone", cat:"health",        domain:"recovery" },
+    { id:"xm_e_rec2",    title:"7 Tage Tages-Log",                     desc:"7 Tage täglich 3 Erfolge geloggt die gut liefen.",           xp:280, stat:"VIT", statPts:4,  type:"milestone", cat:"health",        domain:"recovery" },
     // Finance
     { id:"xm_e_fin1",    title:"Ersten Monatsplan erstellt",           desc:"Einnahmen, Ausgaben, Sparziel — schriftlich für 1 Monat.",        xp:350, stat:"INT", statPts:5,  type:"milestone", cat:"discipline",    domain:"finance" },
     // Home
@@ -122,7 +122,7 @@ export const EXTRA_MILESTONES = {
     { id:"xm_d_fin1",    title:"4 Wochen Budget getrackt",             desc:"4 Wochen konsequent Einnahmen und Ausgaben aufgeschrieben.",      xp:520, stat:"INT", statPts:6,  type:"milestone", cat:"discipline",    domain:"finance" },
     // Recovery milestones
     { id:"xm_d_rec1",    title:"30 Tage Schlaf-/Morgenroutine",        desc:"30 Tage: gleiche Schlafzeit + Morgenritual eingehalten.",         xp:650, stat:"VIT", statPts:8,  type:"milestone", cat:"health",        domain:"recovery" },
-    { id:"xm_d_rec2",    title:"20 Meditation/Atemübungen abgeschlossen", desc:"20 bewusste Achtsamkeitssessions — mind. je 5 Minuten.",      xp:480, stat:"VIT", statPts:6,  type:"milestone", cat:"health",        domain:"recovery" },
+    { id:"xm_d_rec2",    title:"20 Reset-Protokolle abgeschlossen",       desc:"20 bewusste Atem-Sessions — mind. je 5 Minuten.",      xp:480, stat:"VIT", statPts:6,  type:"milestone", cat:"health",        domain:"recovery" },
     // Creative milestones
     { id:"xm_d_cre1",    title:"3 kreative Werke fertiggestellt",      desc:"Nicht gut sein — fertig sein. 3 abgeschlossene Werke.",           xp:600, stat:"CRE", statPts:7,  type:"milestone", cat:"skill_creative", domain:"creativity" },
   ],
