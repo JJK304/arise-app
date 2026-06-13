@@ -138,7 +138,7 @@ export const RECOVERY_QUESTS = [
     balanceArea: "social",
   },
 
-  // ── Reflexion ──
+  // ── Tages-Log ──
   {
     id:       "rec_reflexion",
     title:    "Kurzes Tages-Log schreiben",
