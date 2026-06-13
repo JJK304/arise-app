@@ -10,6 +10,7 @@ import { getTodayKey, getTodayWeekKey } from "./dates.js";
 import { checkTitleUnlocks }       from "../data/titles.js";
 import { applyQuestToAllGoals, getNewlyCompletedGoals, canClaimGoalReward, calculateGoalReward, markGoalRewardClaimed } from "./goals.js";
 import { applyAffinityGains, applyStatGains, applyTitleUnlock, updateXpHistory } from "./rewards.js";
+import { canRankUpTo } from "./rankRequirements.js";
 
 // ── Externe Abhängigkeiten (App-Kontext) ──────────────────
 // Diese Funktion braucht XP_PER_LEVEL, getRankFromGlobal etc.
