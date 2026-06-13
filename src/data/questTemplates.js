@@ -248,8 +248,8 @@ export const QUEST_TEMPLATES = [
   },
   {
     id: "tpl_journaling",
-    titleTemplate: "{duration} Min. Journaling",
-    descTemplate:  "Was lief heute? Was lernst du? Was planst du?",
+    titleTemplate: "{duration} Min. Tages-Log",
+    descTemplate:  "Was lief heute? Was gelernt? Was als Nächstes?",
     type: "daily", domain: "discipline",
     paths: ["monk", "scholar"],
     baseXp: 20, actionType: "reflection",

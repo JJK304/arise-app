@@ -68,7 +68,7 @@ export const EXTRA_DAILIES = {
 
 export const EXTRA_WEEKLIES = {
   E: [
-    { id:"xw_e_1", title:"Woche review: Was lief gut / schlecht?",    desc:"15 Min. ruhige Reflexion: 3 Erfolge, 2 Misserfolge, 1 Fokus.",    xp:120, stat:"END", statPts:0, type:"weekly", cat:"discipline", domain:"discipline" },
+    { id:"xw_e_1", title:"Wochen-Log: Was lief gut / schlecht?",      desc:"15 Min. Auswertung: 3 Erfolge, 2 Misserfolge, 1 Fokus.",    xp:120, stat:"END", statPts:0, type:"weekly", cat:"discipline", domain:"discipline" },
     { id:"xw_e_2", title:"1 Recovery-Block machen",                    desc:"1h bewusstes Nichts-tun: kein Handy, kein Laptop, kein Content.", xp:100, stat:"VIT", statPts:0, type:"weekly", cat:"health",     domain:"recovery" },
     { id:"xw_e_3", title:"Zimmer oder Arbeitsplatz komplett aufräumen", desc:"Alles. Nicht nur halb — wirklich gründlich.",                    xp:90,  stat:"END", statPts:0, type:"weekly", cat:"discipline", domain:"home" },
     { id:"xw_e_4", title:"5x Tages-Log diese Woche",                  desc:"5 von 7 Tagen: 3 Erfolge loggen die gut liefen.",             xp:105, stat:"VIT", statPts:0, type:"weekly", cat:"health",     domain:"recovery" },
@@ -80,7 +80,7 @@ export const EXTRA_WEEKLIES = {
     { id:"xw_d_1", title:"3 Lernsessions à 45 Min.",                   desc:"3x 45 Min. fokussiertes Lernen — kein Multitasking.",             xp:180, stat:"INT", statPts:0, type:"weekly", cat:"mind",       domain:"mind" },
     { id:"xw_d_2", title:"2 Trainingseinheiten + Recovery-Tag",        desc:"2x Training, 1x bewusste Erholung mit Stretching/Spa.",          xp:165, stat:"END", statPts:0, type:"weekly", cat:"strength",   domain:"body" },
     { id:"xw_d_3", title:"Projekt 1 Schritt voranbringen",             desc:"Coding, Elektronik, kreatives Projekt — einen Schritt weiter.",   xp:150, stat:"CRA", statPts:0, type:"weekly", cat:"skill_tech", domain:"craft" },
-    { id:"xw_d_4", title:"1 Social Challenge + Reflexion",             desc:"Einmal auf jemanden zugehen und reflektieren wie es war.",        xp:130, stat:"CHA", statPts:0, type:"weekly", cat:"social",     domain:"social" },
+    { id:"xw_d_4", title:"1 Social Challenge + Auswertung",            desc:"Einmal auf jemanden zugehen und danach auswerten wie es lief.",        xp:130, stat:"CHA", statPts:0, type:"weekly", cat:"social",     domain:"social" },
     { id:"xw_d_5", title:"Budget 5 Tage tracken",                      desc:"Ausgaben 5 Tage aufschreiben. Muster erkennen.",                  xp:120, stat:"INT", statPts:0, type:"weekly", cat:"discipline", domain:"finance" },
     { id:"xw_d_6", title:"Pflegewoche: täglich vollständige Routine",  desc:"7 Tage: Pflege, Outfit, Auftreten bewusst gestalten.",            xp:140, stat:"APP", statPts:0, type:"weekly", cat:"appearance", domain:"appearance" },
     { id:"xw_d_7", title:"1 Recovery-Block + 1 Reset-Einheit",        desc:"Je 30 Min. — einmal Ruhe, einmal aktive Atem-Regeneration.",            xp:130, stat:"VIT", statPts:0, type:"weekly", cat:"health",     domain:"recovery" },

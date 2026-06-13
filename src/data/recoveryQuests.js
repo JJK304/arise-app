@@ -141,8 +141,8 @@ export const RECOVERY_QUESTS = [
   // ── Reflexion ──
   {
     id:       "rec_reflexion",
-    title:    "Kurze Reflexion schreiben",
-    desc:     "Was war heute gut? Was nimmst du mit?",
+    title:    "Kurzes Tages-Log schreiben",
+    desc:     "Was lief heute gut? Was nimmst du mit?",
     xp:       18,
     stat:     "END", statPts: 0,
     type:     "daily", cat: "discipline",
