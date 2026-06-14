@@ -109,7 +109,6 @@ export default function AriseApp() {
   });
   const [newAchievements, setNewAchievements] = useState([]);
   const [newTitles, setNewTitles] = useState([]);
-  const [questFeedback, setQuestFeedback] = useState(null);
   // Goal UI state
   const [showGoalForm, setShowGoalForm] = useState(false);
   const [goalForm, setGoalForm] = useState({ templateId:"learning_goal", title:"", targetValue:"", deadline:"" });
@@ -304,8 +303,6 @@ export default function AriseApp() {
       for (const lu of feedback.levelUps) {
         setLevelUpAnim({ rank: lu.rank, level: lu.level, rankUp: lu.rankUp });
         setTimeout(() => setLevelUpAnim(null), 2800);
-        if (lu.rankUp) showNotif(`⚡ RANK UP! ${RANK_COLORS[lu.rank].label.toUpperCase()}`, RANK_COLORS[lu.rank].primary);
-        else showNotif(`↑ LEVEL UP! ${lu.rank}-Rank Lv.${lu.level}`, "#00ffff");
       }
     }
 
@@ -361,61 +358,6 @@ export default function AriseApp() {
       clearTimeout(feedbackRef.current);
       feedbackRef.current = setTimeout(() => setNewTitles([]), 4500);
     }
-
-    // Build signal hint for feedback display
-    let signalHint = null;
-    try {
-      const pathGainKeys = Object.keys(feedback.pathGains || {}).filter(k => k !== "shadow");
-      const topGainPath  = pathGainKeys.sort((a,b) => (feedback.pathGains[b]||0)-(feedback.pathGains[a]||0))[0];
-      const challengePath = challenge.path;
-      const displayPath   = topGainPath || challengePath;
-
-      if (displayPath && PATHS[displayPath] && displayPath !== "shadow") {
-        const affinityNow = (newState.player?.affinities?.[displayPath] || 0);
-        const pathName    = PATHS[displayPath].name;
-        const pathIcon    = PATHS[displayPath].icon;
-        if (affinityNow >= 5 && affinityNow % 5 === 0) {
-          // Milestone affinity — show for everyone
-          signalHint = `${pathIcon} ${pathName} Signal +${affinityNow}`;
-        } else if (challenge.personalized && challenge.source !== "starter") {
-          // Personalized quest — always show path signal
-          signalHint = `${pathIcon} ${pathName} Signal aktiv`;
-        } else if (affinityNow > 0) {
-          // Starter / generic — show subtle signal detected message
-          signalHint = `${pathIcon} ${pathName} Signal detected`;
-        }
-      }
-      // Interest signal for personalized quests
-      if (!signalHint && challenge.interestId && INTERESTS?.[challenge.interestId]) {
-        const interest = INTERESTS[challenge.interestId];
-        signalHint = `◈ ${interest.label} Signal`;
-      }
-    } catch(_) {}
-
-    // Goal progress hint
-    let goalProgressHint = null;
-    try {
-      if (feedback.goalNotifications?.length > 0) {
-        const gn = feedback.goalNotifications[0];
-        if (gn.title) goalProgressHint = `Objective Progress: ${gn.title.slice(0,30)}`;
-      }
-    } catch(_) {}
-
-    setQuestFeedback({
-      title:          challenge.title || null,
-      xp:             feedback.xp,
-      statKey:        feedback.statKey,
-      statPts:        feedback.statPts,
-      pathGains:      feedback.pathGains,
-      newTitles:      feedback.newTitles,
-      signalHint,
-      goalProgressHint,
-      type:           challenge.type || "daily",
-    });
-    clearTimeout(feedbackRef.current);
-    // Milestones show longer (4.5s), others 3s
-    const displayMs = challenge.type === "milestone" ? 4500 : 3000;
-    feedbackRef.current = setTimeout(() => setQuestFeedback(null), displayMs);
 
     haptic(challenge.type === "milestone" ? "heavy" : "medium");
     setState(newState); saveData("arise_v3", newState);
@@ -639,8 +581,6 @@ export default function AriseApp() {
       for (const lu of feedback.levelUps) {
         setLevelUpAnim({ rank: lu.rank, level: lu.level, rankUp: lu.rankUp });
         setTimeout(() => setLevelUpAnim(null), 2800);
-        if (lu.rankUp) showNotif(`⚡ RANK UP! ${RANK_COLORS[lu.rank].label.toUpperCase()}`, RANK_COLORS[lu.rank].primary);
-        else showNotif(`↑ LEVEL UP! ${lu.rank}-Rank Lv.${lu.level}`, "#00ffff");
       }
     }
 
@@ -673,19 +613,49 @@ export default function AriseApp() {
   };
 
 
-  // ── SETUP SCREEN ──
+  // ── SETUP SCREEN — SYSTEM · PLAYER REGISTRATION ──
   if(!state) return (
-    <div style={{ minHeight:"100vh",background:"#050508",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",fontFamily:"'Rajdhani',sans-serif",backgroundImage:"radial-gradient(ellipse at 50% 0%,#0d0d2b,#050508 60%)",padding:24 }}>
+    <div style={{ minHeight:"100vh",background:"#04040a",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",fontFamily:"'Rajdhani',sans-serif",backgroundImage:"radial-gradient(ellipse at 50% 0%,#0a1330,#04040a 62%)",padding:24,position:"relative",overflow:"hidden" }}>
       <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
-      <div style={{ textAlign:"center",marginBottom:40 }}>
-        <div style={{ fontSize:"0.65rem",letterSpacing:"0.4em",color:"#94a3b8",marginBottom:14 }}>SYSTEM NOTIFICATION</div>
-        <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"clamp(2.5rem,10vw,4.5rem)",fontWeight:900,background:"linear-gradient(135deg,#00ffff,#8b5cf6)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",lineHeight:1,marginBottom:8 }}>ARISE</div>
-        <div style={{ color:"#94a3b8",fontSize:"0.78rem",letterSpacing:"0.25em" }}>YOU HAVE BEEN CHOSEN TO LEVEL UP</div>
-      </div>
-      <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #1a1a3e",borderRadius:16,padding:"28px 24px",width:"100%",maxWidth:380 }}>
-        <div style={{ color:"#94a3b8",fontSize:"0.82rem",marginBottom:22,lineHeight:1.6 }}>Das System hat dich erkannt. Dein Erwachen beginnt jetzt. Wähle deinen Namen.</div>
-        <input value={nameInput} onChange={e=>setNameInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleCreate()} placeholder="Dein Name..." style={{ width:"100%",background:"rgba(0,255,255,0.03)",border:"1px solid #00ffff22",borderRadius:10,padding:"13px 15px",color:"#e2e8f0",fontSize:"1rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box",marginBottom:14,letterSpacing:"0.05em" }}/>
-        <button onClick={handleCreate} style={{ width:"100%",background:"linear-gradient(135deg,#00ffff18,#8b5cf625)",border:"1px solid #00ffff44",color:"#00ffff",borderRadius:10,padding:13,fontSize:"0.95rem",fontFamily:"'Orbitron',sans-serif",fontWeight:700,letterSpacing:"0.15em",cursor:"pointer" }}>SYSTEM INITIALISIEREN</button>
+      <style>{`
+        @keyframes sysIn{0%{opacity:0;transform:translateY(16px) scale(.97)}100%{opacity:1;transform:translateY(0) scale(1)}}
+        @keyframes sysGlow{0%,100%{box-shadow:0 0 0 1px #00e5ff22,0 0 30px #00e5ff12,inset 0 0 20px #00e5ff08}50%{box-shadow:0 0 0 1px #00e5ff40,0 0 46px #00e5ff26,inset 0 0 28px #00e5ff10}}
+        @keyframes sysScan{0%{transform:translateY(-8px);opacity:0}10%{opacity:.45}100%{transform:translateY(380px);opacity:0}}
+        @keyframes sysLabel{from{opacity:0;letter-spacing:.7em}to{opacity:1;letter-spacing:.42em}}
+      `}</style>
+
+      <div style={{ position:"absolute",inset:0,background:"radial-gradient(circle at 50% 16%, #00e5ff10, transparent 46%)",pointerEvents:"none" }}/>
+
+      <div style={{ position:"relative",width:"100%",maxWidth:400,animation:"sysIn .5s cubic-bezier(.2,.8,.2,1)" }}>
+        <div style={{ position:"relative",background:"linear-gradient(180deg,#070b18f2,#05060ef2)",border:"1px solid #00e5ff22",borderRadius:5,padding:"30px 24px 22px",animation:"sysGlow 3.6s ease-in-out infinite",overflow:"hidden" }}>
+
+          {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h],i)=>(
+            <div key={i} style={{ position:"absolute",[v]:8,[h]:8,width:14,height:14,
+              borderTop:v==="top"?"2px solid #00e5ff":"none",borderBottom:v==="bottom"?"2px solid #00e5ff":"none",
+              borderLeft:h==="left"?"2px solid #00e5ff":"none",borderRight:h==="right"?"2px solid #00e5ff":"none",opacity:.85 }}/>
+          ))}
+          <div style={{ position:"absolute",left:0,right:0,top:0,height:2,background:"linear-gradient(90deg,transparent,#00e5ffaa,transparent)",animation:"sysScan 4.4s linear infinite",pointerEvents:"none" }}/>
+
+          <div style={{ textAlign:"center",marginBottom:16 }}>
+            <div style={{ fontSize:"0.5rem",letterSpacing:"0.42em",color:"#00e5ff",fontFamily:"'Orbitron',sans-serif",fontWeight:700,marginBottom:12,animation:"sysLabel .8s ease both",textShadow:"0 0 14px #00e5ff66" }}>◈ SYSTEM ◈</div>
+            <div style={{ fontSize:"0.5rem",letterSpacing:"0.4em",color:"#64748b",marginBottom:14 }}>SYSTEM NOTIFICATION</div>
+            <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"clamp(2.4rem,11vw,4rem)",fontWeight:900,background:"linear-gradient(135deg,#00e5ff,#8b5cf6)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",lineHeight:1,letterSpacing:"0.04em" }}>ARISE</div>
+          </div>
+
+          <div style={{ textAlign:"center",marginBottom:18 }}>
+            <div style={{ color:"#e2e8f0",fontSize:"0.82rem",fontWeight:700,letterSpacing:"0.16em",fontFamily:"'Rajdhani',sans-serif",marginBottom:6 }}>EIN SPIELER WURDE GEFUNDEN</div>
+            <div style={{ color:"#94a3b8",fontSize:"0.74rem",lineHeight:1.6 }}>Du hast die Qualifikation erhalten,<br/>ein <span style={{ color:"#00e5ff",fontWeight:700 }}>Player</span> zu werden.</div>
+          </div>
+
+          <div style={{ height:1,background:"linear-gradient(90deg,transparent,#00e5ff33,transparent)",marginBottom:16 }}/>
+
+          <div style={{ fontSize:"0.54rem",letterSpacing:"0.22em",color:"#00e5ff99",fontFamily:"'Orbitron',sans-serif",fontWeight:700,marginBottom:9 }}>▣ PLAYER-REGISTRIERUNG</div>
+          <input value={nameInput} onChange={e=>setNameInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleCreate()} placeholder="Name eingeben…" autoFocus style={{ width:"100%",background:"rgba(0,229,255,0.04)",border:"1px solid #00e5ff33",borderRadius:4,padding:"13px 15px",color:"#e2e8f0",fontSize:"1rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:600,outline:"none",boxSizing:"border-box",marginBottom:13,letterSpacing:"0.08em" }}/>
+          <button onClick={handleCreate} style={{ width:"100%",background:"linear-gradient(135deg,#00e5ff1f,#8b5cf62a)",border:"1px solid #00e5ff55",color:"#00e5ff",borderRadius:4,padding:14,fontSize:"0.9rem",fontFamily:"'Orbitron',sans-serif",fontWeight:700,letterSpacing:"0.16em",cursor:"pointer",textShadow:"0 0 12px #00e5ff66" }}>◈ DEM SYSTEM BEITRETEN ◈</button>
+
+          <div style={{ textAlign:"center",marginTop:15,fontSize:"0.56rem",color:"#475569",letterSpacing:"0.05em",lineHeight:1.5 }}>※ Nur du kannst diese Benachrichtigung sehen.</div>
+
+        </div>
       </div>
     </div>
   );
@@ -894,128 +864,56 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
       {levelUpAnim && (
         <div style={{ position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.9)",animation:"fadeInOut 2.8s ease forwards",pointerEvents:"none" }}>
           <div style={{ textAlign:"center" }}>
+            <div style={{ fontSize:"0.55rem",letterSpacing:"0.5em",color:`${rc.primary}aa`,fontFamily:"'Orbitron',sans-serif",fontWeight:700,marginBottom:14,textShadow:`0 0 16px ${rc.primary}` }}>◈ SYSTEM ◈</div>
             <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"clamp(2rem,10vw,3.5rem)",fontWeight:900,color:rc.primary,textShadow:`0 0 30px ${rc.primary}`,animation:"glitch 0.4s infinite",letterSpacing:"0.08em" }}>{levelUpAnim.rankUp?"RANK UP!":"LEVEL UP"}</div>
-            <div style={{ color:"#94a3b8",fontSize:"0.9rem",marginTop:8,letterSpacing:"0.25em" }}>{levelUpAnim.rank}-RANK · LV.{levelUpAnim.level}</div>
+            <div style={{ color:"#94a3b8",fontSize:"0.9rem",marginTop:10,letterSpacing:"0.25em" }}>{levelUpAnim.rank}-RANK · LV.{levelUpAnim.level}</div>
           </div>
         </div>
       )}
 
-      {/* Notification */}
-      {notification && <div style={{ position:"fixed",top:16,left:"50%",transform:"translateX(-50%)",background:"rgba(0,0,0,0.94)",border:`1px solid ${notification.color}44`,borderRadius:10,padding:"9px 18px",color:notification.color,fontFamily:"'Orbitron',sans-serif",fontSize:"0.72rem",letterSpacing:"0.08em",zIndex:500,whiteSpace:"nowrap",animation:"fadeInOut 3.5s ease",pointerEvents:"none" }}>{notification.msg}</div>}
+      {/* Notification — System line */}
+      {notification && (
+        <div style={{ position:"fixed",top:14,left:"50%",transform:"translateX(-50%)",zIndex:500,maxWidth:"calc(100% - 24px)",pointerEvents:"none",animation:"fadeInOut 3.5s ease" }}>
+          <div style={{ position:"relative",background:"#05070ef2",border:`1px solid ${notification.color}55`,borderRadius:3,padding:"8px 16px",display:"flex",alignItems:"center",gap:9,boxShadow:`0 4px 22px rgba(0,0,0,0.6), 0 0 16px ${notification.color}22` }}>
+            <span style={{ fontSize:"0.46rem",letterSpacing:"0.26em",color:`${notification.color}aa`,fontFamily:"'Orbitron',sans-serif",fontWeight:700 }}>◈</span>
+            <span style={{ color:notification.color,fontFamily:"'Orbitron',sans-serif",fontSize:"0.66rem",letterSpacing:"0.08em",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{notification.msg}</span>
+          </div>
+        </div>
+      )}
 
-      {/* Achievement popup */}
+      {/* Achievement popup — System window */}
       {newAchievements.length > 0 && (
-            <div style={{ position:"fixed",top:60,left:"50%",transform:"translateX(-50%)",zIndex:499,animation:"slideDown 0.3s ease",display:"flex",flexDirection:"column",gap:6,minWidth:220,pointerEvents:"none" }}>          {newAchievements.map(a=>(
-            <div key={a.id} style={{ background:"rgba(0,0,0,0.95)",border:"1px solid #f59e0b55",borderRadius:10,padding:"10px 16px",display:"flex",alignItems:"center",gap:10 }}>
-              <span style={{ fontSize:"1.2rem" }}>{a.icon}</span>
+        <div style={{ position:"fixed",top:150,left:"50%",transform:"translateX(-50%)",zIndex:499,animation:"slideDown 0.3s ease",display:"flex",flexDirection:"column",gap:8,width:"calc(100% - 28px)",maxWidth:360,pointerEvents:"none" }}>
+          {newAchievements.map(a=>(
+            <div key={a.id} style={{ position:"relative",background:"linear-gradient(180deg,#070b18f5,#05060ef5)",border:"1px solid #f59e0b40",borderRadius:4,padding:"10px 14px",display:"flex",alignItems:"center",gap:11,boxShadow:"0 8px 30px rgba(0,0,0,0.55), 0 0 20px #f59e0b1f" }}>
+              {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h],ci)=>(
+                <div key={ci} style={{ position:"absolute",[v]:4,[h]:4,width:9,height:9,borderTop:v==="top"?"2px solid #f59e0b":"none",borderBottom:v==="bottom"?"2px solid #f59e0b":"none",borderLeft:h==="left"?"2px solid #f59e0b":"none",borderRight:h==="right"?"2px solid #f59e0b":"none",opacity:.7 }}/>
+              ))}
+              <span style={{ fontSize:"1.3rem" }}>{a.icon}</span>
               <div>
-                <div style={{ color:"#f59e0b",fontSize:"0.72rem",fontFamily:"'Orbitron',sans-serif",letterSpacing:"0.08em" }}>ACHIEVEMENT</div>
-                <div style={{ color:"#e2e8f0",fontSize:"0.82rem",fontWeight:700 }}>{a.title}</div>
+                <div style={{ color:"#f59e0b",fontSize:"0.5rem",fontFamily:"'Orbitron',sans-serif",letterSpacing:"0.22em",fontWeight:700 }}>◈ ACHIEVEMENT</div>
+                <div style={{ color:"#e2e8f0",fontSize:"0.82rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif" }}>{a.title}</div>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* New Titles popup */}
+      {/* New Titles popup — System window */}
       {newTitles.length > 0 && (
-            <div style={{ position:"fixed",top:newAchievements.length>0?120:60,left:"50%",transform:"translateX(-50%)",zIndex:498,animation:"slideDown 0.3s ease",display:"flex",flexDirection:"column",gap:6,minWidth:220,pointerEvents:"none" }}>          {newTitles.map(t=>(
-            <div key={t.id} style={{ background:"rgba(0,0,0,0.95)",border:`1px solid ${t.color}55`,borderRadius:10,padding:"10px 16px",display:"flex",alignItems:"center",gap:10 }}>
-              <span style={{ fontSize:"1.2rem" }}>{t.icon}</span>
+        <div style={{ position:"fixed",top:newAchievements.length>0?226:150,left:"50%",transform:"translateX(-50%)",zIndex:498,animation:"slideDown 0.3s ease",display:"flex",flexDirection:"column",gap:8,width:"calc(100% - 28px)",maxWidth:360,pointerEvents:"none" }}>
+          {newTitles.map(t=>(
+            <div key={t.id} style={{ position:"relative",background:"linear-gradient(180deg,#070b18f5,#05060ef5)",border:`1px solid ${t.color}40`,borderRadius:4,padding:"10px 14px",display:"flex",alignItems:"center",gap:11,boxShadow:`0 8px 30px rgba(0,0,0,0.55), 0 0 20px ${t.color}1f` }}>
+              {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h],ci)=>(
+                <div key={ci} style={{ position:"absolute",[v]:4,[h]:4,width:9,height:9,borderTop:v==="top"?`2px solid ${t.color}`:"none",borderBottom:v==="bottom"?`2px solid ${t.color}`:"none",borderLeft:h==="left"?`2px solid ${t.color}`:"none",borderRight:h==="right"?`2px solid ${t.color}`:"none",opacity:.7 }}/>
+              ))}
+              <span style={{ fontSize:"1.3rem" }}>{t.icon}</span>
               <div>
-                <div style={{ color:t.color,fontSize:"0.72rem",fontFamily:"'Orbitron',sans-serif",letterSpacing:"0.08em" }}>TITEL FREIGESCHALTET</div>
-                <div style={{ color:"#e2e8f0",fontSize:"0.82rem",fontWeight:700 }}>{t.title}</div>
+                <div style={{ color:t.color,fontSize:"0.5rem",fontFamily:"'Orbitron',sans-serif",letterSpacing:"0.22em",fontWeight:700 }}>◈ TITEL FREIGESCHALTET</div>
+                <div style={{ color:"#e2e8f0",fontSize:"0.82rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif" }}>{t.title}</div>
               </div>
             </div>
           ))}
-        </div>
-      )}
-
-      {/* Quest Feedback Moment — QUEST CLEARED */}
-      {questFeedback && (
-        <div style={{ position:"fixed",bottom:90,left:"50%",transform:"translateX(-50%)",zIndex:497,animation:"slideDown 0.25s ease",pointerEvents:"none" }}>
-          <div style={{ background:"rgba(2,2,14,0.97)",border:"1px solid #22c55e28",borderRadius:14,padding:"13px 18px",display:"flex",flexDirection:"column",gap:4,minWidth:200,maxWidth:280,boxShadow:"0 4px 32px rgba(0,0,0,0.7)" }}>
-
-            {/* Header row */}
-            <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:2 }}>
-              <div style={{ fontSize:"0.42rem",letterSpacing:"0.35em",color:"#22c55e66",fontFamily:"'Orbitron',sans-serif",fontWeight:700 }}>
-                QUEST CLEARED
-              </div>
-              {questFeedback.type === "milestone" && (
-                <span style={{ fontSize:"0.48rem",color:"#f59e0b88",background:"rgba(245,158,11,0.1)",border:"1px solid #f59e0b22",borderRadius:4,padding:"1px 6px",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.1em" }}>
-                  MILESTONE
-                </span>
-              )}
-            </div>
-
-            {/* Quest title */}
-            {questFeedback.title && (
-              <div style={{ fontSize:"0.7rem",color:"#cbd5e1",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.02em",lineHeight:1.2,marginBottom:2 }}>
-                {questFeedback.title.length > 32 ? questFeedback.title.slice(0,32)+"…" : questFeedback.title}
-              </div>
-            )}
-
-            {/* XP — prominent */}
-            <div style={{ display:"flex",alignItems:"baseline",gap:6 }}>
-              <span style={{ color:"#22c55e",fontSize:"1.2rem",fontFamily:"'Orbitron',sans-serif",fontWeight:900,lineHeight:1 }}>
-                +{questFeedback.xp}
-              </span>
-              <span style={{ color:"#22c55e66",fontSize:"0.58rem",fontFamily:"'Orbitron',sans-serif",fontWeight:700,letterSpacing:"0.1em" }}>
-                XP
-              </span>
-            </div>
-
-            {/* Stat gain */}
-            {questFeedback.statKey && questFeedback.statPts > 0 && (
-              <div style={{ display:"flex",alignItems:"center",gap:5,fontSize:"0.68rem" }}>
-                <span style={{ color:"#f59e0b",fontWeight:700 }}>+{questFeedback.statPts}</span>
-                <span style={{ color:"#f59e0b88" }}>{questFeedback.statKey}</span>
-              </div>
-            )}
-
-            {/* Path affinity gains — only top 2, only if significant */}
-            {Object.entries(questFeedback.pathGains || {})
-              .filter(([k, v]) => k !== "shadow" && v > 0)
-              .slice(0, 2)
-              .map(([pathId, pts]) => {
-                const p = PATHS[pathId];
-                if (!p) return null;
-                return (
-                  <div key={pathId} style={{ display:"flex",alignItems:"center",gap:4,fontSize:"0.62rem" }}>
-                    <span style={{ color:p.color }}>{p.icon}</span>
-                    <span style={{ color:`${p.color}cc` }}>{p.name}</span>
-                    <span style={{ color:`${p.color}77` }}>+{pts}</span>
-                  </div>
-                );
-              })
-            }
-
-            {/* New title hint */}
-            {(questFeedback.newTitles || []).slice(0,1).map(id => {
-              const t = TITLES.find(tt => tt.id === id);
-              return t ? (
-                <div key={id} style={{ display:"flex",alignItems:"center",gap:4,fontSize:"0.62rem",color:t.color,borderTop:"1px solid rgba(255,255,255,0.05)",paddingTop:3,marginTop:1 }}>
-                  <span>{t.icon}</span>
-                  <span>Titel: {t.title}</span>
-                </div>
-              ) : null;
-            })}
-
-            {/* Signal hint — compact */}
-            {questFeedback.signalHint && (
-              <div style={{ fontSize:"0.58rem",color:"#00ffff66",fontFamily:"'Rajdhani',sans-serif",letterSpacing:"0.04em",borderTop:"1px solid rgba(255,255,255,0.04)",paddingTop:3,marginTop:1 }}>
-                ◈ {questFeedback.signalHint}
-              </div>
-            )}
-
-            {/* Goal progress hint */}
-            {questFeedback.goalProgressHint && (
-              <div style={{ fontSize:"0.58rem",color:"#a78bfa88",fontFamily:"'Rajdhani',sans-serif",letterSpacing:"0.04em" }}>
-                ◇ {questFeedback.goalProgressHint}
-              </div>
-            )}
-
-          </div>
         </div>
       )}
 
