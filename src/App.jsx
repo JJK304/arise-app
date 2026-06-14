@@ -798,8 +798,10 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
 
   const navItems = [
     {id:"profile",icon:"◈",label:"Status"},
+    {id:"stats",  icon:"✦",label:"Stats"},
     {id:"quests", icon:"◉",label:"Quests"},
     {id:"goals",  icon:"⌖",label:"Ziele"},
+    {id:"body",   icon:"⬡",label:"Körper"},
     {id:"review", icon:"⟁",label:"Report"},
     {id:"more",   icon:"⌬",label:"System"},
   ];
@@ -987,7 +989,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
           const dx=e.changedTouches[0].clientX-(e.currentTarget._touchX||0);
           const dy=e.changedTouches[0].clientY-(e.currentTarget._touchY||0);
           if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.5) {
-            const tabs=["profile","quests","goals","review","more"];
+            const tabs=["profile","stats","quests","goals","body","review","more"];
             const ci=tabs.indexOf(view);
             if(dx<0 && ci<tabs.length-1) { setView(tabs[ci+1]); haptic("light"); }
             else if(dx>0 && ci>0) { setView(tabs[ci-1]); haptic("light"); }
