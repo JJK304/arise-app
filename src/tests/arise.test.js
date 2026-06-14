@@ -2337,3 +2337,55 @@ describe("Etappe 14 — Abschluss-Szenarien", () => {
     }
   });
 });
+
+// ═══════════════════════════════════════════════════════════
+// STORAGE-HÄRTUNG — Schreibfehler werden gemeldet, nicht verschluckt
+// ═══════════════════════════════════════════════════════════
+import { estimateSize, onSaveError, saveData as _saveData } from "../storage/db.js";
+
+describe("Storage-Härtung (db.js)", () => {
+  // localStorage temporär mocken (Node hat keins), danach sauber zurücksetzen.
+  const withLS = (mock, fn) => {
+    const orig = globalThis.localStorage;
+    globalThis.localStorage = mock;
+    return Promise.resolve(fn()).finally(() => {
+      if (orig === undefined) delete globalThis.localStorage; else globalThis.localStorage = orig;
+    });
+  };
+
+  it("estimateSize liefert serialisierte Zeichenlänge", () => {
+    expect(estimateSize({ a: 1 })).toBe(JSON.stringify({ a: 1 }).length);
+    expect(estimateSize(undefined)).toBe(0);
+  });
+
+  it("onSaveError: registrieren liefert eine Unsubscribe-Funktion", () => {
+    const unsub = onSaveError(() => {});
+    expect(typeof unsub).toBe("function");
+    unsub();
+  });
+
+  it("saveData meldet Quota-Fehler statt ihn zu verschlucken", () =>
+    withLS({ getItem: () => null, setItem: () => { throw new Error("QuotaExceeded"); } }, async () => {
+      const reasons = [];
+      const unsub = onSaveError(e => reasons.push(e.reason));
+      const res = await _saveData("k", { a: 1 });
+      unsub();
+      expect(res.ls).toBe(false);
+      expect(res.ok).toBe(false);          // ls fehlgeschlagen + kein IndexedDB im Node-Env
+      expect(reasons).toContain("quota");
+    }));
+
+  it("saveData: erfolgreicher localStorage-Write meldet keinen Fehler", () => {
+    const store = {};
+    return withLS({ getItem: k => store[k] ?? null, setItem: (k, v) => { store[k] = v; } }, async () => {
+      const reasons = [];
+      const unsub = onSaveError(e => reasons.push(e.reason));
+      const res = await _saveData("k", { a: 1 });
+      unsub();
+      expect(res.ls).toBe(true);
+      expect(res.ok).toBe(true);
+      expect(reasons).not.toContain("write");
+      expect(reasons).not.toContain("quota");
+    });
+  });
+});

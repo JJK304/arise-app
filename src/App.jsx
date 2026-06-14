@@ -61,7 +61,7 @@ import {
 } from "./lib/progressLogs.js";
 
 // Storage
-import { saveData, loadData, LS } from "./storage/db.js";
+import { saveData, loadData, LS, onSaveError } from "./storage/db.js";
 
 // Components
 import { MiniChart } from "./components/MiniChart.jsx";
@@ -247,6 +247,16 @@ export default function AriseApp() {
     clearTimeout(notifRef.current);
     notifRef.current = setTimeout(()=>setNotification(null), 3500);
   };
+
+  // Speicherfehler sichtbar machen — statt still Fortschritt zu verlieren.
+  // Eine Subscription deckt alle saveData-Aufrufe ab.
+  useEffect(() => onSaveError(({ reason }) => {
+    if (reason === "quota_soft") {
+      showNotif("⚠ Speicher fast voll — Daten exportieren", "#f59e0b");
+    } else {
+      showNotif("⚠ Speichern fehlgeschlagen — Daten sichern!", "#ef4444");
+    }
+  }), []);
 
   const handleCreate = () => {
     if(!nameInput.trim()) return;
