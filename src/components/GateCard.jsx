@@ -27,10 +27,10 @@ export const GateCard = ({ gate, stepsDone, completed, onToggleStep, onClaim, re
           <div style={{ flex:1 }}>
             <div style={{ fontSize:"0.7rem",color:"#94a3b8",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{gate.title}</div>
             {prevGateLabel && (
-              <div style={{ fontSize:"0.58rem",color:"#64748b",marginTop:2 }}>⧫ Erfordert: {prevGateLabel}</div>
+              <div style={{ fontSize:"0.64rem",color:"#64748b",marginTop:2 }}>⧫ Erfordert: {prevGateLabel}</div>
             )}
           </div>
-          <span style={{ fontSize:"0.6rem",color:"#64748b",background:"rgba(255,255,255,0.04)",borderRadius:4,padding:"2px 6px" }}>
+          <span style={{ fontSize:"0.64rem",color:"#64748b",background:"rgba(255,255,255,0.04)",borderRadius:4,padding:"2px 6px" }}>
             TIER {gate.tier}
           </span>
         </div>
@@ -58,7 +58,7 @@ export const GateCard = ({ gate, stepsDone, completed, onToggleStep, onClaim, re
 
       {/* Recommended badge */}
       {recommended && !completed && (
-        <div style={{ position:"absolute",top:10,right:10,background:`${gate.color}22`,border:`1px solid ${gate.color}44`,borderRadius:20,padding:"2px 8px",fontSize:"0.55rem",color:gate.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.08em" }}>
+        <div style={{ position:"absolute",top:10,right:10,background:`${gate.color}22`,border:`1px solid ${gate.color}44`,borderRadius:20,padding:"2px 8px",fontSize:"0.64rem",color:gate.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.08em" }}>
           EMPFOHLEN
         </div>
       )}
@@ -70,16 +70,16 @@ export const GateCard = ({ gate, stepsDone, completed, onToggleStep, onClaim, re
         </div>
         <div style={{ flex:1 }}>
           <div style={{ display:"flex",alignItems:"center",gap:6,marginBottom:2 }}>
-            <span style={{ fontSize:"0.56rem",letterSpacing:"0.12em",color:gate.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>◈ GATE QUEST</span>
+            <span style={{ fontSize:"0.64rem",letterSpacing:"0.12em",color:gate.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>◈ GATE QUEST</span>
             {gate.tier && (
-              <span style={{ background:`${gate.color}15`,border:`1px solid ${gate.color}33`,color:gate.color,borderRadius:4,padding:"1px 5px",fontSize:"0.52rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif" }}>
+              <span style={{ background:`${gate.color}15`,border:`1px solid ${gate.color}33`,color:gate.color,borderRadius:4,padding:"1px 5px",fontSize:"0.64rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif" }}>
                 TIER {gate.tier}
               </span>
             )}
             {pathInfo && (
               <>
-                <span style={{ color:"#475569",fontSize:"0.56rem" }}>·</span>
-                <span style={{ fontSize:"0.56rem",color:pathInfo.color }}>{pathInfo.icon} {pathInfo.name}</span>
+                <span style={{ color:"#475569",fontSize:"0.64rem" }}>·</span>
+                <span style={{ fontSize:"0.64rem",color:pathInfo.color }}>{pathInfo.icon} {pathInfo.name}</span>
               </>
             )}
           </div>
@@ -92,8 +92,8 @@ export const GateCard = ({ gate, stepsDone, completed, onToggleStep, onClaim, re
       {/* Progress bar */}
       <div style={{ marginBottom:10 }}>
         <div style={{ display:"flex",justifyContent:"space-between",marginBottom:4 }}>
-          <span style={{ fontSize:"0.58rem",color:"#64748b",letterSpacing:"0.08em" }}>AWAKENING PROGRESS</span>
-          <span style={{ fontSize:"0.62rem",color:allDone?"#22c55e":gate.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{doneCnt}/{totalSteps}</span>
+          <span style={{ fontSize:"0.64rem",color:"#64748b",letterSpacing:"0.08em" }}>AWAKENING PROGRESS</span>
+          <span style={{ fontSize:"0.64rem",color:allDone?"#22c55e":gate.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{doneCnt}/{totalSteps}</span>
         </div>
         <div style={{ background:"rgba(255,255,255,0.05)",borderRadius:4,height:4,overflow:"hidden" }}>
           <div style={{ width:`${pct}%`,height:"100%",background:`linear-gradient(90deg,${gate.color}66,${gate.color})`,borderRadius:4,transition:"width 0.5s ease",boxShadow:`0 0 6px ${gate.color}88` }}/>
@@ -134,7 +134,7 @@ export const GateCard = ({ gate, stepsDone, completed, onToggleStep, onClaim, re
 
       {/* Reward preview */}
       <div style={{ background:`${gate.color}08`,border:`1px solid ${gate.color}1a`,borderRadius:8,padding:"9px 11px",marginBottom:allDone&&!completed?10:0 }}>
-        <div style={{ fontSize:"0.52rem",letterSpacing:"0.12em",color:"#64748b",marginBottom:5 }}>GATE REWARD</div>
+        <div style={{ fontSize:"0.64rem",letterSpacing:"0.12em",color:"#64748b",marginBottom:5 }}>GATE REWARD</div>
         <div style={{ display:"flex",flexWrap:"wrap",gap:8,alignItems:"center" }}>
           <span style={{ fontSize:"0.72rem",color:"#22c55e",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>+{gate.reward.xp} XP</span>
           {Object.entries(gate.reward.affinity || {}).map(([pathId, pts]) => (

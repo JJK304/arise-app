@@ -19,7 +19,7 @@ export function PreferencesSection({ preferences, rankColor, toggleArrayPref, sa
       <span style={{ color:rc.primary,fontSize:"0.7rem" }}>{icon}</span>
       <span style={{ fontFamily:"'Rajdhani',sans-serif",fontWeight:700,fontSize:"0.65rem",letterSpacing:"0.2em",color:rc.primary }}>{label}</span>
       <div style={{ flex:1,height:1,background:`${rc.primary}22`,borderRadius:1 }}/>
-      <span style={{ fontSize:"0.6rem",color:"#64748b",transform:collapsedSections["prefs_"+id]===false?"rotate(0deg)":"rotate(-90deg)",transition:"transform 0.2s",display:"inline-block" }}>▾</span>
+      <span style={{ fontSize:"0.64rem",color:"#64748b",transform:collapsedSections["prefs_"+id]===false?"rotate(0deg)":"rotate(-90deg)",transition:"transform 0.2s",display:"inline-block" }}>▾</span>
     </button>
   );
 
@@ -32,7 +32,7 @@ export function PreferencesSection({ preferences, rankColor, toggleArrayPref, sa
 
   return (
     <div style={{ marginBottom:18 }}>
-      <div style={{ fontSize:"0.56rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:11 }}>◈ PERSONALISIERUNG</div>
+      <div style={{ fontSize:"0.64rem",letterSpacing:"0.28em",color:"#94a3b8",marginBottom:11 }}>◈ PERSONALISIERUNG</div>
 
       {/* Interessen */}
       <div id="interests-section" style={{ marginBottom:10 }}>
@@ -40,11 +40,11 @@ export function PreferencesSection({ preferences, rankColor, toggleArrayPref, sa
         {collapsedSections["prefs_interests"]===false && (
           <div style={{ animation:"sectionOpen 0.2s ease" }}>
             {interests.length > 0 && (
-              <div style={{ fontSize:"0.58rem",color:"#22c55e",marginBottom:7 }}>{interests.length} ausgewählt</div>
+              <div style={{ fontSize:"0.64rem",color:"#22c55e",marginBottom:7 }}>{interests.length} ausgewählt</div>
             )}
             {Object.entries(INTEREST_GROUPS).map(([groupId, group]) => (
               <div key={groupId} style={{ marginBottom:10 }}>
-                <div style={{ fontSize:"0.56rem",letterSpacing:"0.12em",color:"#64748b",marginBottom:5 }}>{group.label}</div>
+                <div style={{ fontSize:"0.64rem",letterSpacing:"0.12em",color:"#64748b",marginBottom:5 }}>{group.label}</div>
                 <div style={{ display:"flex",flexWrap:"wrap",gap:5 }}>
                   {group.ids.map(id => {
                     const interest = INTERESTS[id];
@@ -71,7 +71,7 @@ export function PreferencesSection({ preferences, rankColor, toggleArrayPref, sa
         <SectionToggle id="paths" label="FOKUSPFADE" icon="⬡"/>
         {collapsedSections["prefs_paths"]===false && (
           <div style={{ animation:"sectionOpen 0.2s ease" }}>
-            <div style={{ fontSize:"0.58rem",color:"#64748b",marginBottom:8,lineHeight:1.4 }}>
+            <div style={{ fontSize:"0.64rem",color:"#64748b",marginBottom:8,lineHeight:1.4 }}>
               Pfade bestimmen welche Quests und Gates vorgeschlagen werden.
             </div>
             <div style={{ display:"flex",flexWrap:"wrap",gap:6,marginBottom:4 }}>
@@ -111,7 +111,7 @@ export function PreferencesSection({ preferences, rankColor, toggleArrayPref, sa
 
       {/* Quest-Länge */}
       <div style={{ marginBottom:12 }}>
-        <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#94a3b8",marginBottom:8 }}>BEVORZUGTE QUEST-LÄNGE</div>
+        <div style={{ fontSize:"0.64rem",letterSpacing:"0.15em",color:"#94a3b8",marginBottom:8 }}>BEVORZUGTE QUEST-LÄNGE</div>
         <div style={{ display:"flex",gap:7 }}>
           {QUEST_LENGTH_OPTIONS.map(opt => {
             const active = questLength === opt.id;
@@ -120,7 +120,7 @@ export function PreferencesSection({ preferences, rankColor, toggleArrayPref, sa
                 style={{ flex:1,background:active?`${rc.primary}18`:"rgba(255,255,255,0.02)",border:`1px solid ${active?rc.primary+"55":"rgba(148,163,184,0.1)"}`,borderRadius:9,padding:"10px 6px",textAlign:"center",cursor:"pointer",transition:"all 0.15s" }}>
                 <div style={{ fontSize:"1rem",marginBottom:3 }}>{opt.icon}</div>
                 <div style={{ fontSize:"0.72rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif",letterSpacing:"0.04em",color:active?rc.primary:"#94a3b8" }}>{opt.label}</div>
-                <div style={{ fontSize:"0.56rem",color:"#64748b",marginTop:2 }}>{opt.desc}</div>
+                <div style={{ fontSize:"0.64rem",color:"#64748b",marginTop:2 }}>{opt.desc}</div>
               </button>
             );
           })}
@@ -129,7 +129,7 @@ export function PreferencesSection({ preferences, rankColor, toggleArrayPref, sa
 
       {/* Schwierigkeit */}
       <div style={{ marginBottom:14 }}>
-        <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#94a3b8",marginBottom:8 }}>SCHWIERIGKEIT</div>
+        <div style={{ fontSize:"0.64rem",letterSpacing:"0.15em",color:"#94a3b8",marginBottom:8 }}>SCHWIERIGKEIT</div>
         <div style={{ display:"flex",gap:7 }}>
           {DIFFICULTY_OPTIONS.map(opt => {
             const active = difficulty === opt.id;
@@ -139,7 +139,7 @@ export function PreferencesSection({ preferences, rankColor, toggleArrayPref, sa
                 style={{ flex:1,background:active?`${diffColor}18`:"rgba(255,255,255,0.02)",border:`1px solid ${active?diffColor+"55":"rgba(148,163,184,0.1)"}`,borderRadius:9,padding:"10px 6px",textAlign:"center",cursor:"pointer",transition:"all 0.15s" }}>
                 <div style={{ fontSize:"1rem",marginBottom:3 }}>{opt.icon}</div>
                 <div style={{ fontSize:"0.72rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif",letterSpacing:"0.04em",color:active?diffColor:"#94a3b8" }}>{opt.label}</div>
-                <div style={{ fontSize:"0.56rem",color:"#64748b",marginTop:2 }}>{opt.desc}</div>
+                <div style={{ fontSize:"0.64rem",color:"#64748b",marginTop:2 }}>{opt.desc}</div>
               </button>
             );
           })}

@@ -43,7 +43,7 @@ export function ClearedFeedback({ card }) {
         {/* header bar: ◈ SYSTEM ─── KIND */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: card.subtitle ? 3 : 6 }}>
           <span style={{
-            fontSize: "0.46rem", letterSpacing: "0.3em", color: `${color}99`,
+            fontSize: "0.64rem", letterSpacing: "0.3em", color: `${color}99`,
             fontFamily: "'Orbitron',sans-serif", fontWeight: 700, whiteSpace: "nowrap",
           }}>◈ SYSTEM</span>
           <span style={{ flex: 1, height: 1, background: `linear-gradient(90deg,${color}33,transparent)` }} />
@@ -63,11 +63,11 @@ export function ClearedFeedback({ card }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
           {(card.lines || []).map((l, i) => (
             <div key={i} style={{
-              fontSize: "0.63rem", lineHeight: 1.5,
+              fontSize: "0.64rem", lineHeight: 1.5,
               color: l.color || "#94a3b8",
               display: "flex", alignItems: "baseline", gap: 7,
             }}>
-              <span style={{ fontSize: "0.54rem", color: l.color || "#64748b" }}>{l.mark || "▸"}</span>
+              <span style={{ fontSize: "0.64rem", color: l.color || "#64748b" }}>{l.mark || "▸"}</span>
               <span>{l.text}</span>
             </div>
           ))}

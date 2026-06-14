@@ -25,7 +25,7 @@ export const RadarChart = ({ stats, rankColor }) => {
   const dataPath = dataPoints.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ") + " Z";
   return (
     <div style={{ background:"rgba(255,255,255,0.02)", border:`1px solid ${rankColor}22`, borderRadius:14, padding:"14px 10px 8px" }}>
-      <div style={{ fontSize:"0.56rem", letterSpacing:"0.28em", color:"#94a3b8", marginBottom:10 }}>◈ STAT OVERVIEW</div>
+      <div style={{ fontSize:"0.64rem", letterSpacing:"0.28em", color:"#94a3b8", marginBottom:10 }}>◈ STAT OVERVIEW</div>
       <div style={{ display:"flex", justifyContent:"center" }}>
         <svg width={260} height={260} viewBox="0 0 260 260" style={{ overflow:"visible" }}>
           {gridLevels.map((pct, gi) => {

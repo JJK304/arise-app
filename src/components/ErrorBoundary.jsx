@@ -51,7 +51,7 @@ export class ErrorBoundary extends React.Component {
           ))}
 
           <div style={{ textAlign: "center", marginBottom: 18 }}>
-            <div style={{ fontSize: "0.5rem", letterSpacing: "0.42em", color: "#ef4444", fontFamily: "'Orbitron',sans-serif", fontWeight: 700, marginBottom: 10, textShadow: "0 0 14px #ef444466" }}>◈ SYSTEM ◈</div>
+            <div style={{ fontSize: "0.64rem", letterSpacing: "0.42em", color: "#ef4444", fontFamily: "'Orbitron',sans-serif", fontWeight: 700, marginBottom: 10, textShadow: "0 0 14px #ef444466" }}>◈ SYSTEM ◈</div>
             <div style={{ fontFamily: "'Orbitron',sans-serif", fontSize: "1.25rem", fontWeight: 900, color: "#ef4444", letterSpacing: "0.08em", textShadow: "0 0 20px #ef444488" }}>⚠ SYSTEM ERROR</div>
           </div>
 
@@ -69,7 +69,7 @@ export class ErrorBoundary extends React.Component {
             </button>
           </div>
 
-          <div style={{ fontSize: "0.56rem", color: "#475569", textAlign: "center", marginTop: 14, lineHeight: 1.5 }}>
+          <div style={{ fontSize: "0.64rem", color: "#475569", textAlign: "center", marginTop: 14, lineHeight: 1.5 }}>
             Bleibt der Fehler bestehen, importiere das Backup nach einem Neustart.
           </div>
         </div>

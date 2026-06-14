@@ -38,8 +38,8 @@ function NodeChip({ label, status }) {
       background: status === "available" ? "rgba(0,255,255,0.05)" : "rgba(255,255,255,0.015)",
       border: `1px solid ${st.color}${status === "locked" ? "22" : "33"}`,
     }}>
-      <span style={{ fontSize: "0.5rem", color: st.color }}>{st.mark}</span>
-      <span style={{ fontSize: "0.56rem", color: status === "locked" ? "#64748b" : "#cbd5e1", whiteSpace: "nowrap" }}>{label}</span>
+      <span style={{ fontSize: "0.64rem", color: st.color }}>{st.mark}</span>
+      <span style={{ fontSize: "0.64rem", color: status === "locked" ? "#64748b" : "#cbd5e1", whiteSpace: "nowrap" }}>{label}</span>
     </div>
   );
 }
@@ -48,7 +48,7 @@ function NodeChip({ label, status }) {
 function BranchProgress({ state, signalPaths }) {
   if (signalPaths.length === 0) {
     return (
-      <div style={{ fontSize: "0.6rem", color: "#64748b", padding: "8px 2px", lineHeight: 1.6 }}>
+      <div style={{ fontSize: "0.64rem", color: "#64748b", padding: "8px 2px", lineHeight: 1.6 }}>
         Noch keine Branches erkannt. Schließe Quests ab — das System
         beobachtet dein Verhalten und zeigt hier, welche Richtungen wachsen.
       </div>
@@ -65,13 +65,13 @@ function BranchProgress({ state, signalPaths }) {
         return (
           <div key={sp.pathId}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 2 }}>
-              <span style={{ fontSize: "0.62rem", color: "#cbd5e1" }}>
+              <span style={{ fontSize: "0.64rem", color: "#cbd5e1" }}>
                 {p.icon} {p.name}
-                <span style={{ fontSize: "0.5rem", color: p.color, marginLeft: 6, letterSpacing: "0.1em" }}>
+                <span style={{ fontSize: "0.64rem", color: p.color, marginLeft: 6, letterSpacing: "0.1em" }}>
                   SIGNAL LV.{sp.level}
                 </span>
               </span>
-              <span style={{ fontSize: "0.52rem", color: "#64748b", fontFamily: "'Orbitron',sans-serif" }}>
+              <span style={{ fontSize: "0.64rem", color: "#64748b", fontFamily: "'Orbitron',sans-serif" }}>
                 {pct}% · ◆ {ms.doneCount}/{ms.total} · M {mastery.pct}%
               </span>
             </div>
@@ -116,7 +116,7 @@ function BranchTree({ state, signalPaths }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
       <div>
-        <div style={{ fontSize: "0.52rem", letterSpacing: "0.18em", color: "#64748b", marginBottom: 5 }}>
+        <div style={{ fontSize: "0.64rem", letterSpacing: "0.18em", color: "#64748b", marginBottom: 5 }}>
           ⧫ DISCOVERY GATES {discCleared.length > 0 && <span style={{ color: "#22c55e" }}>· {discCleared.length} cleared</span>}
         </div>
         <div style={{ display: "flex", gap: 5, flexWrap: "wrap" }}>
@@ -127,13 +127,13 @@ function BranchTree({ state, signalPaths }) {
       </div>
       {branches.map(({ path, chain }) => path && (
         <div key={path.id}>
-          <div style={{ fontSize: "0.52rem", letterSpacing: "0.18em", color: path.color, marginBottom: 5 }}>
+          <div style={{ fontSize: "0.64rem", letterSpacing: "0.18em", color: path.color, marginBottom: 5 }}>
             {path.icon} {path.name.toUpperCase()} BRANCH
           </div>
           <div style={{ display: "flex", gap: 5, flexWrap: "wrap", alignItems: "center" }}>
             {chain.map((n, i) => (
               <React.Fragment key={i}>
-                {i > 0 && <span style={{ color: "#334155", fontSize: "0.5rem" }}>→</span>}
+                {i > 0 && <span style={{ color: "#334155", fontSize: "0.64rem" }}>→</span>}
                 <NodeChip label={n.label} status={n.status} />
               </React.Fragment>
             ))}
@@ -141,7 +141,7 @@ function BranchTree({ state, signalPaths }) {
         </div>
       ))}
       {branches.length === 0 && (
-        <div style={{ fontSize: "0.56rem", color: "#64748b" }}>
+        <div style={{ fontSize: "0.64rem", color: "#64748b" }}>
           Path-Branches erscheinen, sobald Signale wachsen.
         </div>
       )}
@@ -153,7 +153,7 @@ function BranchTree({ state, signalPaths }) {
 function NextAscensionPanel({ state }) {
   const status = getRankUpStatus(state);
   if (!status) {
-    return <div style={{ fontSize: "0.6rem", color: "#00ffff" }}>◈ Höchster Rank erreicht — Ascendant.</div>;
+    return <div style={{ fontSize: "0.64rem", color: "#00ffff" }}>◈ Höchster Rank erreicht — Ascendant.</div>;
   }
   const nextColor = RANK_COLORS[status.nextRank]?.primary || "#00ffff";
 
@@ -169,14 +169,14 @@ function NextAscensionPanel({ state }) {
       background: `${nextColor}08`, border: `1px solid ${nextColor}26`,
     }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
-        <span style={{ fontSize: "0.56rem", letterSpacing: "0.2em", color: nextColor }}>
+        <span style={{ fontSize: "0.64rem", letterSpacing: "0.2em", color: nextColor }}>
           ⧫ NEXT ASCENSION — {status.nextRank}-RANK
         </span>
-        <span style={{ fontSize: "0.5rem", color: "#64748b", fontFamily: "'Orbitron',sans-serif" }}>
+        <span style={{ fontSize: "0.64rem", color: "#64748b", fontFamily: "'Orbitron',sans-serif" }}>
           {doneCount}/{status.checks.length} ✓
         </span>
       </div>
-      <div style={{ fontSize: "0.54rem", color: "#94a3b8", marginBottom: 4 }}>
+      <div style={{ fontSize: "0.64rem", color: "#94a3b8", marginBottom: 4 }}>
         XP: Lv.{state.level}/{LEVELS_PER_RANK} · {(state.xp || 0).toLocaleString()}/{xpNeeded.toLocaleString()}
         {levelsLeft > 0 && <span style={{ color: "#64748b" }}> · noch {levelsLeft} Level in {state.rank}</span>}
       </div>
@@ -184,9 +184,9 @@ function NextAscensionPanel({ state }) {
         <div style={{ width: `${xpPct}%`, height: "100%", background: nextColor, borderRadius: 2 }} />
       </div>
       {status.checks.map(c => (
-        <div key={c.id} style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: "0.56rem", lineHeight: 1.6, color: c.done ? "#22c55e" : "#94a3b8" }}>
+        <div key={c.id} style={{ display: "flex", justifyContent: "space-between", gap: 8, fontSize: "0.64rem", lineHeight: 1.6, color: c.done ? "#22c55e" : "#94a3b8" }}>
           <span>{c.done ? "✓" : "▢"} {c.label}</span>
-          <span style={{ fontFamily: "'Orbitron',sans-serif", fontSize: "0.5rem", color: c.done ? "#22c55e" : "#64748b" }}>
+          <span style={{ fontFamily: "'Orbitron',sans-serif", fontSize: "0.64rem", color: c.done ? "#22c55e" : "#64748b" }}>
             {Math.min(c.have, c.need)}/{c.need}
           </span>
         </div>
@@ -204,7 +204,7 @@ export function LevelTree({ state }) {
 
   const section = (title, body) => (
     <div style={{ marginBottom: 14 }}>
-      <div style={{ fontSize: "0.56rem", letterSpacing: "0.28em", color: "#94a3b8", marginBottom: 8 }}>{title}</div>
+      <div style={{ fontSize: "0.64rem", letterSpacing: "0.28em", color: "#94a3b8", marginBottom: 8 }}>{title}</div>
       {body}
     </div>
   );

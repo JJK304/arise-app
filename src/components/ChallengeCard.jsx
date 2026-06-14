@@ -80,36 +80,36 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
 
           {/* Meta row */}
           <div style={{ display:"flex", flexWrap:"wrap", alignItems:"center", gap:4, marginBottom:4, lineHeight:1 }}>
-            <span style={{ color:tc, fontSize:"0.58rem", letterSpacing:"0.08em", fontWeight:700 }}>{typeLabel}</span>
+            <span style={{ color:tc, fontSize:"0.64rem", letterSpacing:"0.08em", fontWeight:700 }}>{typeLabel}</span>
 
             {recommended && !done && (
-              <span style={{ background:`${tc}22`, border:`1px solid ${tc}44`, color:tc, borderRadius:20, padding:"1px 6px", fontSize:"0.52rem", letterSpacing:"0.06em", fontWeight:700 }}>◈ SYS.EMPFEHLUNG</span>
+              <span style={{ background:`${tc}22`, border:`1px solid ${tc}44`, color:tc, borderRadius:20, padding:"1px 6px", fontSize:"0.64rem", letterSpacing:"0.06em", fontWeight:700 }}>◈ SYS.EMPFEHLUNG</span>
             )}
 
             <span style={{ color:"#475569" }}>·</span>
 
-            <span style={{ color: isMilestone ? "#22c55e" : "#22c55e", fontSize:"0.6rem", fontWeight:700 }}>
+            <span style={{ color: isMilestone ? "#22c55e" : "#22c55e", fontSize:"0.64rem", fontWeight:700 }}>
               +{challenge.xp} XP
             </span>
 
             {isMilestone && challenge.statPts > 0 && (
               <>
                 <span style={{ color:"#475569" }}>·</span>
-                <span style={{ color:statColor, fontSize:"0.58rem", fontWeight:700 }}>+{challenge.statPts} {statKey}</span>
+                <span style={{ color:statColor, fontSize:"0.64rem", fontWeight:700 }}>+{challenge.statPts} {statKey}</span>
               </>
             )}
 
             {pathInfo && (
               <>
                 <span style={{ color:"#475569" }}>·</span>
-                <span style={{ color:pathInfo.color, fontSize:"0.56rem" }}>{pathInfo.icon} {pathInfo.name}</span>
+                <span style={{ color:pathInfo.color, fontSize:"0.64rem" }}>{pathInfo.icon} {pathInfo.name}</span>
               </>
             )}
 
             {challenge.topic && (
               <>
                 <span style={{ color:"#475569" }}>·</span>
-                <span style={{ color:"#a78bfa88", fontSize:"0.56rem" }}>{challenge.topic}</span>
+                <span style={{ color:"#a78bfa88", fontSize:"0.64rem" }}>{challenge.topic}</span>
               </>
             )}
           </div>
@@ -139,19 +139,19 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
           {(!done) && (
             <div style={{ display:"flex",flexWrap:"wrap",gap:5,marginTop:5,alignItems:"center" }}>
               {domainLabel && !challenge.recovery && (
-                <span style={{ background:"rgba(255,255,255,0.04)",border:"1px solid rgba(148,163,184,0.12)",borderRadius:4,padding:"2px 6px",fontSize:"0.54rem",color:"#64748b" }}>
+                <span style={{ background:"rgba(255,255,255,0.04)",border:"1px solid rgba(148,163,184,0.12)",borderRadius:4,padding:"2px 6px",fontSize:"0.64rem",color:"#64748b" }}>
                   {domainLabel}
                 </span>
               )}
 
               {linkedGoal && (
-                <span style={{ background:"rgba(245,158,11,0.1)",border:"1px solid #f59e0b33",color:"#f59e0b",borderRadius:4,padding:"2px 6px",fontSize:"0.54rem",fontWeight:700 }}>
+                <span style={{ background:"rgba(245,158,11,0.1)",border:"1px solid #f59e0b33",color:"#f59e0b",borderRadius:4,padding:"2px 6px",fontSize:"0.64rem",fontWeight:700 }}>
                   ⌖ {linkedGoal.title.slice(0,22)}{linkedGoal.title.length>22?"…":""}
                 </span>
               )}
 
               {challenge.reason && (
-                <span style={{ color:"#a78bfa55",fontSize:"0.52rem",fontFamily:"'Rajdhani',sans-serif" }}>
+                <span style={{ color:"#a78bfa55",fontSize:"0.64rem",fontFamily:"'Rajdhani',sans-serif" }}>
                   ↳ {challenge.reason}
                 </span>
               )}

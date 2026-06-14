@@ -23,7 +23,7 @@ export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss
         {/* Header */}
         <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
           <div>
-            <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#8b5cf666",marginBottom:3 }}>SYSTEM RECORD</div>
+            <div style={{ fontSize:"0.64rem",letterSpacing:"0.2em",color:"#8b5cf666",marginBottom:3 }}>SYSTEM RECORD</div>
             <div style={{ fontSize:"0.88rem",color:"#e2e8f0",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{quest.title}</div>
           </div>
           <button onClick={onDismiss}
@@ -33,7 +33,7 @@ export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss
         {/* Metrics */}
         {fields.metrics.length > 0 && (
           <div style={{ marginBottom:12 }}>
-            <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#64748b",marginBottom:8 }}>METRICS (optional)</div>
+            <div style={{ fontSize:"0.64rem",letterSpacing:"0.15em",color:"#64748b",marginBottom:8 }}>METRICS (optional)</div>
             <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
               {fields.metrics.map(key => {
                 const meta = METRIC_LABELS[key];
@@ -41,7 +41,7 @@ export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss
                 if (meta.type === "text") {
                   return (
                     <div key={key} style={{ gridColumn: "1 / -1" }}>
-                      <label style={{ fontSize:"0.52rem",color:"#64748b",letterSpacing:"0.1em" }}>
+                      <label style={{ fontSize:"0.64rem",color:"#64748b",letterSpacing:"0.1em" }}>
                         {meta.icon} {meta.label}
                       </label>
                       <input
@@ -57,7 +57,7 @@ export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss
                 const isRange = meta.type === "range";
                 return (
                   <div key={key} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:9,padding:"10px" }}>
-                    <div style={{ fontSize:"0.56rem",color:"#64748b",marginBottom:5 }}>
+                    <div style={{ fontSize:"0.64rem",color:"#64748b",marginBottom:5 }}>
                       {meta.icon} {meta.label}{isRange ? " (1–5)" : ""}
                     </div>
                     <input
@@ -76,7 +76,7 @@ export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss
 
         {/* Notes */}
         <div style={{ marginBottom:14 }}>
-          <div style={{ fontSize:"0.52rem",letterSpacing:"0.15em",color:"#64748b",marginBottom:6 }}>
+          <div style={{ fontSize:"0.64rem",letterSpacing:"0.15em",color:"#64748b",marginBottom:6 }}>
             {fields.notesLabel}{fields.notesRequired ? "" : " (optional)"}
           </div>
           <textarea
@@ -100,7 +100,7 @@ export function ProgressLogModal({ quest, logForm, setLogForm, onSave, onDismiss
           </button>
         </div>
 
-        <div style={{ fontSize:"0.58rem",color:"#475569",textAlign:"center",marginTop:8 }}>
+        <div style={{ fontSize:"0.64rem",color:"#475569",textAlign:"center",marginTop:8 }}>
           +{xpHint} XP — Documented Progress Bonus
         </div>
       </div>

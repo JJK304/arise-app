@@ -16,7 +16,7 @@ export const MiniChart = ({ data, color = "#00ffff", height = 60, label = "" }) 
   const area = path + ` L${pts[pts.length - 1].x},${h} L${pts[0].x},${h} Z`;
   return (
     <div>
-      {label && <div style={{ fontSize:"0.58rem", color:"#64748b", letterSpacing:"0.1em", marginBottom:4 }}>{label}</div>}
+      {label && <div style={{ fontSize:"0.64rem", color:"#64748b", letterSpacing:"0.1em", marginBottom:4 }}>{label}</div>}
       <svg width="100%" viewBox={`0 0 ${w} ${h}`} style={{ overflow:"visible" }}>
         <defs>
           <linearGradient id={`g_${color.replace("#", "")}`} x1="0" y1="0" x2="0" y2="1">

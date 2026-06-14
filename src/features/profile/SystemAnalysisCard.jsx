@@ -23,9 +23,9 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
     <div style={{ marginBottom:8 }}>
       <div style={{ background:"rgba(0,255,255,0.04)",border:"1px solid #00ffff1e",borderRadius:10,padding:"13px" }}>
         <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6 }}>
-          <div style={{ fontSize:"0.52rem",letterSpacing:"0.2em",color:"#00ffff66" }}>SYSTEM ANALYSIS</div>
+          <div style={{ fontSize:"0.64rem",letterSpacing:"0.2em",color:"#00ffff66" }}>SYSTEM ANALYSIS</div>
           {sysAnalysis.rankPhase && (
-            <span style={{ fontSize:"0.52rem",color:"#00ffff44",background:"rgba(0,255,255,0.06)",border:"1px solid #00ffff1a",borderRadius:4,padding:"2px 7px",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.08em" }}>
+            <span style={{ fontSize:"0.64rem",color:"#00ffff44",background:"rgba(0,255,255,0.06)",border:"1px solid #00ffff1a",borderRadius:4,padding:"2px 7px",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.08em" }}>
               {{beginner:"BEGINNER",intermediate:"INTERMEDIATE",advanced:"ADVANCED",elite:"ELITE"}[sysAnalysis.rankPhase] || sysAnalysis.rankPhase.toUpperCase()}
             </span>
           )}
@@ -38,7 +38,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
         {/* Signal Paths — from signal system */}
         {(sysAnalysis.topSignalPaths || []).length > 0 ? (
           <div style={{ marginBottom: sysAnalysis.balanceHints.length>0||showSuggestion ? 8 : 0 }}>
-            <div style={{ fontSize:"0.5rem",letterSpacing:"0.12em",color:"#00ffff44",marginBottom:4 }}>SIGNAL DETECTED</div>
+            <div style={{ fontSize:"0.64rem",letterSpacing:"0.12em",color:"#00ffff44",marginBottom:4 }}>SIGNAL DETECTED</div>
             <div style={{ display:"flex",gap:5,flexWrap:"wrap" }}>
               {(sysAnalysis.topSignalPaths || []).slice(0,4).map(sp => {
                 const p = PATHS[sp.pathId];
@@ -46,23 +46,23 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
                 const levelColor = ["#64748b","#64748b","#f59e0b","#22c55e"][sp.level] || "#64748b";
                 return (
                   <div key={sp.pathId} title={sp.reason} style={{ background:`${p?.color}10`,border:`1px solid ${p?.color}${sp.level >= 2 ? "40" : "1a"}`,borderRadius:20,padding:"3px 9px",display:"flex",alignItems:"center",gap:4 }}>
-                    <span style={{ fontSize:"0.6rem",color:p?.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{p?.icon} {p?.name}</span>
-                    <span style={{ fontSize:"0.48rem",color:levelColor,fontFamily:"'Orbitron',sans-serif",fontWeight:700 }}>{levelLabel}</span>
+                    <span style={{ fontSize:"0.64rem",color:p?.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{p?.icon} {p?.name}</span>
+                    <span style={{ fontSize:"0.64rem",color:levelColor,fontFamily:"'Orbitron',sans-serif",fontWeight:700 }}>{levelLabel}</span>
                   </div>
                 );
               })}
             </div>
             {sysAnalysis.topSignalPaths?.[0]?.reason && (
-              <div style={{ fontSize:"0.58rem",color:"#64748b",marginTop:4 }}>
+              <div style={{ fontSize:"0.64rem",color:"#64748b",marginTop:4 }}>
                 {sysAnalysis.topSignalPaths[0].reason}
               </div>
             )}
             {/* Etappe 6: nachvollziehbarer Signal-Breakdown des dominanten Pfads */}
             {sysAnalysis.dominantBreakdown?.parts?.length > 0 && (
               <div style={{ marginTop:6,padding:"6px 8px",background:"rgba(0,255,255,0.03)",border:"1px solid rgba(0,255,255,0.08)",borderRadius:6 }}>
-                <div style={{ fontSize:"0.48rem",letterSpacing:"0.14em",color:"#00ffff33",marginBottom:3 }}>WARUM DIESES SIGNAL</div>
+                <div style={{ fontSize:"0.64rem",letterSpacing:"0.14em",color:"#00ffff33",marginBottom:3 }}>WARUM DIESES SIGNAL</div>
                 {sysAnalysis.dominantBreakdown.parts.slice(0,4).map((part,i)=>(
-                  <div key={i} style={{ fontSize:"0.56rem",color:"#94a3b8",lineHeight:1.5,display:"flex",justifyContent:"space-between",gap:8 }}>
+                  <div key={i} style={{ fontSize:"0.64rem",color:"#94a3b8",lineHeight:1.5,display:"flex",justifyContent:"space-between",gap:8 }}>
                     <span>▸ {part.label}</span>
                   </div>
                 ))}
@@ -75,7 +75,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
               const p = PATHS[pathId];
               const cnt = sysAnalysis.pathCounts[pathId] || 0;
               return (
-                <span key={pathId} style={{ background:`${p?.color}14`,border:`1px solid ${p?.color}2a`,color:p?.color,borderRadius:20,padding:"3px 9px",fontSize:"0.6rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
+                <span key={pathId} style={{ background:`${p?.color}14`,border:`1px solid ${p?.color}2a`,color:p?.color,borderRadius:20,padding:"3px 9px",fontSize:"0.64rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>
                   {p?.icon} {p?.name} ×{cnt}
                 </span>
               );
@@ -86,13 +86,13 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
         {/* Etappe 8: Rank-Up-Anforderungen (mehr als XP) — immer sichtbar wenn offen */}
         {rankUpStatus && !rankUpStatus.met && (
           <div style={{ marginBottom:8,padding:"6px 8px",background:"rgba(245,158,11,0.04)",border:"1px solid rgba(245,158,11,0.14)",borderRadius:6 }}>
-            <div style={{ fontSize:"0.48rem",letterSpacing:"0.14em",color:"#f59e0b88",marginBottom:3 }}>
+            <div style={{ fontSize:"0.64rem",letterSpacing:"0.14em",color:"#f59e0b88",marginBottom:3 }}>
               ⧫ RANK-UP {rankUpStatus.nextRank} — ANFORDERUNGEN
             </div>
             {rankUpStatus.checks.map(c => (
-              <div key={c.id} style={{ fontSize:"0.56rem",color:c.done?"#22c55e":"#94a3b8",lineHeight:1.55,display:"flex",justifyContent:"space-between",gap:8 }}>
+              <div key={c.id} style={{ fontSize:"0.64rem",color:c.done?"#22c55e":"#94a3b8",lineHeight:1.55,display:"flex",justifyContent:"space-between",gap:8 }}>
                 <span>{c.done ? "✓" : "▢"} {c.label}</span>
-                <span style={{ color:c.done?"#22c55e":"#64748b",fontFamily:"'Orbitron',sans-serif",fontSize:"0.5rem" }}>{Math.min(c.have,c.need)}/{c.need}</span>
+                <span style={{ color:c.done?"#22c55e":"#64748b",fontFamily:"'Orbitron',sans-serif",fontSize:"0.64rem" }}>{Math.min(c.have,c.need)}/{c.need}</span>
               </div>
             ))}
           </div>
@@ -146,12 +146,12 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
             const p = PATHS[dominantPath];
             return (
               <div style={{ marginTop:8,background:`${p?.color}08`,border:`1px solid ${p?.color}1a`,borderRadius:8,padding:"8px 11px" }}>
-                <div style={{ fontSize:"0.5rem",letterSpacing:"0.12em",color:`${p?.color}88`,marginBottom:3 }}>NEXT MILESTONE</div>
+                <div style={{ fontSize:"0.64rem",letterSpacing:"0.12em",color:`${p?.color}88`,marginBottom:3 }}>NEXT MILESTONE</div>
                 <div style={{ fontSize:"0.68rem",color:"#cbd5e1",lineHeight:1.4 }}>
                   {p?.icon} {milestone.label}
                 </div>
                 {milestone.specific && (
-                  <div style={{ fontSize:"0.54rem",color:"#64748b",marginTop:2 }}>Spezifisch für {p?.name}</div>
+                  <div style={{ fontSize:"0.64rem",color:"#64748b",marginTop:2 }}>Spezifisch für {p?.name}</div>
                 )}
               </div>
             );
@@ -169,7 +169,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
         {/* Goal Focus */}
         {sysAnalysis.activeGoalFocus && (
           <div style={{ marginTop:10,background:"rgba(245,158,11,0.06)",border:"1px solid #f59e0b22",borderRadius:8,padding:"9px 11px" }}>
-            <div style={{ fontSize:"0.52rem",color:"#f59e0b88",letterSpacing:"0.12em",marginBottom:4 }}>AKTIVES ZIEL</div>
+            <div style={{ fontSize:"0.64rem",color:"#f59e0b88",letterSpacing:"0.12em",marginBottom:4 }}>AKTIVES ZIEL</div>
             <div style={{ display:"flex",alignItems:"center",gap:6,marginBottom:4 }}>
               <span style={{ fontSize:"1rem" }}>{sysAnalysis.activeGoalFocus.icon || "🎯"}</span>
               <div style={{ flex:1 }}>
@@ -192,7 +192,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
 
         {/* Balance Warning */}
         {sysAnalysis.balanceWarning && (
-          <div style={{ marginTop:8,fontSize:"0.62rem",color:"#f59e0b88",lineHeight:1.5 }}>
+          <div style={{ marginTop:8,fontSize:"0.64rem",color:"#f59e0b88",lineHeight:1.5 }}>
             ⚠️ {sysAnalysis.balanceWarning}
           </div>
         )}

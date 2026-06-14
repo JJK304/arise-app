@@ -53,7 +53,7 @@ export function OnboardingModal({ onDismiss, onSetInterests, rc }) {
             {/* Header */}
             <div style={{ textAlign: "center", marginBottom: 22 }}>
               <div style={{
-                fontSize: "0.48rem", letterSpacing: "0.35em",
+                fontSize: "0.64rem", letterSpacing: "0.35em",
                 color: `${color}88`, marginBottom: 8,
                 fontFamily: "'Orbitron',sans-serif", fontWeight: 700,
                 textShadow: `0 0 12px ${color}55`,
@@ -125,7 +125,7 @@ export function OnboardingModal({ onDismiss, onSetInterests, rc }) {
                 }}>
                   <span style={{ color: block.color, fontSize: "0.85rem" }}>{block.icon}</span>
                   <span style={{
-                    fontSize: "0.6rem", letterSpacing: "0.12em",
+                    fontSize: "0.64rem", letterSpacing: "0.12em",
                     color: block.color, fontFamily: "'Rajdhani',sans-serif",
                     fontWeight: 700,
                   }}>
@@ -178,7 +178,7 @@ export function OnboardingModal({ onDismiss, onSetInterests, rc }) {
             </div>
 
             <div style={{
-              fontSize: "0.56rem", color: "#64748b",
+              fontSize: "0.64rem", color: "#64748b",
               textAlign: "center", marginTop: 14, lineHeight: 1.5,
             }}>
               Onboarding jederzeit wieder aufrufbar unter<br />
