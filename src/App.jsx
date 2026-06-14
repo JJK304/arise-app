@@ -71,6 +71,8 @@ import { SplashScreen } from "./components/SplashScreen.jsx";
 import { StatBar } from "./components/StatBar.jsx";
 import { ChallengeCard } from "./components/ChallengeCard.jsx";
 import { GateCard } from "./components/GateCard.jsx";
+import { SetupScreen } from "./components/SetupScreen.jsx";
+import { SystemOverlays } from "./components/SystemOverlays.jsx";
 
 
 
@@ -624,51 +626,7 @@ export default function AriseApp() {
 
 
   // ── SETUP SCREEN — SYSTEM · PLAYER REGISTRATION ──
-  if(!state) return (
-    <div style={{ minHeight:"100vh",background:"#04040a",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",fontFamily:"'Rajdhani',sans-serif",backgroundImage:"radial-gradient(ellipse at 50% 0%,#0a1330,#04040a 62%)",padding:24,position:"relative",overflow:"hidden" }}>
-      <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
-      <style>{`
-        @keyframes sysIn{0%{opacity:0;transform:translateY(16px) scale(.97)}100%{opacity:1;transform:translateY(0) scale(1)}}
-        @keyframes sysGlow{0%,100%{box-shadow:0 0 0 1px #00e5ff22,0 0 30px #00e5ff12,inset 0 0 20px #00e5ff08}50%{box-shadow:0 0 0 1px #00e5ff40,0 0 46px #00e5ff26,inset 0 0 28px #00e5ff10}}
-        @keyframes sysScan{0%{transform:translateY(-8px);opacity:0}10%{opacity:.45}100%{transform:translateY(380px);opacity:0}}
-        @keyframes sysLabel{from{opacity:0;letter-spacing:.7em}to{opacity:1;letter-spacing:.42em}}
-      `}</style>
-
-      <div style={{ position:"absolute",inset:0,background:"radial-gradient(circle at 50% 16%, #00e5ff10, transparent 46%)",pointerEvents:"none" }}/>
-
-      <div style={{ position:"relative",width:"100%",maxWidth:400,animation:"sysIn .5s cubic-bezier(.2,.8,.2,1)" }}>
-        <div style={{ position:"relative",background:"linear-gradient(180deg,#070b18f2,#05060ef2)",border:"1px solid #00e5ff22",borderRadius:5,padding:"30px 24px 22px",animation:"sysGlow 3.6s ease-in-out infinite",overflow:"hidden" }}>
-
-          {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h],i)=>(
-            <div key={i} style={{ position:"absolute",[v]:8,[h]:8,width:14,height:14,
-              borderTop:v==="top"?"2px solid #00e5ff":"none",borderBottom:v==="bottom"?"2px solid #00e5ff":"none",
-              borderLeft:h==="left"?"2px solid #00e5ff":"none",borderRight:h==="right"?"2px solid #00e5ff":"none",opacity:.85 }}/>
-          ))}
-          <div style={{ position:"absolute",left:0,right:0,top:0,height:2,background:"linear-gradient(90deg,transparent,#00e5ffaa,transparent)",animation:"sysScan 4.4s linear infinite",pointerEvents:"none" }}/>
-
-          <div style={{ textAlign:"center",marginBottom:16 }}>
-            <div style={{ fontSize:"0.64rem",letterSpacing:"0.42em",color:"#00e5ff",fontFamily:"'Orbitron',sans-serif",fontWeight:700,marginBottom:12,animation:"sysLabel .8s ease both",textShadow:"0 0 14px #00e5ff66" }}>◈ SYSTEM ◈</div>
-            <div style={{ fontSize:"0.64rem",letterSpacing:"0.4em",color:"#64748b",marginBottom:14 }}>SYSTEM NOTIFICATION</div>
-            <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"clamp(2.4rem,11vw,4rem)",fontWeight:900,background:"linear-gradient(135deg,#00e5ff,#8b5cf6)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",lineHeight:1,letterSpacing:"0.04em" }}>ARISE</div>
-          </div>
-
-          <div style={{ textAlign:"center",marginBottom:18 }}>
-            <div style={{ color:"#e2e8f0",fontSize:"0.82rem",fontWeight:700,letterSpacing:"0.16em",fontFamily:"'Rajdhani',sans-serif",marginBottom:6 }}>EIN SPIELER WURDE GEFUNDEN</div>
-            <div style={{ color:"#94a3b8",fontSize:"0.74rem",lineHeight:1.6 }}>Du hast die Qualifikation erhalten,<br/>ein <span style={{ color:"#00e5ff",fontWeight:700 }}>Player</span> zu werden.</div>
-          </div>
-
-          <div style={{ height:1,background:"linear-gradient(90deg,transparent,#00e5ff33,transparent)",marginBottom:16 }}/>
-
-          <div style={{ fontSize:"0.64rem",letterSpacing:"0.22em",color:"#00e5ff99",fontFamily:"'Orbitron',sans-serif",fontWeight:700,marginBottom:9 }}>▣ PLAYER-REGISTRIERUNG</div>
-          <input value={nameInput} onChange={e=>setNameInput(e.target.value)} onKeyDown={e=>e.key==="Enter"&&handleCreate()} placeholder="Name eingeben…" autoFocus style={{ width:"100%",background:"rgba(0,229,255,0.04)",border:"1px solid #00e5ff33",borderRadius:4,padding:"13px 15px",color:"#e2e8f0",fontSize:"1rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:600,outline:"none",boxSizing:"border-box",marginBottom:13,letterSpacing:"0.08em" }}/>
-          <button onClick={handleCreate} style={{ width:"100%",background:"linear-gradient(135deg,#00e5ff1f,#8b5cf62a)",border:"1px solid #00e5ff55",color:"#00e5ff",borderRadius:4,padding:14,fontSize:"0.9rem",fontFamily:"'Orbitron',sans-serif",fontWeight:700,letterSpacing:"0.16em",cursor:"pointer",textShadow:"0 0 12px #00e5ff66" }}>◈ DEM SYSTEM BEITRETEN ◈</button>
-
-          <div style={{ textAlign:"center",marginTop:15,fontSize:"0.64rem",color:"#475569",letterSpacing:"0.05em",lineHeight:1.5 }}>※ Nur du kannst diese Benachrichtigung sehen.</div>
-
-        </div>
-      </div>
-    </div>
-  );
+  if(!state) return <SetupScreen nameInput={nameInput} setNameInput={setNameInput} handleCreate={handleCreate} />;
 
   // ── COMPUTED ──
   const rc = RANK_COLORS[state.rank];
@@ -870,62 +828,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
       <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet"/>
       <style>{`@keyframes fadeInOut{0%{opacity:0;transform:scale(.85)}15%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0}} @keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}} @keyframes glitch{0%,100%{transform:translate(0)}25%{transform:translate(-2px,1px)}75%{transform:translate(2px,-1px)}} @keyframes statModal{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}} @keyframes splashOut{from{opacity:1}to{opacity:0;pointer-events:none}} @keyframes splashPulse{0%{opacity:0;transform:scale(0.8)}60%{transform:scale(1.05)}100%{opacity:1;transform:scale(1)}} @keyframes splashFade{from{opacity:0}to{opacity:1}} @keyframes splashBar{from{width:0%}to{width:100%}} @keyframes sectionOpen{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}} *{-webkit-tap-highlight-color:transparent;} input,select,textarea{-webkit-appearance:none;background-color:rgba(255,255,255,0.04)!important;color:#e2e8f0!important;} input:-webkit-autofill,input:-webkit-autofill:hover,input:-webkit-autofill:focus{-webkit-box-shadow:0 0 0 1000px #0d0d17 inset!important;-webkit-text-fill-color:#e2e8f0!important;} input::placeholder{color:#475569;} html,body{background:${rc.bg} !important; transition:background 1s ease;} @supports(padding:max(0px)){.safe-bottom{padding-bottom:max(18px,env(safe-area-inset-bottom))}}`}</style>
 
-      {/* Level Up overlay */}
-      {levelUpAnim && (
-        <div style={{ position:"fixed",inset:0,zIndex:1000,display:"flex",alignItems:"center",justifyContent:"center",background:"rgba(0,0,0,0.9)",animation:"fadeInOut 2.8s ease forwards",pointerEvents:"none" }}>
-          <div style={{ textAlign:"center" }}>
-            <div style={{ fontSize:"0.64rem",letterSpacing:"0.5em",color:`${rc.primary}aa`,fontFamily:"'Orbitron',sans-serif",fontWeight:700,marginBottom:14,textShadow:`0 0 16px ${rc.primary}` }}>◈ SYSTEM ◈</div>
-            <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"clamp(2rem,10vw,3.5rem)",fontWeight:900,color:rc.primary,textShadow:`0 0 30px ${rc.primary}`,animation:"glitch 0.4s infinite",letterSpacing:"0.08em" }}>{levelUpAnim.rankUp?"RANK UP!":"LEVEL UP"}</div>
-            <div style={{ color:"#94a3b8",fontSize:"0.9rem",marginTop:10,letterSpacing:"0.25em" }}>{levelUpAnim.rank}-RANK · LV.{levelUpAnim.level}</div>
-          </div>
-        </div>
-      )}
-
-      {/* Notification — System line */}
-      {notification && (
-        <div style={{ position:"fixed",top:14,left:"50%",transform:"translateX(-50%)",zIndex:500,maxWidth:"calc(100% - 24px)",pointerEvents:"none",animation:"fadeInOut 3.5s ease" }}>
-          <div style={{ position:"relative",background:"#05070ef2",border:`1px solid ${notification.color}55`,borderRadius:3,padding:"8px 16px",display:"flex",alignItems:"center",gap:9,boxShadow:`0 4px 22px rgba(0,0,0,0.6), 0 0 16px ${notification.color}22` }}>
-            <span style={{ fontSize:"0.64rem",letterSpacing:"0.26em",color:`${notification.color}aa`,fontFamily:"'Orbitron',sans-serif",fontWeight:700 }}>◈</span>
-            <span style={{ color:notification.color,fontFamily:"'Orbitron',sans-serif",fontSize:"0.66rem",letterSpacing:"0.08em",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis" }}>{notification.msg}</span>
-          </div>
-        </div>
-      )}
-
-      {/* Achievement popup — System window */}
-      {newAchievements.length > 0 && (
-        <div style={{ position:"fixed",top:150,left:"50%",transform:"translateX(-50%)",zIndex:499,animation:"slideDown 0.3s ease",display:"flex",flexDirection:"column",gap:8,width:"calc(100% - 28px)",maxWidth:360,pointerEvents:"none" }}>
-          {newAchievements.map(a=>(
-            <div key={a.id} style={{ position:"relative",background:"linear-gradient(180deg,#070b18f5,#05060ef5)",border:"1px solid #f59e0b40",borderRadius:4,padding:"10px 14px",display:"flex",alignItems:"center",gap:11,boxShadow:"0 8px 30px rgba(0,0,0,0.55), 0 0 20px #f59e0b1f" }}>
-              {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h],ci)=>(
-                <div key={ci} style={{ position:"absolute",[v]:4,[h]:4,width:9,height:9,borderTop:v==="top"?"2px solid #f59e0b":"none",borderBottom:v==="bottom"?"2px solid #f59e0b":"none",borderLeft:h==="left"?"2px solid #f59e0b":"none",borderRight:h==="right"?"2px solid #f59e0b":"none",opacity:.7 }}/>
-              ))}
-              <span style={{ fontSize:"1.3rem" }}>{a.icon}</span>
-              <div>
-                <div style={{ color:"#f59e0b",fontSize:"0.64rem",fontFamily:"'Orbitron',sans-serif",letterSpacing:"0.22em",fontWeight:700 }}>◈ ACHIEVEMENT</div>
-                <div style={{ color:"#e2e8f0",fontSize:"0.82rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif" }}>{a.title}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* New Titles popup — System window */}
-      {newTitles.length > 0 && (
-        <div style={{ position:"fixed",top:newAchievements.length>0?226:150,left:"50%",transform:"translateX(-50%)",zIndex:498,animation:"slideDown 0.3s ease",display:"flex",flexDirection:"column",gap:8,width:"calc(100% - 28px)",maxWidth:360,pointerEvents:"none" }}>
-          {newTitles.map(t=>(
-            <div key={t.id} style={{ position:"relative",background:"linear-gradient(180deg,#070b18f5,#05060ef5)",border:`1px solid ${t.color}40`,borderRadius:4,padding:"10px 14px",display:"flex",alignItems:"center",gap:11,boxShadow:`0 8px 30px rgba(0,0,0,0.55), 0 0 20px ${t.color}1f` }}>
-              {[["top","left"],["top","right"],["bottom","left"],["bottom","right"]].map(([v,h],ci)=>(
-                <div key={ci} style={{ position:"absolute",[v]:4,[h]:4,width:9,height:9,borderTop:v==="top"?`2px solid ${t.color}`:"none",borderBottom:v==="bottom"?`2px solid ${t.color}`:"none",borderLeft:h==="left"?`2px solid ${t.color}`:"none",borderRight:h==="right"?`2px solid ${t.color}`:"none",opacity:.7 }}/>
-              ))}
-              <span style={{ fontSize:"1.3rem" }}>{t.icon}</span>
-              <div>
-                <div style={{ color:t.color,fontSize:"0.64rem",fontFamily:"'Orbitron',sans-serif",letterSpacing:"0.22em",fontWeight:700 }}>◈ TITEL FREIGESCHALTET</div>
-                <div style={{ color:"#e2e8f0",fontSize:"0.82rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif" }}>{t.title}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <SystemOverlays rc={rc} levelUpAnim={levelUpAnim} notification={notification} newAchievements={newAchievements} newTitles={newTitles} />
 
       {/* ── CLEARED FEEDBACK CARD (Etappe 13) ── */}
       {clearedCard && <ClearedFeedback card={clearedCard} />}
