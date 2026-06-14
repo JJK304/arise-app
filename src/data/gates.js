@@ -25,7 +25,7 @@ export const GATES = [
       "45 Min. Deep Work ohne Ablenkung absolvieren",
       "10 Aufgaben eigenständig und vollständig lösen",
       "Ein Konzept in eigenen Worten schriftlich erklären",
-      "Reflexion: Was habe ich heute verstanden? Was ist noch unklar?",
+      "Auswertung: Was habe ich heute verstanden? Was ist noch unklar?",
     ],
     reward: { xp: 400, affinity: { scholar: 10 }, title: "apprentice_scholar", titleLabel: "Apprentice Scholar" },
   },
@@ -189,7 +189,7 @@ export const GATES = [
       "15 km in einer Einheit laufen",
       "Regelmäßige Mobility-Routine etabliert (3x/Woche, je 10 Min.)",
       "Persönliche Bestzeit über 5 km verbessern",
-      "Lauftagebuch der letzten 4 Wochen: Reflexion und nächste Ziele",
+      "Lauf-Log der letzten 4 Wochen: Auswertung und nächste Ziele",
     ],
     reward: { xp: 1000, affinity: { runner: 20 }, title: "long_run", titleLabel: "The Long Run" },
   },
@@ -206,7 +206,7 @@ export const GATES = [
       "30 Min. konzentriertes Üben (Instrument, Zeichnen, Komposition oder Kochen)",
       "Etwas Neues ausprobieren das du noch nie versucht hast",
       "Ergebnis festhalten (Foto, Aufnahme oder Skizze)",
-      "Reflexion: Was hat geklappt, was noch nicht?",
+      "Auswertung: Was hat geklappt, was noch nicht?",
     ],
     reward: { xp: 350, affinity: { artisan: 10 }, title: "creative_spark", titleLabel: "Creative Spark" },
   },
@@ -263,8 +263,8 @@ export const GATES = [
       "5 Social Challenges in einer Woche abschließen",
       "Vor einer kleinen Gruppe sprechen (mind. 3 Zuhörer)",
       "Vollständige Pflege- und Style-Routine 5 Tage einhalten",
-      "Bewusst auf Körpersprache achten und reflektieren",
-      "Reflexion: In welchen Situationen fühle ich mich unsicher?",
+      "Bewusst auf Körpersprache achten und auswerten",
+      "Auswertung: In welchen Situationen fühle ich mich unsicher?",
     ],
     reward: { xp: 650, affinity: { charmer: 15 }, title: "the_presence", titleLabel: "The Presence" },
   },
@@ -473,7 +473,7 @@ export const GATES = [
     unlockCondition: null,
     steps: [
       "7 aufeinanderfolgende Tage meditieren (je mind. 5 Min.)",
-      "3 Tage Journaling: Morgen oder Abend",
+      "3 Tage Tages-Log: Morgen oder Abend",
       "Ein Atemübungs-Protokoll durchführen (4-7-8 oder Box Breathing)",
     ],
     reward: { xp: 330, affinity: { monk: 10 }, title: "still_mind", titleLabel: "Still Mind" },
@@ -488,7 +488,7 @@ export const GATES = [
       "Stressoren identifizieren und mind. einen aktiv reduzieren",
       "Wöchentliche Recovery-Session (1h bewusstes Nichts-tun)",
       "Ernährung 5 Tage tracken: entzündungsarm, ausgewogen",
-      "Reflexion: Was raubt dir Energie? Was gibt dir Energie?",
+      "Auswertung: Was raubt dir Energie? Was gibt dir Energie?",
     ],
     reward: { xp: 680, affinity: { monk: 15 }, title: "recovery_ritual", titleLabel: "Recovery Ritual" },
   },
@@ -498,11 +498,11 @@ export const GATES = [
     path: "monk", domain: "recovery", icon: "◎", color: "#10b981",
     unlockCondition: "gate_monk_2",
     steps: [
-      "30-Tage Meditation Streak (kein Aussetzer)",
+      "30-Tage Reset-Protokoll-Streak (kein Aussetzer)",
       "Persönliche Philosophie oder Lebensregeln aufschreiben",
       "Digitales Detox-Wochenende: 48h ohne Social Media",
       "Resilienz-Test: bewusst einer schwierigen Situation standhalten",
-      "Meditationserfahrungen und Erkenntnisse dokumentieren",
+      "Reset-Sessions und Erkenntnisse dokumentieren",
     ],
     reward: { xp: 1000, affinity: { monk: 20 }, title: "inner_fortress", titleLabel: "Inner Fortress" },
   },
@@ -563,7 +563,7 @@ export const GATES = [
       "Eine Entscheidung treffen die andere betrifft — und dazu stehen",
       "In einer Gruppe oder Situation Initiative ergreifen",
       "Jemandem helfen der eine Führung oder Richtung braucht",
-      "Reflexion: Was macht gute Führung aus? (Notiz schreiben)",
+      "Auswertung: Was macht gute Führung aus? (Notiz schreiben)",
     ],
     reward: { xp: 360, affinity: { leader: 10 }, title: "first_decision", titleLabel: "First Decision" },
   },
@@ -621,7 +621,7 @@ export const GATES = [
       "Eine Person aktiv über längere Zeit emotional oder praktisch unterstützen",
       "Eigene Grenzen klar kommunizieren — in einem schwierigen Gespräch",
       "Erholung planen: bewusst Ruhezeit in Wochenstruktur integrieren",
-      "Reflexion: Wie geht es dir wirklich? Ehrliche Bestandsaufnahme.",
+      "Auswertung: Wie geht es dir wirklich? Ehrliche Bestandsaufnahme.",
     ],
     reward: { xp: 680, affinity: { healer: 15 }, title: "steady_support", titleLabel: "Steady Support" },
   },
@@ -632,7 +632,7 @@ export const GATES = [
     unlockCondition: "gate_healer_2",
     steps: [
       "30-Tage Recovery-Protokoll: täglich mindestens eine bewusste Erholungseinheit",
-      "Jemanden durch eine schwierige Phase begleiten und danach gemeinsam reflektieren",
+      "Jemanden durch eine schwierige Phase begleiten und danach gemeinsam auswerten",
       "Eigene mentale Stärken und Schwachstellen dokumentieren",
       "Resilienz-Skill entwickeln: Stressor über 2 Wochen aktiv anders bewältigen",
       "Persönliches Wohlbefindensystem aufbauen und schriftlich festhalten",
@@ -654,7 +654,7 @@ export const GATES = [
     steps: [
       "3 Fokus-Sessions à 25 Minuten in einer Woche abschließen",
       "Ablenkungen für eine Session vollständig eliminieren",
-      "Reflexion: Welche Themen ziehen deine Aufmerksamkeit am stärksten?",
+      "Auswertung: Welche Themen ziehen deine Aufmerksamkeit am stärksten?",
     ],
     reward: { xp: 300, affinity: { strategist: 6, scholar: 4 }, title: "focused_mind", titleLabel: "Focused Mind" },
   },
@@ -667,7 +667,7 @@ export const GATES = [
     steps: [
       "5 Tage in Folge mindestens 20 Minuten körperlich aktiv sein",
       "Einen Körperwert tracken (Gewicht, Liegestütze oder Laufstrecke)",
-      "Reflexion: Welche Art von Bewegung macht dir wirklich Spaß?",
+      "Auswertung: Welche Art von Bewegung macht dir wirklich Spaß?",
     ],
     reward: { xp: 270, affinity: { fighter: 5, runner: 5 }, title: "body_awakened", titleLabel: "Body Awakened" },
   },
@@ -680,7 +680,7 @@ export const GATES = [
     steps: [
       "Etwas fertig erstellen — egal wie klein (Skizze, Text, Song, Rezept, Code)",
       "Das Ergebnis jemandem zeigen oder archivieren",
-      "Reflexion: Was möchtest du noch erschaffen?",
+      "Auswertung: Was möchtest du noch erschaffen?",
     ],
     reward: { xp: 260, affinity: { artisan: 5, creator: 5 }, title: "first_output", titleLabel: "First Output" },
   },
@@ -693,7 +693,7 @@ export const GATES = [
     steps: [
       "Mit einer Person ein echtes Gespräch führen (nicht nur Small Talk)",
       "Jemandem aktiv helfen ohne Gegenleistung",
-      "Reflexion: Welche Arten von sozialer Energie liegen dir?",
+      "Auswertung: Welche Arten von sozialer Energie liegen dir?",
     ],
     reward: { xp: 250, affinity: { charmer: 5, leader: 4 }, title: "first_connection", titleLabel: "First Connection" },
   },
@@ -706,7 +706,7 @@ export const GATES = [
     steps: [
       "7 Tage lang täglich eine kleine Routine einhalten",
       "Einen Lebensbereich aufräumen oder strukturieren",
-      "Reflexion: Welche Gewohnheiten willst du aufbauen?",
+      "Auswertung: Welche Gewohnheiten willst du aufbauen?",
     ],
     reward: { xp: 270, affinity: { guardian: 6, strategist: 4 }, title: "system_start", titleLabel: "System Start" },
   },
@@ -719,7 +719,7 @@ export const GATES = [
     steps: [
       "5 Tage bewusst auf Schlaf achten (feste Schlafenszeit)",
       "Eine Entspannungs- oder Atemübung 3 Mal durchführen",
-      "Reflexion: Was raubt dir Energie? Was gibt dir Energie?",
+      "Auswertung: Was raubt dir Energie? Was gibt dir Energie?",
     ],
     reward: { xp: 250, affinity: { monk: 6, healer: 4 }, title: "rest_protocol", titleLabel: "Rest Protocol" },
   },
@@ -732,7 +732,7 @@ export const GATES = [
     steps: [
       "Eine Fähigkeit 7 Tage lang täglich üben (mind. 10 Min.)",
       "Lernfortschritt notieren oder dokumentieren",
-      "Reflexion: Welche Fähigkeiten möchtest du wirklich meistern?",
+      "Auswertung: Welche Fähigkeiten möchtest du wirklich meistern?",
     ],
     reward: { xp: 260, affinity: { scholar: 5, engineer: 3, artisan: 2 }, title: "first_dedication", titleLabel: "First Dedication" },
   },
@@ -742,7 +742,7 @@ export const GATES = [
   // trial: true  →  prüfen echte Fähigkeit, nicht Wiederholung
   // Tier 1: Einstieg (1–3 Schritte, kurze Sessions)
   // Tier 2: Anwendung (mehrere Sessions, Dokumentation)
-  // Tier 3: Ergebnis (messbarer Fortschritt, Reflexion)
+  // Tier 3: Ergebnis (messbarer Fortschritt, Auswertung)
   // ════════════════════════════════════════════════════════
 
   // ── Scholar Trials ───────────────────────────────────
@@ -780,7 +780,7 @@ export const GATES = [
       "Komplexes Thema von Grund auf selbst erarbeiten und verstehen",
       "Erklärungsdokument erstellen (eigene Worte, keine Kopie)",
       "Prüfungssimulation oder anspruchsvolle Aufgabe meistern",
-      "Reflexion: Was fehlt noch? Roadmap für nächste Stufe.",
+      "Auswertung: Was fehlt noch? Roadmap für nächste Stufe.",
     ],
     reward: { xp: 1200, affinity: { scholar: 18 }, title: "knowledge_proven", titleLabel: "Knowledge Proven" },
   },
@@ -860,7 +860,7 @@ export const GATES = [
       "Messbarer Leistungsfortschritt über 6 Wochen dokumentieren",
       "Persönliche Bestleistung in einer Disziplin erreichen",
       "Routine nachweislich konsistent: kein Aussetzer über 2 Wochen",
-      "Reflexion: Wie hat Training deinen Alltag verändert?",
+      "Auswertung: Wie hat Training deinen Alltag verändert?",
     ],
     reward: { xp: 1600, affinity: { fighter: 18 }, title: "warrior_standard", titleLabel: "Warrior Standard" },
   },
@@ -874,7 +874,7 @@ export const GATES = [
     steps: [
       "Kleines Werk fertigstellen — ein Post, eine Skizze, ein Track, ein Video",
       "Ergebnis zeigen oder veröffentlichen",
-      "Reflexion: Was würdest du beim nächsten Mal verbessern?",
+      "Auswertung: Was würdest du beim nächsten Mal verbessern?",
     ],
     reward: { xp: 480, affinity: { creator: 8 }, title: "finished_creator", titleLabel: "Finished" },
   },
@@ -900,7 +900,7 @@ export const GATES = [
       "Fertiges Werk veröffentlichen oder bewusst archivieren",
       "Eigene kreative Stimme definieren: Was unterscheidet mich?",
       "3 Werke abschließen die einen nachvollziehbaren Fortschritt zeigen",
-      "Portfolio-Eintrag oder Reflexion: Wer bin ich als Creator?",
+      "Portfolio-Eintrag oder Auswertung: Wer bin ich als Creator?",
     ],
     reward: { xp: 1600, affinity: { creator: 18 }, title: "published", titleLabel: "Published" },
   },
@@ -954,7 +954,7 @@ export const GATES = [
     steps: [
       "Drei echte Gespräche führen — bewusst mit Aufmerksamkeit",
       "Körpersprache und Stimme in einem Gespräch beobachten",
-      "Reflexion: Was lief gut? Was wirkte unbequem?",
+      "Auswertung: Was lief gut? Was wirkte unbequem?",
     ],
     reward: { xp: 460, affinity: { charmer: 8 }, title: "communicated", titleLabel: "Communicated" },
   },
@@ -981,7 +981,7 @@ export const GATES = [
     steps: [
       "7 Tage Schlafroutine einhalten und dokumentieren",
       "Stressor identifizieren und einen gezielten Schritt dagegen unternehmen",
-      "Wöchentliche Recovery-Reflexion: Was hat mir Energie gegeben?",
+      "Wöchentliches Recovery-Log: Was hat mir Energie gegeben?",
     ],
     reward: { xp: 460, affinity: { monk: 8 }, title: "stabilized", titleLabel: "Stabilized" },
   },
@@ -1035,7 +1035,7 @@ export const GATES = [
     steps: [
       "Eine wichtige Entscheidung für andere treffen und begründen",
       "Initiative ergreifen und Gruppe oder Situation aktiv gestalten",
-      "Reflexion: Wie hat die Entscheidung gewirkt?",
+      "Auswertung: Wie hat die Entscheidung gewirkt?",
     ],
     reward: { xp: 480, affinity: { leader: 8 }, title: "decided_guided", titleLabel: "Decided" },
   },
@@ -1060,7 +1060,7 @@ export const GATES = [
     path: "healer", domain: "recovery", icon: "⌁", color: "#34d399",
     unlockCondition: "gate_healer_1",
     steps: [
-      "Person aktiv unterstützen und danach reflektieren",
+      "Person aktiv unterstützen und danach auswerten",
       "Eigene mentale Energie ehrlich einschätzen",
       "Recovery-Routine 7 Tage einhalten und dokumentieren",
     ],
@@ -1073,7 +1073,7 @@ export const GATES = [
     unlockCondition: "trial_healer_1",
     steps: [
       "14 Tage tägliche Recovery-Routine ohne Aussetzer",
-      "Jemanden durch schwierige Phase begleiten und Reflexion schreiben",
+      "Jemanden durch schwierige Phase begleiten und Auswertung schreiben",
       "Eigene Belastungsgrenzen klar definieren und kommunizieren",
       "Persönliches Wohlbefindensystem in 5 Punkten formulieren",
     ],
@@ -1101,7 +1101,7 @@ export const GATES = [
     steps: [
       "Anspruchsvolleres Werk in gewähltem Medium fertigstellen",
       "Technik bewusst verbessern: eine Schwäche gezielt angehen",
-      "Feedback einholen und reflektieren",
+      "Feedback einholen und auswerten",
       "Zweites Werk — sichtbarer Fortschritt zum ersten",
     ],
     reward: { xp: 900, affinity: { artisan: 12 }, title: "mastery_medium", titleLabel: "Mastery of Medium" },
@@ -1116,7 +1116,7 @@ export const GATES = [
     steps: [
       "3 Lauf-Sessions in einer Woche abschließen",
       "Strecke oder Zeit dokumentieren",
-      "Reflexion: Wo liegt mein Limit? Was muss ich verbessern?",
+      "Auswertung: Wo liegt mein Limit? Was muss ich verbessern?",
     ],
     reward: { xp: 460, affinity: { runner: 8 }, title: "distance_checked", titleLabel: "Distance Checked" },
   },
@@ -1144,7 +1144,7 @@ export const GATES = [
     steps: [
       "14 Tage täglich aufräumen (< 10 Min. reichen)",
       "Haushalt und Finanzen in einer Woche vollständig im Griff",
-      "Reflexion: Was brauche ich damit mein Umfeld funktioniert?",
+      "Auswertung: Was brauche ich damit mein Umfeld funktioniert?",
     ],
     reward: { xp: 480, affinity: { guardian: 8 }, title: "structure_held", titleLabel: "Structure Held" },
   },
@@ -1161,7 +1161,7 @@ export const GATES = [
     discovery: true,
     steps: [
       "Eine Aktivität außerhalb der gewohnten Routine ausprobieren",
-      "Erfahrung kurz reflektieren: Was war neu? Was hat überrascht?",
+      "Erfahrung kurz auswerten: Was war neu? Was hat überrascht?",
     ],
     reward: { xp: 200, affinity: { explorer: 5 }, title: "first_step", titleLabel: "First Step" },
   },
@@ -1172,7 +1172,7 @@ export const GATES = [
     discovery: true,
     steps: [
       "Jemandem heute aktiv und ohne Erwartung helfen",
-      "Kurz reflektieren: Wie hat es sich angefühlt?",
+      "Kurz auswerten: Wie hat es sich angefühlt?",
     ],
     reward: { xp: 180, affinity: { healer: 5, leader: 3 }, title: "first_support", titleLabel: "First Support" },
   },
@@ -1185,7 +1185,7 @@ export const GATES = [
     steps: [
       "3 Fokus-Sessions à 20+ Minuten ohne Unterbrechung abschließen",
       "Notieren, was dich am stärksten ablenkt — und einen Gegenzug festlegen",
-      "Reflexion: Wann am Tag ist dein Fokus am stärksten?",
+      "Auswertung: Wann am Tag ist dein Fokus am stärksten?",
     ],
     reward: { xp: 220, affinity: { strategist: 4, scholar: 3, monk: 3 }, title: "mind_locked", titleLabel: "Mind Locked" },
   },
@@ -1198,7 +1198,7 @@ export const GATES = [
     steps: [
       "Eine Entscheidung treffen, die du sonst aufgeschoben hättest — und umsetzen",
       "Einmal Verantwortung für etwas übernehmen, das andere betrifft",
-      "Reflexion: Wo könntest du öfter vorangehen statt abzuwarten?",
+      "Auswertung: Wo könntest du öfter vorangehen statt abzuwarten?",
     ],
     reward: { xp: 220, affinity: { leader: 5, charmer: 2 }, title: "first_command", titleLabel: "First Command" },
   },
@@ -1211,7 +1211,7 @@ export const GATES = [
     steps: [
       "Etwas mit den eigenen Händen erschaffen, reparieren oder kochen",
       "Das Ergebnis kurz festhalten (Foto oder Notiz)",
-      "Reflexion: Was würdest du beim nächsten Mal besser machen?",
+      "Auswertung: Was würdest du beim nächsten Mal besser machen?",
     ],
     reward: { xp: 230, affinity: { artisan: 4, engineer: 4 }, title: "maker_awakened", titleLabel: "Maker Awakened" },
   },
@@ -1224,7 +1224,7 @@ export const GATES = [
     steps: [
       "Einen Bereich deines Umfelds vollständig in Ordnung bringen",
       "Eine kleine Routine festlegen, damit er so bleibt",
-      "Reflexion: Welcher Bereich kostet dich am meisten Energie?",
+      "Auswertung: Welcher Bereich kostet dich am meisten Energie?",
     ],
     reward: { xp: 210, affinity: { guardian: 5, strategist: 2 }, title: "foundation_laid", titleLabel: "Foundation Laid" },
   },
@@ -1237,7 +1237,7 @@ export const GATES = [
     steps: [
       "Deine Ausgaben der letzten 7 Tage ehrlich erfassen",
       "Eine konkrete Verbesserung festlegen (sparen, kündigen, verhandeln)",
-      "Reflexion: Wofür willst du deine Ressourcen wirklich einsetzen?",
+      "Auswertung: Wofür willst du deine Ressourcen wirklich einsetzen?",
     ],
     reward: { xp: 210, affinity: { merchant: 5, strategist: 2 }, title: "asset_awakened", titleLabel: "Asset Awakened" },
   },
@@ -1258,7 +1258,7 @@ export const GATES = [
       "5 Lauf-Sessions in 2 Wochen abschließen",
       "Längste Strecke oder beste Zeit dokumentieren",
       "Pace oder Distanz gegenüber Trial I messbar verbessert",
-      "Reflexion: Was limitiert mich noch — Technik, Ausdauer, Mental?",
+      "Auswertung: Was limitiert mich noch — Technik, Ausdauer, Mental?",
     ],
     reward: { xp: 850, affinity: { runner: 12 }, title: "endurance_push", titleLabel: "Endurance Push" },
   },
@@ -1314,7 +1314,7 @@ export const GATES = [
       "30 Tage täglich minimale Ordnungsroutine eingehalten",
       "Finanzen und Haushalt gleichzeitig 4 Wochen im Griff",
       "Einen Bereich dauerhaft verbessert (Möbel, System, Gewohnheit)",
-      "Reflexion: Was macht mein Umfeld stabiler und weniger stressig?",
+      "Auswertung: Was macht mein Umfeld stabiler und weniger stressig?",
     ],
     reward: { xp: 900, affinity: { guardian: 12 }, title: "stable_foundation", titleLabel: "Stable Foundation" },
   },
@@ -1341,7 +1341,7 @@ export const GATES = [
     steps: [
       "Umfangreiches Werk oder Projekt vollständig abschließen",
       "Werk öffentlich zeigen oder einer echten Person präsentieren",
-      "Ehrliches externes Feedback eingeholt und reflektiert",
+      "Ehrliches externes Feedback eingeholt und ausgewertet",
       "Nächste Stufe: Was brauche ich um besser zu werden?",
     ],
     reward: { xp: 1450, affinity: { artisan: 18 }, title: "the_craftsman", titleLabel: "The Craftsman" },
@@ -1355,7 +1355,7 @@ export const GATES = [
     unlockCondition: "trial_charmer_2",
     steps: [
       "10 bewusste soziale Interaktionen über 4 Wochen dokumentiert",
-      "Herausfordernde soziale Situation gemeistert — Reflexion schreiben",
+      "Herausfordernde soziale Situation gemeistert — Auswertung schreiben",
       "Eigenes Auftreten und Style bewusst weiterentwickelt",
       "Feedback von einer Person eingeholt: Wie wirkst du auf andere?",
     ],
@@ -1387,7 +1387,7 @@ export const GATES = [
       "30-Tage Recovery-Protokoll vollständig eingehalten",
       "Eine Person aktiv durch schwierige Phase begleitet",
       "Eigenes Wohlbefindensystem aufgebaut und dokumentiert",
-      "Reflexion: Wie halte ich mich selbst stabil während ich anderen helfe?",
+      "Auswertung: Wie halte ich mich selbst stabil während ich anderen helfe?",
     ],
     reward: { xp: 1400, affinity: { healer: 18 }, title: "resilient_support", titleLabel: "Resilient Support" },
   },
@@ -1402,7 +1402,7 @@ export const GATES = [
       "Gruppe oder Projekt über 4+ Wochen aktiv geführt",
       "Gruppenkonflikt oder schwierige Entscheidung durchgestanden",
       "Jemanden über längere Zeit gecoacht oder begleitet",
-      "Reflexion: Was macht mich als Leader aus — Stärken und Schwächen?",
+      "Auswertung: Was macht mich als Leader aus — Stärken und Schwächen?",
     ],
     reward: { xp: 1200, affinity: { leader: 20 }, title: "the_leader", titleLabel: "The Leader" },
   },
@@ -1414,10 +1414,10 @@ export const GATES = [
     path: "monk", domain: "recovery", icon: "◎", color: "#8b5cf6",
     unlockCondition: "trial_monk_2",
     steps: [
-      "30-Tage Meditation oder Achtsamkeitsroutine eingehalten",
+      "30-Tage Reset-Protokoll-Routine eingehalten",
       "Digital-Detox-Woche vollständig abgeschlossen",
       "Persönliche Schlafroutine dauerhaft stabilisiert",
-      "Reflexion: Was bedeutet innere Ruhe für mich konkret?",
+      "Auswertung: Was bedeutet innere Ruhe für mich konkret?",
     ],
     reward: { xp: 1350, affinity: { monk: 18 }, title: "inner_stillness", titleLabel: "Inner Stillness" },
   },
@@ -1433,7 +1433,7 @@ export const GATES = [
     special: true,
     steps: [
       "In einer Woche aus 5 verschiedenen Domains je eine Quest abschließen",
-      "Wochenreview mit Reflexion über alle aktiven Pfade",
+      "Wochenreview mit Auswertung über alle aktiven Pfade",
       "Schwächsten Bereich identifizieren und gezielte Übung starten",
     ],
     reward: { xp: 600, affinity: { shadow: 10 }, title: "the_allrounder", titleLabel: "The Allrounder" },
