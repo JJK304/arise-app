@@ -1854,6 +1854,51 @@ describe("Etappe 8 — Rank-Up-Anforderungen", () => {
       expect(p.progression?.S, p.id).toBeTruthy();
     }
   });
+
+  // ── Breite-Floor (Körper UND Geist …): ab C nötig, D bleibt frei ──
+  const histDomains = (specs) =>
+    specs.flatMap(([d, n]) =>
+      Array.from({ length: n }, (_, i) => ({ id:`${d}${i}`, type:"daily", domain:d, completedAt:new Date().toISOString() }))
+    );
+
+  it("D bleibt mit Single-Domain-History passierbar (kein Breite-Zwang für Anfänger)", () => {
+    const st = {
+      ...emptyProgress(),
+      questHistory: histDomains([["mind", 12]]),
+      gateProgress: { gate_discovery_focus: { completed: true } },
+    };
+    expect(canRankUpTo(st, "D")).toBe(true);
+  });
+
+  it("C verlangt Breite: reine Single-Domain-History scheitert am breadth-Check", () => {
+    const res = checkRankUpRequirements({ ...emptyProgress(), questHistory: histDomains([["body", 20]]) }, "C");
+    const breadth = res.checks.find(c => c.id === "breadth");
+    expect(breadth?.need).toBe(3);
+    expect(breadth?.done).toBe(false);
+  });
+
+  it("C breadth erfüllt bei ≥3 aktiven Domains (30 Tage)", () => {
+    const res = checkRankUpRequirements({ ...emptyProgress(), questHistory: histDomains([["body",3],["mind",3],["social",3]]) }, "C");
+    expect(res.checks.find(c => c.id === "breadth").done).toBe(true);
+  });
+
+  it("B Vitalitäts-Floor: ohne Körper/Recovery in 14 Tagen gesperrt", () => {
+    const res = checkRankUpRequirements({ ...emptyProgress(), questHistory: histDomains([["mind", 10]]) }, "B");
+    const vit = res.checks.find(c => c.id === "vitality");
+    expect(vit?.done).toBe(false);
+  });
+
+  it("B Vitalitäts-Floor erfüllt mit aktueller Recovery-Aktivität", () => {
+    const res = checkRankUpRequirements({ ...emptyProgress(), questHistory: histDomains([["mind",2],["recovery",1]]) }, "B");
+    expect(res.checks.find(c => c.id === "vitality").done).toBe(true);
+  });
+
+  it("S verlangt strengere Breite (≥4 Domains)", () => {
+    const res = checkRankUpRequirements({ ...emptyProgress(), questHistory: histDomains([["body",2],["mind",2],["social",2]]) }, "S");
+    const breadth = res.checks.find(c => c.id === "breadth");
+    expect(breadth?.need).toBe(4);
+    expect(breadth?.done).toBe(false); // nur 3 Domains
+  });
 });
 
 // ═══════════════════════════════════════════════════════════

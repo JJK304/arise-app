@@ -42,11 +42,11 @@ const GROUP_TO_VAR = {
 
 // ── Gewichtungen (Summe = 1.0) ──────────────────────────────
 const W = {
-  goal:     0.35,  // Active goal match — highest priority
-  behavior: 0.30,  // Recent behavior — stronger than manual selection
-  interest: 0.20,  // Explicit interest selection
+  goal:     0.34,  // Active goal match — highest priority
+  behavior: 0.29,  // Recent behavior — stronger than manual selection
+  interest: 0.19,  // Explicit interest selection
   signal:   0.10,  // Signal/path level (from signal system)
-  balance:  0.05,  // Balance need for neglected domains
+  balance:  0.08,  // Balance need for neglected domains (Breite-Nudge, < signal)
 };
 
 // Signal level → quest specificity threshold
@@ -508,7 +508,7 @@ export function generatePersonalizedQuests(preferences, context = {}, maxQuests 
   const MAX_PER_DOMAIN = 3;
   const MAX_PER_GOAL   = 2;
   const MAX_GOAL_TOTAL = Math.ceil(maxQuests * 0.4);   // max 40% goal-linked
-  const MAX_NEGLECT    = 1;
+  const MAX_NEGLECT    = 2;   // bis zu 2 Balance-Quests pro Set (Breite-Nudge)
 
   let goalLinkedCount = 0;
   let neglectCount    = 0;

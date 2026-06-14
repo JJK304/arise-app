@@ -14,6 +14,7 @@
 import { GATES, isGateCompleted } from "../data/gates.js";
 import { getTopSignalPaths } from "./signals.js";
 import { countMasteredPaths } from "./mastery.js";
+import { catToDomain } from "../data/domains.js";
 
 const RANK_ORDER = ["E", "D", "C", "B", "A", "S", "SS", "SSS"];
 
@@ -48,11 +49,26 @@ function deriveMetrics(state = {}) {
 
   // Konsistenz: aktive Tage in den letzten 30 Tagen
   const cutoff30 = Date.now() - 30 * 86400000;
+  const recent30 = questHistory.filter(h => h.completedAt && new Date(h.completedAt) >= cutoff30);
   const activeDays30 = new Set(
-    questHistory
-      .filter(h => h.completedAt && new Date(h.completedAt) >= cutoff30)
-      .map(h => String(h.completedAt).slice(0, 10))
+    recent30.map(h => String(h.completedAt).slice(0, 10))
   ).size;
+
+  // Breite: unterschiedliche aktive Domains in den letzten 30 Tagen.
+  // Verhindert Tunnelblick — ab C verlangt der Aufstieg Aktivität in
+  // mehreren Lebensbereichen (Körper UND Geist …), ohne Balance zu erzwingen.
+  const domainsActive30 = new Set(
+    recent30.map(h => h.domain || catToDomain(h.cat)).filter(Boolean)
+  ).size;
+
+  // Vitalitäts-Floor: Körper oder Recovery in den letzten 14 Tagen aktiv.
+  // Man darf den eigenen Körper/Schlaf nicht komplett fürs Grinden opfern.
+  const cutoff14 = Date.now() - 14 * 86400000;
+  const bodyRecovery14 = questHistory.some(h => {
+    if (!h.completedAt || new Date(h.completedAt) < cutoff14) return false;
+    const d = h.domain || catToDomain(h.cat);
+    return d === "body" || d === "recovery";
+  }) ? 1 : 0;
 
   // Stärkstes Path-Signal (nur berechnet wenn benötigt — hier einmalig)
   let topSignalLevel = 0;
@@ -75,6 +91,8 @@ function deriveMetrics(state = {}) {
     completedGoals: goals.filter(g => g.status === "completed").length,
     goalProgress:   goals.filter(g => g.status === "completed" || (g.currentValue || 0) > 0).length,
     activeDays30,
+    domainsActive30,
+    bodyRecovery14,
     topSignalLevel,
     pathActive:     (prefs.activePaths || []).length > 0,
     mastered,
@@ -94,12 +112,14 @@ export const RANK_UP_REQUIREMENTS = {
     req("signal",    "1 Path-Signal entwickelt",           M => ({ have: M.topSignalLevel, need: 1 })),
     req("gate1",     "1 Path Gate I oder Trial I",         M => ({ have: M.pathGatesT1 + M.trialsT1, need: 1 })),
     req("weeklies",  "3 Weekly Quests abgeschlossen",      M => ({ have: M.weeklyClears,  need: 3 })),
+    req("breadth",   "Aktiv in ≥3 Domains (30 Tage)",      M => ({ have: M.domainsActive30, need: 3 })),
   ],
   B: [
     req("path",      "1 Path aktiv (gewählt oder Signal stark)", M => ({ have: (M.pathActive || M.topSignalLevel >= 2) ? 1 : 0, need: 1 })),
     req("trial",     "1 Trial abgeschlossen",              M => ({ have: M.trialsTotal,   need: 1 })),
     req("logs",      "3 Progress Logs",                    M => ({ have: M.logs,          need: 3 })),
     req("goal",      "1 Goal mit Fortschritt",             M => ({ have: M.goalProgress,  need: 1 })),
+    req("vitality",  "Körper oder Recovery aktiv (14 Tage)", M => ({ have: M.bodyRecovery14, need: 1 })),
   ],
   A: [
     req("tier2",     "Gate II oder Trial II gecleart",     M => ({ have: M.gatesT2 + M.trialsT2, need: 1 })),
@@ -112,6 +132,7 @@ export const RANK_UP_REQUIREMENTS = {
     req("consistency","18 aktive Tage in den letzten 30",  M => ({ have: M.activeDays30,  need: 18 })),
     req("logs",      "8 Progress Logs",                    M => ({ have: M.logs,          need: 8 })),
     req("reviews",   "2 Weekly Reviews",                   M => ({ have: M.reviews,       need: 2 })),
+    req("breadth",   "Aktiv in ≥4 Domains (30 Tage)",      M => ({ have: M.domainsActive30, need: 4 })),
   ],
   SS: [
     req("goals",     "3 Goals abgeschlossen",              M => ({ have: M.completedGoals, need: 3 })),
