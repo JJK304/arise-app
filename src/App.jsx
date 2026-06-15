@@ -554,6 +554,27 @@ export default function AriseApp() {
     setState(s); saveData("arise_v3", s);
   };
 
+  // Tägliche Pflicht-Quest (Anker): nicht-verhandelbare Gewohnheit, erscheint jeden Tag, max. 3.
+  const addAnchorQuest = (title) => {
+    const t = (title||"").trim();
+    if(!t) return;
+    const anchors = (state.customQuests||[]).filter(q=>q.anchor);
+    if(anchors.length >= 3){ showNotif("Maximal 3 Pflicht-Quests — Fokus auf das Wesentliche.", "#f59e0b"); return; }
+    const quest = {
+      id:`anchor_${Date.now()}`,
+      title:t,
+      desc:"Tägliche Pflicht — nicht verhandelbar.",
+      xp:20, stat:"END", statPts:0,
+      type:"daily", actionType:"action",
+      cat:"discipline", domain:"discipline",
+      path:null, difficulty:"normal", tags:[],
+      personalized:false, source:"custom", anchor:true,
+    };
+    const s = { ...state, customQuests:[...(state.customQuests||[]), quest] };
+    setState(s); saveData("arise_v3", s);
+    showNotif("⧫ Pflicht-Quest aktiviert", "#f59e0b");
+  };
+
   const handleReset = async () => {
     // Clear IndexedDB
     try {
@@ -693,7 +714,8 @@ export default function AriseApp() {
     ...(state.completedChallenges || []),
     ...(state.questHistory || []).filter(h => h.type === "milestone").map(h => h.id),
   ]);
-const customQuests = state.customQuests||[];
+const customQuests = (state.customQuests||[]).filter(q=>!q.anchor);
+const anchorQuests = (state.customQuests||[]).filter(q=> q.anchor);
 
 // Unified done-check: uses completionStatus (new) + completedChallenges (legacy fallback)
 const isQuestDone = (quest) => {
@@ -1052,7 +1074,7 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
         {view==="profile" && <ProfileView rc={rc} state={state} globalLvl={globalLvl} xpNeeded={xpNeeded} xpPct={xpPct} totalMilestonesDone={totalMilestonesDone} setSelectedStat={setSelectedStat} unlockedAchievements={unlockedAchievements} sysAnalysis={sysAnalysis} setState={setState} showNotif={showNotif} />}
 
         {/* ── QUESTS ── */}
-        {view==="quests" && <QuestsView rotatedDaily={rotatedDaily} rotatedWeekly={rotatedWeekly} isQuestDone={isQuestDone} state={state} recoveryHint={recoveryHint} filterType={filterType} setFilterType={setFilterType} showTodayOnly={showTodayOnly} setShowTodayOnly={setShowTodayOnly} sortBy={sortBy} setSortBy={setSortBy} showCustomForm={showCustomForm} setShowCustomForm={setShowCustomForm} customForm={customForm} setCustomForm={setCustomForm} addCustomQuest={addCustomQuest} rc={rc} availableCats={availableCats} filterCat={filterCat} setFilterCat={setFilterCat} gateProgress={gateProgress} _signalPaths={_signalPaths} prefs={prefs} recommendedGates={recommendedGates} handleGateStepToggle={handleGateStepToggle} handleGateClaim={handleGateClaim} displayChallenges={displayChallenges} handleComplete={handleComplete} deleteCustomQuest={deleteCustomQuest} nextMilestones={nextMilestones} customQuests={customQuests} personalizedQuests={personalizedQuests} recoveryQuests={recoveryQuests} collapsedSections={collapsedSections} toggleSection={toggleSection} />}
+        {view==="quests" && <QuestsView rotatedDaily={rotatedDaily} rotatedWeekly={rotatedWeekly} isQuestDone={isQuestDone} state={state} recoveryHint={recoveryHint} filterType={filterType} setFilterType={setFilterType} showTodayOnly={showTodayOnly} setShowTodayOnly={setShowTodayOnly} sortBy={sortBy} setSortBy={setSortBy} showCustomForm={showCustomForm} setShowCustomForm={setShowCustomForm} customForm={customForm} setCustomForm={setCustomForm} addCustomQuest={addCustomQuest} rc={rc} availableCats={availableCats} filterCat={filterCat} setFilterCat={setFilterCat} gateProgress={gateProgress} _signalPaths={_signalPaths} prefs={prefs} recommendedGates={recommendedGates} handleGateStepToggle={handleGateStepToggle} handleGateClaim={handleGateClaim} displayChallenges={displayChallenges} handleComplete={handleComplete} deleteCustomQuest={deleteCustomQuest} nextMilestones={nextMilestones} customQuests={customQuests} anchorQuests={anchorQuests} addAnchorQuest={addAnchorQuest} personalizedQuests={personalizedQuests} recoveryQuests={recoveryQuests} collapsedSections={collapsedSections} toggleSection={toggleSection} />}
 
 
         {/* ── GOALS ── */}

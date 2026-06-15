@@ -3,12 +3,14 @@
 // Filter (Typ/Kategorie/Heute/Sort), Custom-Quest-Formular,
 // Gate-Liste, sektionierte Quest-Liste. Viele Props (Tier-3-Kandidat).
 // ============================================================
+import { useState } from "react";
 import { isGateCompleted, getGateStepsDone, isGateUnlocked, getVisibleGates } from "../data/gates.js";
 import { CAT_LABELS } from "../data/stats.js";
 import { GateCard } from "./GateCard.jsx";
 import { ChallengeCard } from "./ChallengeCard.jsx";
 
-export function QuestsView({ rotatedDaily, rotatedWeekly, isQuestDone, state, recoveryHint, filterType, setFilterType, showTodayOnly, setShowTodayOnly, sortBy, setSortBy, showCustomForm, setShowCustomForm, customForm, setCustomForm, addCustomQuest, rc, availableCats, filterCat, setFilterCat, gateProgress, _signalPaths, prefs, recommendedGates, handleGateStepToggle, handleGateClaim, displayChallenges, handleComplete, deleteCustomQuest, nextMilestones, customQuests, personalizedQuests, recoveryQuests, collapsedSections, toggleSection }) {
+export function QuestsView({ rotatedDaily, rotatedWeekly, isQuestDone, state, recoveryHint, filterType, setFilterType, showTodayOnly, setShowTodayOnly, sortBy, setSortBy, showCustomForm, setShowCustomForm, customForm, setCustomForm, addCustomQuest, rc, availableCats, filterCat, setFilterCat, gateProgress, _signalPaths, prefs, recommendedGates, handleGateStepToggle, handleGateClaim, displayChallenges, handleComplete, deleteCustomQuest, nextMilestones, customQuests, anchorQuests = [], addAnchorQuest, personalizedQuests, recoveryQuests, collapsedSections, toggleSection }) {
+  const [anchorInput, setAnchorInput] = useState("");
   return (
   <div>
     {/* ── SYSTEM · TAGES-DIREKTIVE — Fokus auf offene Quests + Fortschritt ── */}
@@ -75,6 +77,56 @@ export function QuestsView({ rotatedDaily, rotatedWeekly, isQuestDone, state, re
         </div>
       );
     })()}
+    {/* ── SYSTEM-PFLICHT — tägliche Anker (nicht verhandelbar, Solo-Leveling-Pflichtquest) ── */}
+    {(() => {
+      const gold = "#f59e0b";
+      const total = anchorQuests.length;
+      const doneCount = anchorQuests.filter(c=>isQuestDone(c)).length;
+      const allClear = total>0 && doneCount===total;
+      const streak = state.currentStreak||0;
+      const submit = () => { if(anchorInput.trim()){ addAnchorQuest(anchorInput); setAnchorInput(""); } };
+      return (
+        <div style={{ background:`linear-gradient(135deg,${gold}0a,${gold}14)`, border:`1px solid ${gold}3a`, borderRadius:12, padding:"12px 14px", marginBottom:12, position:"relative", overflow:"hidden" }}>
+          <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${gold},transparent)`, opacity:0.6 }}/>
+          <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
+            <span style={{ color:gold, fontSize:"0.9rem", textShadow:`0 0 10px ${gold}88` }}>⧫</span>
+            <span style={{ fontFamily:"'Orbitron',sans-serif", fontWeight:900, fontSize:"0.66rem", letterSpacing:"0.2em", color:allClear?"#22c55e":gold, textShadow:`0 0 10px ${gold}44` }}>SYSTEM-PFLICHT</span>
+            <div style={{ flex:1, height:1, background:`${gold}22` }}/>
+            {streak>0 && <span style={{ fontSize:"0.66rem", color:"#f97316", fontFamily:"'Rajdhani',sans-serif", fontWeight:700 }}>{streak}🔥</span>}
+            {total>0 && <span style={{ fontSize:"0.64rem", color:allClear?"#22c55e":"#94a3b8", fontFamily:"'Rajdhani',sans-serif", fontWeight:700 }}>{doneCount}/{total}</span>}
+          </div>
+
+          {total===0 ? (
+            <div style={{ fontSize:"0.72rem", color:"#94a3b8", lineHeight:1.45, marginBottom:9 }}>
+              Lege bis zu <b style={{color:gold}}>3 nicht-verhandelbare</b> Quests fest — die Dinge, die du <i>jeden</i> Tag tust. Sie rotieren nie und tragen deinen Streak.
+            </div>
+          ) : (
+            <div style={{ display:"flex", flexDirection:"column", gap:7, marginBottom: total<3?9:0 }}>
+              {anchorQuests.map(c=>(
+                <div key={c.id} style={{ position:"relative" }}>
+                  <ChallengeCard challenge={c} done={isQuestDone(c)} onComplete={handleComplete} rankColor={rc.primary} best={state.questRecords?.[c.id] ?? null} goals={state.goals||[]}/>
+                  {!isQuestDone(c) && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#64748b",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {total < 3 && (
+            <div style={{ display:"flex", gap:7 }}>
+              <input
+                value={anchorInput}
+                onChange={e=>setAnchorInput(e.target.value)}
+                onKeyDown={e=>{ if(e.key==="Enter") submit(); }}
+                placeholder="z. B. Workout · 20 Min lesen · kein Zucker"
+                style={{ flex:1, background:"rgba(255,255,255,0.04)", border:`1px solid ${gold}33`, borderRadius:8, padding:"8px 10px", color:"#e2e8f0", fontSize:"0.78rem", fontFamily:"'Rajdhani',sans-serif", outline:"none", boxSizing:"border-box" }}
+              />
+              <button onClick={submit} style={{ background:`linear-gradient(135deg,${gold}18,${gold}30)`, border:`1px solid ${gold}44`, color:gold, borderRadius:8, padding:"8px 14px", fontSize:"0.72rem", fontFamily:"'Rajdhani',sans-serif", fontWeight:700, letterSpacing:"0.05em", cursor:"pointer", whiteSpace:"nowrap" }}>+ PFLICHT</button>
+            </div>
+          )}
+        </div>
+      );
+    })()}
+
     {/* Recovery Hint Banner */}
     {recoveryHint && (
       <div onClick={()=>setFilterType("recovery")} style={{ background:recoveryHint.urgent?"rgba(34,197,94,0.08)":"rgba(100,116,139,0.08)", border:`1px solid ${recoveryHint.urgent?"#22c55e33":"#33415533"}`, borderRadius:10, padding:"10px 13px", marginBottom:10, display:"flex", alignItems:"center", gap:8, cursor:"pointer", transition:"all 0.2s" }}>
