@@ -2389,3 +2389,59 @@ describe("Storage-Härtung (db.js)", () => {
     });
   });
 });
+
+// ═══════════════════════════════════════════════════════════
+// BODY PROGRESS — messbare Körper-Progression (PRs → Stats)
+// ═══════════════════════════════════════════════════════════
+import { getPersonalBests, detectNewRecords, strengthScore, getStrengthProgress, recordStatGains } from "../lib/bodyProgress.js";
+
+describe("Body Progress — Personal Records & Kraft", () => {
+  // Einträge sind newest-first (wie bodyEntries)
+  it("getPersonalBests: max für higher-better, min für lower-better", () => {
+    const e = [{ bench:"80", weight:"82" }, { bench:"75", weight:"85" }, { bench:"70", weight:"88" }];
+    const pb = getPersonalBests(e);
+    expect(pb.bench).toBe(80);   // höher = besser
+    expect(pb.weight).toBe(82);  // niedriger = besser
+  });
+
+  it("detectNewRecords: erster Eintrag → keine Rekorde", () => {
+    expect(detectNewRecords([{ bench:"60" }])).toHaveLength(0);
+    expect(detectNewRecords([])).toHaveLength(0);
+  });
+
+  it("detectNewRecords: neuer Bestwert erkannt, Gleichstand/Rückschritt nicht", () => {
+    const pr = detectNewRecords([{ bench:"85" }, { bench:"80" }]);
+    expect(pr).toHaveLength(1);
+    expect(pr[0]).toMatchObject({ metric:"bench", value:85, prev:80, delta:5, stat:"STR" });
+    expect(detectNewRecords([{ bench:"80" }, { bench:"80" }])).toHaveLength(0); // Gleichstand
+    expect(detectNewRecords([{ bench:"75" }, { bench:"80" }])).toHaveLength(0); // Rückschritt
+  });
+
+  it("detectNewRecords: lower-better (run5k) — schnellere Zeit ist Rekord → AGI", () => {
+    const pr = detectNewRecords([{ run5k:"24" }, { run5k:"26" }]);
+    expect(pr).toHaveLength(1);
+    expect(pr[0]).toMatchObject({ metric:"run5k", stat:"AGI" });
+  });
+
+  it("strengthScore: Powerlifting-Total (Squat+Bench+DL, Pullups exkl.)", () => {
+    expect(strengthScore({ squat:"100", bench:"80", deadlift:"120", pullups:"10" })).toBe(300);
+    expect(strengthScore({})).toBe(0);
+  });
+
+  it("getStrengthProgress: aktuell vs. Start + Delta", () => {
+    const e = [
+      { squat:"120", bench:"90", deadlift:"140" }, // current 350
+      { squat:"110", bench:"85", deadlift:"135" },
+      { squat:"100", bench:"80", deadlift:"120" }, // start 300
+    ];
+    const sp = getStrengthProgress(e);
+    expect(sp.current).toBe(350);
+    expect(sp.start).toBe(300);
+    expect(sp.delta).toBe(50);
+    expect(sp.hasData).toBe(true);
+  });
+
+  it("recordStatGains: PRs → aggregierte Stat-Punkte", () => {
+    expect(recordStatGains([{ stat:"STR" }, { stat:"STR" }, { stat:"AGI" }])).toEqual({ STR:2, AGI:1 });
+  });
+});

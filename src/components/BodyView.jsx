@@ -3,11 +3,45 @@
 // Check-in-Formular, Verlauf. Präsentational (Werte als Props).
 // ============================================================
 import { MiniChart } from "./MiniChart.jsx";
+import { getStrengthProgress, getPersonalBests, BODY_METRICS } from "../lib/bodyProgress.js";
 
 export function BodyView({ bodyEntries, bodyMetrics, bodyMetric, setBodyMetric, bodyChartData, activeMetric, bodyForm, setBodyForm, saveBodyEntry, rc }) {
   return (
     <div>
       <div style={{ fontSize:"0.64rem",letterSpacing:"0.28em",color:"#64748b",marginBottom:13 }}>KÖRPER-TRACKING</div>
+
+      {/* MESSBARE KRAFT — Fortschritt vs. dein früheres Ich */}
+      {(() => {
+        const sp  = getStrengthProgress(bodyEntries);
+        const pbs = getPersonalBests(bodyEntries);
+        const pbKeys = Object.keys(BODY_METRICS).filter(k => k in pbs);
+        if (!sp.hasData && pbKeys.length === 0) return null;
+        return (
+          <div style={{ background:"linear-gradient(135deg,#f59e0b0a,#f59e0b16)",border:"1px solid #f59e0b33",borderRadius:12,padding:"14px",marginBottom:15 }}>
+            <div style={{ fontSize:"0.64rem",letterSpacing:"0.22em",color:"#f59e0b",marginBottom:8,fontFamily:"'Orbitron',sans-serif",fontWeight:700 }}>⚡ MESSBARE KRAFT</div>
+            {sp.hasData && (
+              <div style={{ display:"flex",alignItems:"baseline",gap:8,marginBottom:pbKeys.length?8:0,flexWrap:"wrap" }}>
+                <span style={{ fontFamily:"'Orbitron',sans-serif",fontWeight:900,fontSize:"1.6rem",color:"#f59e0b",lineHeight:1 }}>{sp.current}</span>
+                <span style={{ fontSize:"0.64rem",color:"#94a3b8" }}>kg Total · Squat+Bench+DL</span>
+                {sp.delta !== 0 && (
+                  <span style={{ marginLeft:"auto",fontSize:"0.72rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif",color:sp.delta>0?"#22c55e":"#ef4444" }}>
+                    {sp.delta>0?"↑ +":"↓ "}{sp.delta} kg seit Start
+                  </span>
+                )}
+              </div>
+            )}
+            {pbKeys.length > 0 && (
+              <div style={{ display:"flex",flexWrap:"wrap",gap:6 }}>
+                {pbKeys.map(k => (
+                  <span key={k} style={{ background:"rgba(255,255,255,0.03)",border:"1px solid rgba(245,158,11,0.18)",borderRadius:7,padding:"4px 9px",fontSize:"0.64rem",fontFamily:"'Rajdhani',sans-serif",color:"#94a3b8" }}>
+                    <span style={{ color:"#f59e0b88" }}>PB </span>{BODY_METRICS[k].label}: <span style={{ color:"#e2e8f0",fontWeight:700 }}>{pbs[k]}{BODY_METRICS[k].unit}</span>
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Metric selector + chart */}
       {bodyEntries.length >= 2 && (

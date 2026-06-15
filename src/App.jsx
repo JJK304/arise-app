@@ -48,6 +48,7 @@ import { OnboardingModal } from "./features/profile/OnboardingModal.jsx";
 import { ProgressLogModal } from "./features/quests/ProgressLogModal.jsx";
 import { ClearedFeedback } from "./components/ClearedFeedback.jsx";
 import { shouldPromptProgressLog } from "./lib/progressLogs.js";
+import { detectNewRecords, recordStatGains } from "./lib/bodyProgress.js";
 import { DEMO_PROFILES } from "./data/demoProfiles.js";
 import { analyzeSystem } from "./lib/systemAnalysis.js";
 import {
@@ -432,8 +433,31 @@ export default function AriseApp() {
     const updated = [entry, ...bodyEntries].slice(0,52);
     setBodyEntries(updated); saveData("arise_body", updated);
     setBodyForm({ weight:"",bf:"",bench:"",squat:"",deadlift:"",pullups:"",run5k:"",note:"" });
-    showNotif("✓ Check-In gespeichert", "#22c55e");
-    if(state) setTimeout(() => checkAchievements(state, updated), 100);
+
+    // Personal Records koppeln echte Kraft/Werte an Stat-Punkte.
+    // Anti-grind: zählt nur bei einem echten neuen Bestwert.
+    const records = detectNewRecords(updated);
+    if (records.length > 0 && state) {
+      const gains    = recordStatGains(records);
+      const newStats = { ...(state.stats || {}) };
+      for (const [k, n] of Object.entries(gains)) newStats[k] = (newStats[k] || 0) + n;
+      const newState = { ...state, stats: newStats };
+      setState(newState); saveData("arise_v3", newState);
+      haptic("heavy");
+      showClearedCard({
+        kind: "⚡ NEUER REKORD",
+        subtitle: "Körper-Check-in",
+        color: "#f59e0b",
+        lines: [
+          ...records.map(r => ({ mark: "▲", text: `${r.label}: ${r.value}${r.unit} (${r.delta > 0 ? "+" : ""}${r.delta}${r.unit})`, color: "#f59e0b" })),
+          ...Object.entries(gains).map(([k, n]) => ({ mark: "★", text: `+${n} ${k}`, color: "#f59e0b" })),
+        ],
+      }, 4200);
+      setTimeout(() => checkAchievements(newState, updated), 100);
+    } else {
+      showNotif("✓ Check-In gespeichert", "#22c55e");
+      if (state) setTimeout(() => checkAchievements(state, updated), 100);
+    }
   };
 
   const loadDemoProfile = (profileId) => {
