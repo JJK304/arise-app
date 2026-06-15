@@ -177,42 +177,53 @@ export function QuestsView({ rotatedDaily, rotatedWeekly, isQuestDone, state, re
       </div>
     ) : (
       <div style={{ display:"flex",flexDirection:"column",gap:16 }}>
-        {/* Empfohlene Gates — oben, außerhalb der Sections */}
-        {recommendedGates.length > 0 && (
-          <div>
-            <div style={{ display:"flex",alignItems:"center",gap:8,marginBottom:8 }}>
-              <span style={{ color:"#f59e0b",fontSize:"0.7rem" }}>◈</span>
-              <span style={{ fontFamily:"'Rajdhani',sans-serif",fontWeight:700,fontSize:"0.65rem",letterSpacing:"0.2em",color:"#f59e0b" }}>◈ NEXT GATE AVAILABLE</span>
-              <div style={{ flex:1,height:1,background:"#f59e0b22",borderRadius:1 }}/>
-            </div>
-            <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
-              {recommendedGates.map(gate => (
-                <GateCard
-                  key={gate.id}
-                  gate={gate}
-                  stepsDone={getGateStepsDone(gate.id, gateProgress)}
-                  completed={isGateCompleted(gate.id, gateProgress)}
-                  recommended={true}
-                  onToggleStep={handleGateStepToggle}
-                  onClaim={handleGateClaim}
-                />
-              ))}
-            </div>
-          </div>
-        )}
-
         {[
+          // ── Der Grind (oben): die täglichen/wöchentlichen Direktiven ──
           { key:"daily",     label:"DAILY SYSTEM QUESTS",   icon:"◎", items:rotatedDaily,   color:"#3b82f6", recommended:false },
           { key:"weekly",    label:"WEEKLY ORDERS",           icon:"◇", items:rotatedWeekly,  color:"#8b5cf6", recommended:false },
-          { key:"milestone", label:"AWAKENING MILESTONES",    icon:"◆", items:nextMilestones,    color:"#f59e0b", recommended:false },
-          { key:"custom",    label:"CUSTOM ORDERS",           icon:"✦", items:customQuests,      color:"#06b6d4", recommended:false },
           ...(personalizedQuests.length > 0 ? [
             { key:"personalized", label:"SYSTEM RECOMMENDATION", icon:"◈", items:personalizedQuests, color:"#a78bfa", recommended:true },
           ] : []),
+          // ── Das Endgame (darunter): Tore, die deine angesammelte Stärke freischaltet ──
+          ...(recommendedGates.length > 0 ? [
+            { key:"gates", label:"TORE", icon:"⧫", items:recommendedGates, color:"#f59e0b", recommended:false, gateTier:true },
+          ] : []),
+          { key:"milestone", label:"AWAKENING MILESTONES",    icon:"◆", items:nextMilestones,    color:"#f59e0b", recommended:false },
+          { key:"custom",    label:"CUSTOM ORDERS",           icon:"✦", items:customQuests,      color:"#06b6d4", recommended:false },
           ...(recoveryQuests.length > 0 ? [
             { key:"recovery", label:"RECOVERY PROTOCOL", icon:"⟡", items:recoveryQuests, color:"#22c55e", recommended:true },
           ] : []),
         ].filter(s=>s.items.length>0).map(section=>{
+          // Gate-Tier: Schwellen-Divider + Gate-Karten — das Endgame nach dem Daily-Grind
+          if (section.gateTier) {
+            return (
+              <div key={section.key}>
+                <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:4 }}>
+                  <div style={{ flex:1, height:1, background:"linear-gradient(90deg,transparent,#f59e0b44)" }}/>
+                  <span style={{ color:"#f59e0b", fontSize:"0.78rem", textShadow:"0 0 10px #f59e0b88" }}>⧫</span>
+                  <span style={{ fontFamily:"'Orbitron',sans-serif", fontWeight:900, fontSize:"0.7rem", letterSpacing:"0.24em", color:"#f59e0b", textShadow:"0 0 12px #f59e0b55" }}>TORE</span>
+                  <span style={{ color:"#f59e0b", fontSize:"0.78rem", textShadow:"0 0 10px #f59e0b88" }}>⧫</span>
+                  <div style={{ flex:1, height:1, background:"linear-gradient(90deg,#f59e0b44,transparent)" }}/>
+                </div>
+                <div style={{ textAlign:"center", fontSize:"0.62rem", color:"#64748b", marginBottom:10, letterSpacing:"0.04em" }}>
+                  Größere Prüfungen — hier beweist du deine angesammelte Stärke
+                </div>
+                <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+                  {recommendedGates.map(gate => (
+                    <GateCard
+                      key={gate.id}
+                      gate={gate}
+                      stepsDone={getGateStepsDone(gate.id, gateProgress)}
+                      completed={isGateCompleted(gate.id, gateProgress)}
+                      recommended={true}
+                      onToggleStep={handleGateStepToggle}
+                      onClaim={handleGateClaim}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          }
           const done=section.items.filter(c=>isQuestDone(c)).length;
           const total=section.items.length;
           const allDone=done===total;
