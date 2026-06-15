@@ -11,9 +11,11 @@ import { ACHIEVEMENTS } from "../data/achievements.js";
 import { MiniChart } from "./MiniChart.jsx";
 import { StatBar } from "./StatBar.jsx";
 import { SystemAnalysisCard } from "../features/profile/SystemAnalysisCard.jsx";
+import { computePowerLevel } from "../lib/powerLevel.js";
 import { saveData } from "../storage/db.js";
 
 export function ProfileView({ rc, state, globalLvl, xpNeeded, xpPct, totalMilestonesDone, setSelectedStat, unlockedAchievements, sysAnalysis, setState, showNotif }) {
+  const pl = computePowerLevel(state, { globalLevel: globalLvl, milestonesDone: totalMilestonesDone });
   return (
   <div>
 
@@ -67,6 +69,55 @@ export function ProfileView({ rc, state, globalLvl, xpNeeded, xpPct, totalMilest
         })}
       </div>
     </div>
+
+    {/* ── POWER LEVEL ── eine Zahl, die nur durch echte Verbesserung steigt ── */}
+    {(() => {
+      const multColor = pl.mult >= 1.0 ? "#22c55e" : pl.mult >= 0.85 ? "#f59e0b" : "#ef4444";
+      const bodyColor = "#ef4444", mindColor = "#3b82f6";
+      const axisMax   = Math.max(pl.body, pl.mind, 1);
+      const weakLabel = pl.weakAxis === "body" ? "Körper" : pl.weakAxis === "mind" ? "Geist" : null;
+      const weakStats = pl.weakAxis === "body" ? "STR · AGI · VIT" : "INT · CRE · END";
+      return (
+        <div style={{ background:`linear-gradient(135deg,#0a0a16,${rc.primary}14)`, border:`1px solid ${rc.primary}44`, borderRadius:14, padding:"14px 16px", marginBottom:12, position:"relative", overflow:"hidden" }}>
+          <div style={{ position:"absolute", top:-18, right:-6, fontSize:"6rem", opacity:0.05, fontWeight:900, color:rc.primary, lineHeight:1, pointerEvents:"none", userSelect:"none" }}>⚡</div>
+          <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", gap:12 }}>
+            <div>
+              <div style={{ fontSize:"0.6rem", letterSpacing:"0.3em", color:`${rc.primary}99`, marginBottom:2 }}>POWER LEVEL</div>
+              <div style={{ fontFamily:"'Orbitron',sans-serif", fontWeight:900, fontSize:"2.4rem", color:rc.primary, textShadow:`0 0 22px ${rc.primary}aa`, lineHeight:1 }}>{pl.value.toLocaleString()}</div>
+              <div style={{ fontSize:"0.62rem", color:"#64748b", marginTop:4 }}>
+                {pl.statTotal} Stat · {pl.recordCount} PB · {pl.milestones} ◆
+              </div>
+            </div>
+            <div style={{ minWidth:124 }}>
+              <div style={{ display:"flex", justifyContent:"flex-end", marginBottom:6 }}>
+                <span style={{ background:`${multColor}1f`, border:`1px solid ${multColor}55`, color:multColor, borderRadius:20, padding:"2px 9px", fontSize:"0.64rem", fontWeight:700, fontFamily:"'Rajdhani',sans-serif", letterSpacing:"0.05em" }}>
+                  BREITE ×{pl.mult.toFixed(2)}
+                </span>
+              </div>
+              {[
+                { label:"KÖRPER", val:pl.body, color:bodyColor },
+                { label:"GEIST",  val:pl.mind, color:mindColor },
+              ].map(a => (
+                <div key={a.label} style={{ marginBottom:5 }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", marginBottom:2 }}>
+                    <span style={{ fontSize:"0.6rem", color:a.color, letterSpacing:"0.08em", fontWeight:700 }}>{a.label}</span>
+                    <span style={{ fontSize:"0.6rem", color:"#64748b", fontFamily:"'Rajdhani',sans-serif", fontWeight:700 }}>{a.val}</span>
+                  </div>
+                  <div style={{ background:"rgba(255,255,255,0.05)", borderRadius:3, height:4, overflow:"hidden" }}>
+                    <div style={{ width:`${(a.val/axisMax)*100}%`, height:"100%", background:`linear-gradient(90deg,${a.color}66,${a.color})`, borderRadius:3, transition:"width 0.6s ease" }}/>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          {pl.mult < 1.0 && weakLabel && (
+            <div style={{ marginTop:8, background:`${multColor}12`, border:`1px solid ${multColor}33`, borderRadius:8, padding:"7px 10px", fontSize:"0.64rem", color:"#cbd5e1", lineHeight:1.4 }}>
+              <span style={{ color:multColor, fontWeight:700 }}>⚠ {weakLabel} vernachlässigt.</span> Trainiere {weakStats}, um deinen Breite-Bonus (bis ×1.15) freizuschalten.
+            </div>
+          )}
+        </div>
+      );
+    })()}
 
     {/* ── MAIN PATH + SECONDARY PATH ── */}
     {(() => {

@@ -2473,3 +2473,54 @@ describe("Quest Records — Progressive Overload", () => {
     expect(applyQuestRecord({ q1: 25 }, "q1", "x")).toEqual({ q1: 25 }); // ungültig → unverändert
   });
 });
+
+// ═══════════════════════════════════════════════════════════
+// POWER LEVEL — eine nicht-grindbare Fortschrittszahl (Körper × Geist)
+// ═══════════════════════════════════════════════════════════
+import { computePowerLevel, breadthMultiplier, getAxisScores, sumStats } from "../lib/powerLevel.js";
+
+describe("Power Level — Aggregat & Breite", () => {
+  it("breadthMultiplier: beide 0 neutral, einseitig gedeckelt, balanciert Bonus", () => {
+    expect(breadthMultiplier(0, 0)).toBe(1.0);            // kein Fortschritt → neutral
+    expect(breadthMultiplier(5, 0)).toBe(0.7);            // nur Körper → gesperrt
+    expect(breadthMultiplier(0, 5)).toBe(0.7);            // nur Geist → gesperrt
+    expect(breadthMultiplier(5, 5)).toBeCloseTo(1.15, 5); // perfekt balanciert
+    expect(breadthMultiplier(10, 5)).toBeCloseTo(0.925, 5); // Verhältnis 0.5 → 0.7+0.225
+  });
+
+  it("getAxisScores / sumStats: Körper = STR+AGI+VIT, Geist = INT+CRE+END", () => {
+    const stats = { STR:3, AGI:1, VIT:2, INT:4, CRE:0, END:1, CRA:9, CHA:9 };
+    expect(getAxisScores(stats)).toEqual({ body: 6, mind: 5 });
+    expect(sumStats(stats, ["STR", "VIT"])).toBe(5);
+  });
+
+  it("computePowerLevel: jeder Stat-Punkt bewegt den Wert spürbar (×12)", () => {
+    const base = computePowerLevel({ stats: {}, level: 1 }).value;       // raw=2, mult=1 → 2
+    const oneBody = computePowerLevel({ stats: { STR: 1 }, level: 1 }).value;
+    expect(base).toBe(2);
+    expect(oneBody).toBeGreaterThan(base); // monoton: erster Punkt senkt nie das Level
+  });
+
+  it("computePowerLevel: einseitig (0.7×) vs. balanciert (1.15×) bei gleichem Stat-Einsatz", () => {
+    const onesided = computePowerLevel({ stats: { STR: 6 }, level: 1 });
+    const balanced = computePowerLevel({ stats: { STR: 3, INT: 3 }, level: 1 });
+    expect(onesided.mult).toBe(0.7);
+    expect(balanced.mult).toBeCloseTo(1.15, 5);
+    // Gleiche 6 Stat-Punkte, aber Balance gibt deutlich mehr Power Level
+    expect(balanced.value).toBeGreaterThan(onesided.value);
+    expect(onesided.weakAxis).toBe("mind"); // Geist vernachlässigt
+  });
+
+  it("computePowerLevel: Rekorde, Meilensteine und Level fließen gewichtet ein", () => {
+    const r = computePowerLevel(
+      { stats: { STR: 2, INT: 2 }, questRecords: { a: 10, b: 20 }, completedMilestones: ["m1"] },
+      { globalLevel: 5 }
+    );
+    // raw = 4*12 + 2*4 + 1*8 + 5*2 = 48+8+8+10 = 74 ; mult = 1.15
+    expect(r.raw).toBe(74);
+    expect(r.recordCount).toBe(2);
+    expect(r.milestones).toBe(1);
+    expect(r.value).toBe(Math.round(74 * 1.15));
+    expect(r.balancePct).toBe(100); // STR==INT → perfekt ausgeglichen
+  });
+});
