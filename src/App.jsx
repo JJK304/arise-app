@@ -49,6 +49,7 @@ import { ProgressLogModal } from "./features/quests/ProgressLogModal.jsx";
 import { ClearedFeedback } from "./components/ClearedFeedback.jsx";
 import { shouldPromptProgressLog } from "./lib/progressLogs.js";
 import { detectNewRecords, recordStatGains } from "./lib/bodyProgress.js";
+import { getQuestBest, isQuestRecord, applyQuestRecord } from "./lib/questRecords.js";
 import { DEMO_PROFILES } from "./data/demoProfiles.js";
 import { analyzeSystem } from "./lib/systemAnalysis.js";
 import {
@@ -305,7 +306,7 @@ export default function AriseApp() {
   //   recovery quests (bereits eigener Flow)
   // Etappe 10: shouldPromptProgressLog lebt jetzt testbar in lib/progressLogs.js
 
-  const handleComplete = (challenge) => {
+  const handleComplete = (challenge, recordValue) => {
     // Etappe 13: Signal-Delta für Feedback messen (vorher)
     const _qPath = getQuestPathId(challenge);
     let _preLvl = 0, _preSig = 0;
@@ -316,6 +317,22 @@ export default function AriseApp() {
     if (alreadyDone) {
       showNotif("Quest already cleared", "#64748b");
       return;
+    }
+
+    // Progressive Overload: trackbare Quest mit Wert → Bestwert prüfen.
+    // Neuer Rekord (höher als bisher) → +1 Stat; sonst nur Baseline speichern.
+    let questRecord = null;
+    if (challenge.track) {
+      const val = parseFloat(recordValue);
+      if (Number.isFinite(val)) {
+        const records = state.questRecords || {};
+        if (isQuestRecord(records, challenge.id, val)) {
+          const sk = challenge.subStat || challenge.stat || "END";
+          newState.stats = { ...(newState.stats || {}), [sk]: (newState.stats?.[sk] || 0) + 1 };
+          questRecord = { value: val, prev: getQuestBest(records, challenge.id), stat: sk, unit: challenge.track.unit || "" };
+        }
+        newState.questRecords = applyQuestRecord(records, challenge.id, val);
+      }
     }
 
     // Notifications
@@ -329,6 +346,10 @@ export default function AriseApp() {
     // Etappe 13: aggregierte QUEST-CLEARED-Karte statt Toast-Kaskade
     {
       const lines = [{ mark: "▸", text: `+${feedback.xp} XP`, color: "#3b82f6" }];
+      if (questRecord) {
+        lines.push({ mark: "⚡", text: `NEUER REKORD: ${questRecord.value}${questRecord.unit}${questRecord.prev != null ? ` (vorher ${questRecord.prev}${questRecord.unit})` : ""}`, color: "#f59e0b" });
+        lines.push({ mark: "★", text: `+1 ${questRecord.stat}`, color: "#f59e0b" });
+      }
       if (feedback.statPts > 0 && feedback.statKey) {
         lines.push({ mark: "★", text: `+${feedback.statPts} ${feedback.statKey}`, color: "#f59e0b" });
       }

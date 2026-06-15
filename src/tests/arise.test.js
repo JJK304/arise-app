@@ -2445,3 +2445,31 @@ describe("Body Progress — Personal Records & Kraft", () => {
     expect(recordStatGains([{ stat:"STR" }, { stat:"STR" }, { stat:"AGI" }])).toEqual({ STR:2, AGI:1 });
   });
 });
+
+// ═══════════════════════════════════════════════════════════
+// QUEST RECORDS — Progressive Overload (schlag deinen letzten Wert)
+// ═══════════════════════════════════════════════════════════
+import { getQuestBest, isQuestRecord, applyQuestRecord } from "../lib/questRecords.js";
+
+describe("Quest Records — Progressive Overload", () => {
+  it("getQuestBest: gespeicherter Wert bzw. null", () => {
+    expect(getQuestBest({ q1: 30 }, "q1")).toBe(30);
+    expect(getQuestBest({}, "q1")).toBe(null);
+    expect(getQuestBest({ q1: "x" }, "q1")).toBe(null);
+  });
+
+  it("isQuestRecord: erster Wert = Baseline (kein Rekord), danach höher = Rekord", () => {
+    expect(isQuestRecord({}, "q1", 25)).toBe(false);          // Baseline
+    expect(isQuestRecord({ q1: 25 }, "q1", 30)).toBe(true);   // höher → Rekord
+    expect(isQuestRecord({ q1: 25 }, "q1", 25)).toBe(false);  // Gleichstand
+    expect(isQuestRecord({ q1: 25 }, "q1", 20)).toBe(false);  // schlechter
+    expect(isQuestRecord({ q1: 25 }, "q1", "")).toBe(false);  // ungültig
+  });
+
+  it("applyQuestRecord: Baseline setzen, dann nur bei höherem Wert aktualisieren", () => {
+    expect(applyQuestRecord({}, "q1", 25)).toEqual({ q1: 25 });        // Baseline
+    expect(applyQuestRecord({ q1: 25 }, "q1", 30)).toEqual({ q1: 30 }); // höher
+    expect(applyQuestRecord({ q1: 25 }, "q1", 20)).toEqual({ q1: 25 }); // niedriger → unverändert
+    expect(applyQuestRecord({ q1: 25 }, "q1", "x")).toEqual({ q1: 25 }); // ungültig → unverändert
+  });
+});

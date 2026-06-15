@@ -117,6 +117,7 @@ function buildQuest({ template, topicLabel, interestId, domain, interestPaths, p
     source:       "generated",
     recommended:  false,
     reason,
+    track:        template.track || null,
   };
 }
 

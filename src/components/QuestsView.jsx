@@ -139,7 +139,7 @@ export function QuestsView({ rotatedDaily, rotatedWeekly, isQuestDone, state, re
           return da-db;
         }).map(c=>(
           <div key={c.id} style={{ position:"relative" }}>
-            <ChallengeCard challenge={c} done={isQuestDone(c)} onComplete={handleComplete} rankColor={rc.primary} goals={state.goals||[]}/>
+            <ChallengeCard challenge={c} done={isQuestDone(c)} onComplete={handleComplete} rankColor={rc.primary} best={state.questRecords?.[c.id] ?? null} goals={state.goals||[]}/>
             {c.type==="custom" && !isQuestDone(c) && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#64748b",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
           </div>
         ))}
@@ -212,7 +212,7 @@ export function QuestsView({ rotatedDaily, rotatedWeekly, isQuestDone, state, re
                     return da-db;
                   }).map(c=>(
                     <div key={c.id} style={{ position:"relative",transition:"order 0.4s ease" }}>
-                      <ChallengeCard challenge={c} done={isQuestDone(c)} onComplete={handleComplete} rankColor={rc.primary} recommended={section.recommended && !isQuestDone(c)} goals={state.goals||[]}/>
+                      <ChallengeCard challenge={c} done={isQuestDone(c)} onComplete={handleComplete} rankColor={rc.primary} recommended={section.recommended && !isQuestDone(c)} best={state.questRecords?.[c.id] ?? null} goals={state.goals||[]}/>
                       {c.type==="custom" && !isQuestDone(c) && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#64748b",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
                     </div>
                   ))}

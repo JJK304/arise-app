@@ -18,6 +18,9 @@ export const CHALLENGES_DB = {
   E:{
     daily:[
       {id:"e_d1",  title:"System Focus",        desc:"Arbeite 15 Minuten konzentriert an etwas Wichtigem — kein Handy, keine Ablenkung.",              xp:25, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"discipline"},
+      {id:"e_r1",  title:"Max Liegestütze (1 Satz)", desc:"So viele saubere Liegestütze wie möglich am Stück — trag deine Zahl ein und schlag deinen Rekord.", xp:25, stat:"STR", statPts:0, type:"daily", cat:"strength",   domain:"body",       track:{unit:"x",   label:"Wdh."}},
+      {id:"e_r2",  title:"Plank-Bestzeit",       desc:"Plank so lange wie möglich halten. Sekunden eintragen — neuer Bestwert gibt +1 STR.",               xp:25, stat:"STR", statPts:0, type:"daily", cat:"strength",   domain:"body",       track:{unit:"s",   label:"Sek."}},
+      {id:"e_r3",  title:"Deep-Work-Bestzeit",   desc:"Längste fokussierte Session am Stück heute — Minuten eintragen. Schlag deine letzte Bestzeit.",     xp:30, stat:"INT", statPts:0, type:"daily", cat:"mind",       domain:"mind",       track:{unit:"min", label:"Min."}},
       {id:"e_d2",  title:"Body Activation",     desc:"Bewege dich 20 Minuten bewusst — was auch immer du wählst. Alles zählt.",                         xp:22, stat:"VIT", statPts:0, type:"daily", cat:"health",      domain:"body"},
       {id:"e_d3",  title:"Skill Spark",         desc:"Übe 10 Minuten eine Fähigkeit die dir wichtig ist — irgendetwas das dich weiterbringt.",           xp:20, stat:"INT", statPts:0, type:"daily", cat:"mind",       domain:"mind"},
       {id:"e_d4",  title:"Environment Reset",   desc:"Bringe einen Bereich 10 Minuten in Ordnung — Schreibtisch, Zimmer oder digitale Ablage.",          xp:18, stat:"END", statPts:0, type:"daily", cat:"discipline", domain:"home"},

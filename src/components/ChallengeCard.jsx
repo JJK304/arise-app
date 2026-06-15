@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { STATS_CONFIG, SUB_STATS, CAT_LABELS } from "../data/stats.js";
 import { PATHS } from "../data/paths.js";
 import { DOMAINS } from "../data/domains.js";
@@ -5,7 +6,8 @@ import { DOMAINS } from "../data/domains.js";
 // ============================================================
 // CHALLENGE CARD — Design Fix: Lesbarkeit & Icon-System
 // ============================================================
-export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommended, goals = [] }) => {
+export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommended, goals = [], best = null }) => {
+  const [recVal, setRecVal] = useState("");
   const typeColors = {
     daily:       "#3b82f6",
     weekly:      "#8b5cf6",
@@ -157,12 +159,23 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
               )}
             </div>
           )}
+
+          {/* Track-Input — Progressive Overload: schlag deinen letzten Wert */}
+          {!done && challenge.track && (
+            <div style={{ display:"flex",alignItems:"center",gap:8,marginTop:7,flexWrap:"wrap" }}>
+              <input type="number" inputMode="decimal" value={recVal} onChange={e=>setRecVal(e.target.value)}
+                placeholder={challenge.track.label || "Wert"}
+                style={{ width:74,background:"rgba(255,255,255,0.05)",border:`1px solid ${tc}55`,borderRadius:6,padding:"5px 8px",color:"#e2e8f0",fontSize:"0.78rem",fontFamily:"'Rajdhani',sans-serif",outline:"none",boxSizing:"border-box" }}/>
+              <span style={{ fontSize:"0.64rem",color:"#64748b" }}>{challenge.track.unit}</span>
+              {best != null && <span style={{ fontSize:"0.64rem",color:"#f59e0b",fontWeight:700 }}>⚡ PB {best}{challenge.track.unit}</span>}
+            </div>
+          )}
         </div>
 
         {/* Action button */}
         {!done && (
           <button
-            onClick={() => onComplete(challenge)}
+            onClick={() => onComplete(challenge, recVal)}
             style={{
               background: `linear-gradient(135deg,${tc}14,${tc}28)`,
               border: `1px solid ${tc}44`,
