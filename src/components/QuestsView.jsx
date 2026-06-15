@@ -11,36 +11,67 @@ import { ChallengeCard } from "./ChallengeCard.jsx";
 export function QuestsView({ rotatedDaily, rotatedWeekly, isQuestDone, state, recoveryHint, filterType, setFilterType, showTodayOnly, setShowTodayOnly, sortBy, setSortBy, showCustomForm, setShowCustomForm, customForm, setCustomForm, addCustomQuest, rc, availableCats, filterCat, setFilterCat, gateProgress, _signalPaths, prefs, recommendedGates, handleGateStepToggle, handleGateClaim, displayChallenges, handleComplete, deleteCustomQuest, nextMilestones, customQuests, personalizedQuests, recoveryQuests, collapsedSections, toggleSection }) {
   return (
   <div>
-    {/* Quest Progress Widget */}
+    {/* ── SYSTEM · TAGES-DIREKTIVE — Fokus auf offene Quests + Fortschritt ── */}
     {(() => {
       const totalDaily  = rotatedDaily.length;
       const doneDaily   = rotatedDaily.filter(c => isQuestDone(c)).length;
+      const openDaily   = totalDaily - doneDaily;
       const totalWeekly = rotatedWeekly.length;
       const doneWeekly  = rotatedWeekly.filter(c => isQuestDone(c)).length;
-      const activeGoalCount = (state.goals||[]).filter(g=>g.status==="active").length;
+      const activeGoalCount    = (state.goals||[]).filter(g=>g.status==="active").length;
       const completedGoalCount = (state.goals||[]).filter(g=>g.status==="completed").length;
-      const totalGoalCount = (state.goals||[]).length;
-      const pctD = totalDaily  > 0 ? Math.round((doneDaily  / totalDaily)  * 100) : 0;
-      const pctW = totalWeekly > 0 ? Math.round((doneWeekly / totalWeekly) * 100) : 0;
-      const pctG = totalGoalCount > 0 ? Math.round((completedGoalCount / totalGoalCount) * 100) : 0;
-      const cols = activeGoalCount > 0 ? "1fr 1fr 1fr" : "1fr 1fr";
+      const totalGoalCount     = (state.goals||[]).length;
+      const allClear = totalDaily > 0 && openDaily === 0;
+      const sys = allClear ? "#22c55e" : "#3b82f6";
+      const bars = [
+        { label:"DAILY",  done:doneDaily,  total:totalDaily,  color:"#3b82f6" },
+        { label:"WEEKLY", done:doneWeekly, total:totalWeekly, color:"#8b5cf6" },
+        ...(activeGoalCount > 0 ? [{ label:"ZIELE", done:completedGoalCount, total:totalGoalCount, color:"#f59e0b" }] : []),
+      ];
       return (
-        <div style={{ display:"grid", gridTemplateColumns:cols, gap:7, marginBottom:12 }}>
-          {[
-            { label:"Daily",  done:doneDaily,  total:totalDaily,  pct:pctD, color:"#3b82f6" },
-            { label:"Weekly", done:doneWeekly, total:totalWeekly, pct:pctW, color:"#8b5cf6" },
-            ...(activeGoalCount > 0 ? [{ label:"OBJECTIVES", done:completedGoalCount, total:totalGoalCount, pct:pctG, color:"#f59e0b" }] : []),
-          ].map(item => (
-            <div key={item.label} style={{ background:"rgba(255,255,255,0.02)",border:"1px solid #0d0d1a",borderRadius:9,padding:"9px 11px" }}>
-              <div style={{ display:"flex",justifyContent:"space-between",marginBottom:5 }}>
-                <span style={{ fontSize:"0.64rem",color:"#64748b",letterSpacing:"0.08em" }}>{item.label}</span>
-                <span style={{ fontSize:"0.68rem",color:item.pct===100?"#22c55e":item.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{item.done}/{item.total}</span>
-              </div>
-              <div style={{ background:"rgba(255,255,255,0.05)",borderRadius:3,height:3,overflow:"hidden" }}>
-                <div style={{ width:`${item.pct}%`,height:"100%",background:item.pct===100?"#22c55e":`linear-gradient(90deg,${item.color}66,${item.color})`,borderRadius:3,transition:"width 0.5s ease" }}/>
+        <div style={{ background:`linear-gradient(135deg,${sys}0a,${sys}16)`, border:`1px solid ${sys}3a`, borderRadius:12, padding:"12px 14px", marginBottom:12, position:"relative", overflow:"hidden", boxShadow:`0 0 16px ${sys}14` }}>
+          <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${sys},transparent)`, opacity:0.7 }}/>
+          {/* Fokus-Zeile */}
+          <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:bars.length?10:0 }}>
+            <span style={{ fontSize:"1.05rem", color:sys, textShadow:`0 0 12px ${sys}` }}>◈</span>
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontSize:"0.56rem", letterSpacing:"0.26em", color:`${sys}cc`, fontWeight:700, marginBottom:2 }}>SYSTEM · TAGES-DIREKTIVE</div>
+              <div style={{ fontFamily:"'Rajdhani',sans-serif", fontWeight:700, fontSize:"0.9rem", color:"#e2e8f0", lineHeight:1.1 }}>
+                {totalDaily === 0
+                  ? "Keine Tages-Quests aktiv"
+                  : allClear
+                    ? "✓ Tageslimit erfüllt — alle Quests klar"
+                    : <>Noch <span style={{ color:sys, fontFamily:"'Orbitron',sans-serif", fontWeight:900 }}>{openDaily}</span> {openDaily===1?"Quest":"Quests"} offen heute</>}
               </div>
             </div>
-          ))}
+            {totalDaily > 0 && (
+              <div style={{ display:"flex", gap:3, flexShrink:0, flexWrap:"wrap", maxWidth:72, justifyContent:"flex-end" }}>
+                {rotatedDaily.map(c => {
+                  const d = isQuestDone(c);
+                  return <div key={c.id} style={{ width:7, height:7, borderRadius:"50%", background:d?sys:"transparent", border:`1.5px solid ${d?sys:sys+"55"}`, boxShadow:d?`0 0 5px ${sys}aa`:"none", transition:"all 0.3s" }}/>;
+                })}
+              </div>
+            )}
+          </div>
+          {/* Fortschritts-Balken */}
+          {bars.length > 0 && (
+            <div style={{ display:"grid", gridTemplateColumns:`repeat(${bars.length},1fr)`, gap:8 }}>
+              {bars.map(item => {
+                const pct = item.total > 0 ? Math.round((item.done/item.total)*100) : 0;
+                return (
+                  <div key={item.label}>
+                    <div style={{ display:"flex",justifyContent:"space-between",marginBottom:3 }}>
+                      <span style={{ fontSize:"0.58rem",color:"#64748b",letterSpacing:"0.1em",fontWeight:700 }}>{item.label}</span>
+                      <span style={{ fontSize:"0.62rem",color:pct===100?"#22c55e":item.color,fontFamily:"'Rajdhani',sans-serif",fontWeight:700 }}>{item.done}/{item.total}</span>
+                    </div>
+                    <div style={{ background:"rgba(255,255,255,0.05)",borderRadius:3,height:3,overflow:"hidden" }}>
+                      <div style={{ width:`${pct}%`,height:"100%",background:pct===100?"#22c55e":`linear-gradient(90deg,${item.color}66,${item.color})`,borderRadius:3,transition:"width 0.5s ease" }}/>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       );
     })()}
