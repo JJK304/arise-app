@@ -184,12 +184,13 @@ export function QuestsView({ rotatedDaily, rotatedWeekly, isQuestDone, state, re
         ].filter(s=>s.items.length>0).map(section=>{
           const done=section.items.filter(c=>isQuestDone(c)).length;
           const total=section.items.length;
-          const collapsed=collapsedSections[section.key];
           const allDone=done===total;
+          // Fertige Sektionen standardmäßig eingeklappt (nur Header sichtbar); manueller Toggle hat Vorrang.
+          const collapsed=(section.key in collapsedSections)?collapsedSections[section.key]:allDone;
           return (
             <div key={section.key}>
               {/* Section header */}
-              <button onClick={()=>toggleSection(section.key)} style={{ width:"100%",background:"transparent",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:8,marginBottom:collapsed?0:8,padding:"2px 0",transition:"all 0.2s" }}>
+              <button onClick={()=>toggleSection(section.key,collapsed)} style={{ width:"100%",background:"transparent",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:8,marginBottom:collapsed?0:8,padding:"2px 0",transition:"all 0.2s" }}>
                 <span style={{ color:allDone?"#22c55e":section.color,fontSize:"0.7rem" }}>{allDone?"✓":section.icon}</span>
                 <span style={{ fontFamily:"'Rajdhani',sans-serif",fontWeight:700,fontSize:"0.65rem",letterSpacing:"0.2em",color:allDone?"#22c55e":section.color }}>{section.label}</span>
                 {section.recommended && !allDone && (
@@ -203,21 +204,44 @@ export function QuestsView({ rotatedDaily, rotatedWeekly, isQuestDone, state, re
                 </div>
                 <span style={{ fontSize:"0.64rem",color:"#64748b",transform:collapsed?"rotate(-90deg)":"rotate(0deg)",transition:"transform 0.2s",display:"inline-block" }}>▾</span>
               </button>
-              {/* Section items — done ones sink to bottom */}
-              {!collapsed && (
-                <div style={{ display:"flex",flexDirection:"column",gap:7,animation:"sectionOpen 0.2s ease" }}>
-                  {[...section.items].sort((a,b)=>{
-                    const da=isQuestDone(a)?1:0;
-                    const db=isQuestDone(b)?1:0;
-                    return da-db;
-                  }).map(c=>(
-                    <div key={c.id} style={{ position:"relative",transition:"order 0.4s ease" }}>
-                      <ChallengeCard challenge={c} done={isQuestDone(c)} onComplete={handleComplete} rankColor={rc.primary} recommended={section.recommended && !isQuestDone(c)} best={state.questRecords?.[c.id] ?? null} goals={state.goals||[]}/>
-                      {c.type==="custom" && !isQuestDone(c) && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#64748b",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
-                    </div>
-                  ))}
-                </div>
-              )}
+              {/* Offene Quests als volle Karten; erledigte zu einer Faltzeile zusammengelegt */}
+              {!collapsed && (() => {
+                const openItems = section.items.filter(c=>!isQuestDone(c));
+                const doneItems = section.items.filter(c=> isQuestDone(c));
+                const doneOpen  = !!collapsedSections[section.key+"__done"];
+                return (
+                  <div style={{ display:"flex",flexDirection:"column",gap:7,animation:"sectionOpen 0.2s ease" }}>
+                    {openItems.map(c=>(
+                      <div key={c.id} style={{ position:"relative" }}>
+                        <ChallengeCard challenge={c} done={false} onComplete={handleComplete} rankColor={rc.primary} recommended={section.recommended} best={state.questRecords?.[c.id] ?? null} goals={state.goals||[]}/>
+                        {c.type==="custom" && <button onClick={()=>deleteCustomQuest(c.id)} style={{ position:"absolute",top:8,right:8,background:"transparent",border:"none",color:"#64748b",fontSize:"0.8rem",cursor:"pointer",padding:4 }}>✕</button>}
+                      </div>
+                    ))}
+                    {doneItems.length>0 && (
+                      <div>
+                        <button onClick={()=>toggleSection(section.key+"__done")} style={{ width:"100%",background:"transparent",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:8,padding:"4px 2px",marginTop:openItems.length?2:0 }}>
+                          <span style={{ color:"#22c55e99",fontSize:"0.66rem" }}>✓</span>
+                          <span style={{ fontFamily:"'Rajdhani',sans-serif",fontWeight:700,fontSize:"0.62rem",letterSpacing:"0.12em",color:"#64748b" }}>{doneItems.length} ERLEDIGT</span>
+                          <div style={{ flex:1,height:1,background:"rgba(148,163,184,0.1)" }}/>
+                          <span style={{ fontSize:"0.6rem",color:"#475569",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,letterSpacing:"0.08em" }}>{doneOpen?"AUSBLENDEN":"ZEIGEN"}</span>
+                          <span style={{ fontSize:"0.6rem",color:"#475569",transform:doneOpen?"rotate(0deg)":"rotate(-90deg)",transition:"transform 0.2s",display:"inline-block" }}>▾</span>
+                        </button>
+                        {doneOpen && (
+                          <div style={{ display:"flex",flexDirection:"column",gap:4,marginTop:4 }}>
+                            {doneItems.map(c=>(
+                              <div key={c.id} style={{ display:"flex",alignItems:"center",gap:8,padding:"5px 10px",background:"rgba(255,255,255,0.015)",border:"1px solid rgba(148,163,184,0.06)",borderRadius:7 }}>
+                                <span style={{ color:"#22c55e88",fontSize:"0.76rem",flexShrink:0 }}>✓</span>
+                                <span style={{ flex:1,fontSize:"0.74rem",color:"#64748b",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{c.title}</span>
+                                <span style={{ fontSize:"0.62rem",color:"#475569",flexShrink:0 }}>+{c.xp} XP</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
             </div>
           );
         })}

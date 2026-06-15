@@ -180,7 +180,8 @@ export default function AriseApp() {
     localStorage.setItem("arise_haptic", JSON.stringify(val));
   };
 
-  const toggleSection = (key) => setCollapsedSections(p => ({...p, [key]: !p[key]}));
+  // current optional: schaltet den EFFEKTIVEN Zustand um (z.B. auto-eingeklappte, fertige Sektionen).
+  const toggleSection = (key, current) => setCollapsedSections(p => ({...p, [key]: current === undefined ? !p[key] : !current}));
 
   // Daily/Weekly reset + streak update + completionStatus pruning
   useEffect(() => {
