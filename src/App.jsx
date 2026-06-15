@@ -731,6 +731,9 @@ const isQuestDone = (quest) => {
 };
 
 const todayDone = currentDB.daily.filter(c=>isQuestDone(c)).length;
+// Pflicht-Anker: offene Anzahl + Abend-Eskalation (Cue für die System-Warnung)
+const openAnchors  = anchorQuests.filter(c=>!isQuestDone(c)).length;
+const pflichtUrgent = openAnchors > 0 && new Date().getHours() >= 18;
 const totalMilestonesDone = Object.values(CHALLENGES_DB).flatMap(r=>r.milestones).filter(c=>isQuestDone(c)).length;
 const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements||[]).includes(a.id));
 
@@ -1102,6 +1105,10 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
               {/* Active top bar */}
               <div style={{ position:"absolute",top:0,left:"50%",transform:"translateX(-50%)",width:active?28:0,height:2,background:rc.primary,borderRadius:"0 0 3px 3px",boxShadow:active?`0 0 8px ${rc.primary}`:"none",transition:"all 0.25s ease" }}/>
               <span style={{ fontSize:"0.92rem",color:active?rc.primary:"#475569",textShadow:active?`0 0 10px ${rc.primary}`:"none",transition:"all 0.2s",marginTop:4 }}>{item.icon}</span>
+              {/* System-Pflicht-Cue: offene Anker-Quests, abends rot eskaliert */}
+              {item.id==="quests" && openAnchors>0 && (
+                <span style={{ position:"absolute", top:1, left:"calc(50% + 7px)", minWidth:14, height:14, borderRadius:7, background:pflichtUrgent?"#ef4444":"#f59e0b", color:"#0a0a16", fontSize:"0.56rem", fontWeight:900, display:"flex", alignItems:"center", justifyContent:"center", padding:"0 3px", boxShadow:pflichtUrgent?"0 0 9px #ef4444":"0 0 6px #f59e0b99", fontFamily:"'Rajdhani',sans-serif" }}>{openAnchors}</span>
+              )}
               <span style={{ fontSize:"0.64rem",letterSpacing:"0.12em",color:active?rc.primary:"#475569",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,transition:"all 0.2s" }}>{item.label}</span>
             </button>
           );

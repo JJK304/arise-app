@@ -84,10 +84,12 @@ export function QuestsView({ rotatedDaily, rotatedWeekly, isQuestDone, state, re
       const doneCount = anchorQuests.filter(c=>isQuestDone(c)).length;
       const allClear = total>0 && doneCount===total;
       const streak = state.currentStreak||0;
+      const open = total - doneCount;
+      const warn = open>0 && new Date().getHours() >= 18; // Abend-Eskalation: Streak in Gefahr
       const submit = () => { if(anchorInput.trim()){ addAnchorQuest(anchorInput); setAnchorInput(""); } };
       return (
-        <div style={{ background:`linear-gradient(135deg,${gold}0a,${gold}14)`, border:`1px solid ${gold}3a`, borderRadius:12, padding:"12px 14px", marginBottom:12, position:"relative", overflow:"hidden" }}>
-          <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${gold},transparent)`, opacity:0.6 }}/>
+        <div style={{ background:`linear-gradient(135deg,${gold}0a,${gold}14)`, border:`1px solid ${warn?"#ef444466":gold+"3a"}`, borderRadius:12, padding:"12px 14px", marginBottom:12, position:"relative", overflow:"hidden", boxShadow:warn?"0 0 14px #ef444422":"none" }}>
+          <div style={{ position:"absolute", top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${warn?"#ef4444":gold},transparent)`, opacity:0.6 }}/>
           <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:10 }}>
             <span style={{ color:gold, fontSize:"0.9rem", textShadow:`0 0 10px ${gold}88` }}>⧫</span>
             <span style={{ fontFamily:"'Orbitron',sans-serif", fontWeight:900, fontSize:"0.66rem", letterSpacing:"0.2em", color:allClear?"#22c55e":gold, textShadow:`0 0 10px ${gold}44` }}>SYSTEM-PFLICHT</span>
@@ -95,6 +97,12 @@ export function QuestsView({ rotatedDaily, rotatedWeekly, isQuestDone, state, re
             {streak>0 && <span style={{ fontSize:"0.66rem", color:"#f97316", fontFamily:"'Rajdhani',sans-serif", fontWeight:700 }}>{streak}🔥</span>}
             {total>0 && <span style={{ fontSize:"0.64rem", color:allClear?"#22c55e":"#94a3b8", fontFamily:"'Rajdhani',sans-serif", fontWeight:700 }}>{doneCount}/{total}</span>}
           </div>
+
+          {warn && (
+            <div style={{ background:"#ef444415", border:"1px solid #ef444444", borderRadius:8, padding:"6px 9px", marginBottom:9, fontSize:"0.66rem", color:"#fca5a5", fontFamily:"'Rajdhani',sans-serif", fontWeight:700, letterSpacing:"0.02em", lineHeight:1.35 }}>
+              ⚠ {open} Pflicht-Quest{open>1?"s":""} offen — dein Streak {streak}🔥 bricht um Mitternacht.
+            </div>
+          )}
 
           {total===0 ? (
             <div style={{ fontSize:"0.72rem", color:"#94a3b8", lineHeight:1.45, marginBottom:9 }}>
