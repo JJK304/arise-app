@@ -101,19 +101,6 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
               </>
             )}
 
-            {pathInfo && (
-              <>
-                <span style={{ color:"#475569" }}>·</span>
-                <span style={{ color:pathInfo.color, fontSize:"0.64rem" }}>{pathInfo.icon} {pathInfo.name}</span>
-              </>
-            )}
-
-            {challenge.topic && (
-              <>
-                <span style={{ color:"#475569" }}>·</span>
-                <span style={{ color:"#a78bfa88", fontSize:"0.64rem" }}>{challenge.topic}</span>
-              </>
-            )}
           </div>
 
           {/* Title */}
@@ -146,13 +133,17 @@ export const ChallengeCard = ({ challenge, done, onComplete, rankColor, recommen
                 </span>
               )}
 
+              {pathInfo && (
+                <span style={{ color:pathInfo.color, fontSize:"0.64rem" }}>{pathInfo.icon} {pathInfo.name}</span>
+              )}
+
               {linkedGoal && (
                 <span style={{ background:"rgba(245,158,11,0.1)",border:"1px solid #f59e0b33",color:"#f59e0b",borderRadius:4,padding:"2px 6px",fontSize:"0.64rem",fontWeight:700 }}>
                   ⌖ {linkedGoal.title.slice(0,22)}{linkedGoal.title.length>22?"…":""}
                 </span>
               )}
 
-              {challenge.reason && (
+              {recommended && challenge.reason && (
                 <span style={{ color:"#a78bfa55",fontSize:"0.64rem",fontFamily:"'Rajdhani',sans-serif" }}>
                   ↳ {challenge.reason}
                 </span>
