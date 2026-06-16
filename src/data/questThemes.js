@@ -102,6 +102,11 @@ export const QUEST_THEMES = {
   // ── SSS-Rank ──
   sss_d1: { domains: ["body"] },
 
+  // ── E-Rank Record-/Track-Quests (signal-gebunden, NICHT neutral) ──
+  e_r1: { domains: ["body"], interests: ["krafttraining", "calisthenics", "muskelaufbau"] },
+  e_r2: { domains: ["body"], interests: ["calisthenics", "krafttraining", "muskelaufbau"] },
+  e_r3: { domains: ["mind"], interests: ["deepwork"] },
+
   // ── Extra-Dailies (in E gemergt) ──
   xd_fin_1: { domains: ["finance"], interests: ["budgeting", "finanzplanung"] },
   xd_fin_2: { domains: ["career"], interests: ["karriere", "bewerbung"] },
