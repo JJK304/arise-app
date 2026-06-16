@@ -414,35 +414,41 @@ export default function AriseApp() {
 
 
   const saveProgressLog = (quest, formData) => {
-    if (!quest) return;
-    // Defensive guards — sicherstellen dass Arrays vorhanden
-    const progressLogs = Array.isArray(state.progressLogs) ? state.progressLogs : [];
-    const goals        = Array.isArray(state.goals)        ? state.goals        : [];
-    // Anti-spam: XP-Bonus nur wenn noch kein Log heute für diese Quest
-    const withBonus = canLogWithBonus(progressLogs, quest.id);
-    // Passende Goals aus State finden
-    const matchingGoal = goals.find(g =>
-      g.status === "active" && (g.domain === quest.domain || g.path === quest.path)
-    );
-    const log = createProgressLog({
-      questId:  quest.id,
-      goalId:   matchingGoal?.id || null,
-      quest,
-      metrics:  formData.metrics || {},
-      notes:    formData.notes   || "",
-    });
-    let s = { ...state, progressLogs: addProgressLog(progressLogs, log) };
-    // XP-Bonus nur einmal pro Quest/Tag
-    if (withBonus && log.xpBonus > 0) {
-      s.xp      = (s.xp      || 0) + log.xpBonus;
-      s.totalXP = (s.totalXP || 0) + log.xpBonus;
-      showNotif(`⌁ Log gespeichert +${log.xpBonus} XP`, "#8b5cf6");
-    } else {
-      showNotif("⌁ Log gespeichert", "#8b5cf6");
-    }
+    // Modal IMMER zuerst schließen — kein blockierender Layer bleibt stehen,
+    // egal ob die Log-Verarbeitung unten wirft (Button-Bug-Absicherung).
     setPendingLogQuest(null);
     setLogForm({ notes: "", metrics: {} });
-    setState(s); saveData("arise_v3", s);
+    if (!quest) return;
+    try {
+      // Defensive guards — sicherstellen dass Arrays vorhanden
+      const progressLogs = Array.isArray(state.progressLogs) ? state.progressLogs : [];
+      const goals        = Array.isArray(state.goals)        ? state.goals        : [];
+      // Anti-spam: XP-Bonus nur wenn noch kein Log heute für diese Quest
+      const withBonus = canLogWithBonus(progressLogs, quest.id);
+      // Passende Goals aus State finden
+      const matchingGoal = goals.find(g =>
+        g.status === "active" && (g.domain === quest.domain || g.path === quest.path)
+      );
+      const log = createProgressLog({
+        questId:  quest.id,
+        goalId:   matchingGoal?.id || null,
+        quest,
+        metrics:  (formData && formData.metrics) || {},
+        notes:    (formData && formData.notes)   || "",
+      });
+      let s = { ...state, progressLogs: addProgressLog(progressLogs, log) };
+      // XP-Bonus nur einmal pro Quest/Tag
+      if (withBonus && log.xpBonus > 0) {
+        s.xp      = (s.xp      || 0) + log.xpBonus;
+        s.totalXP = (s.totalXP || 0) + log.xpBonus;
+        showNotif(`⌁ Log gespeichert +${log.xpBonus} XP`, "#8b5cf6");
+      } else {
+        showNotif("⌁ Log gespeichert", "#8b5cf6");
+      }
+      setState(s); saveData("arise_v3", s);
+    } catch (_) {
+      showNotif("⚠ Log konnte nicht gespeichert werden", "#ef4444");
+    }
   };
 
   const dismissLog = () => {
