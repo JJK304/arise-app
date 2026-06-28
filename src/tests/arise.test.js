@@ -2524,3 +2524,32 @@ describe("Power Level — Aggregat & Breite", () => {
     expect(r.balancePct).toBe(100); // STR==INT → perfekt ausgeglichen
   });
 });
+
+// ═══════════════════════════════════════════════════════════
+// SIGNAL-GATING — neutraler Default (Etappe 4/5 Invariante)
+// Schützt vor Regression: neue spezifische Quests müssen gegated werden,
+// neutrale Defaults dürfen nie gegated sein, neutrale Nutzer bekommen
+// keine personalisierten Spezial-Quests.
+// ═══════════════════════════════════════════════════════════
+import { QUEST_THEMES } from "../data/questThemes.js";
+
+describe("Signal-Gating: neutraler Default", () => {
+  it("bekannte spezifische Quests sind in QUEST_THEMES gegated", () => {
+    const specific = ["e_r1","e_r2","e_r3","d_d1","d_d2","d_d3","d_d5","d_d9","d_d11","d_d14","xd_soc_3","xd_soc_4","xd_fin_1","xd_adv_1"];
+    expect(specific.filter(id => !QUEST_THEMES[id])).toEqual([]); // keine darf ungegated sein
+  });
+
+  it("neutrale E-Rank-Quests sind NICHT gegated (immer sichtbar)", () => {
+    const neutral = ["e_d1","e_d2","e_d3","e_d5","e_d6","e_d7","e_d9","e_d15"];
+    expect(neutral.filter(id => QUEST_THEMES[id])).toEqual([]); // keine darf gegated sein
+  });
+
+  it("neutraler Nutzer bekommt keine personalisierten Spezial-Quests", () => {
+    const out = generatePersonalizedQuests(
+      { interests: [], activePaths: [] },
+      { goals: [], questHistory: [], affinities: {}, stats: {} },
+      8
+    );
+    expect(out).toHaveLength(0);
+  });
+});
