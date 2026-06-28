@@ -66,6 +66,7 @@ import { saveData, loadData, LS, onSaveError } from "./storage/db.js";
 
 // Components
 import { StatDetailModal } from "./components/StatDetailModal.jsx";
+import { useSystemFeedback } from "./hooks/useSystemFeedback.js";
 import { RadarChart } from "./components/RadarChart.jsx";
 import { LevelTree } from "./features/profile/LevelTree.jsx";
 import { SplashScreen } from "./components/SplashScreen.jsx";
@@ -97,8 +98,10 @@ export default function AriseApp() {
   const [state, setState] = useState(null);
   const [nameInput, setNameInput] = useState("");
   const [view, setView] = useState("profile");
-  const [notification, setNotification] = useState(null);
-  const [levelUpAnim, setLevelUpAnim] = useState(null);
+  // System-Feedback (Overlays + Timer) — ausgelagert in useSystemFeedback
+  const { notification, levelUpAnim, newAchievements, newTitles, clearedCard,
+          showNotif, showClearedCard, showLevelUp, showTitles,
+          setNewAchievements, achievRef } = useSystemFeedback();
   const [filterType, setFilterType] = useState("all");
   const [filterCat, setFilterCat] = useState("all");
   const [showTodayOnly, setShowTodayOnly] = useState(false);
@@ -117,8 +120,6 @@ export default function AriseApp() {
     type:"daily", domain:"discipline", path:"",
     difficulty:"normal", tags:""
   });
-  const [newAchievements, setNewAchievements] = useState([]);
-  const [newTitles, setNewTitles] = useState([]);
   // Goal UI state
   const [showGoalForm, setShowGoalForm] = useState(false);
   const [goalForm, setGoalForm] = useState({ templateId:"learning_goal", title:"", targetValue:"", deadline:"" });
@@ -131,16 +132,6 @@ export default function AriseApp() {
   // Demo profiles
   const [showDemo, setShowDemo] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [clearedCard, setClearedCard] = useState(null);
-  const clearedRef = useRef();
-  const showClearedCard = (card, ms = 3600) => {
-    setClearedCard(card);
-    clearTimeout(clearedRef.current);
-    clearedRef.current = setTimeout(() => setClearedCard(null), ms);
-  };
-  const notifRef = useRef(null);
-  const achievRef = useRef(null);
-  const feedbackRef = useRef(null);
 
   // Load from IndexedDB on mount — always migrate defensively
   useEffect(() => {
@@ -253,11 +244,6 @@ export default function AriseApp() {
     }
   }, []);
 
-  const showNotif = (msg, color="#00ffff") => {
-    setNotification({msg,color});
-    clearTimeout(notifRef.current);
-    notifRef.current = setTimeout(()=>setNotification(null), 3500);
-  };
 
   // Speicherfehler sichtbar machen — statt still Fortschritt zu verlieren.
   // Eine Subscription deckt alle saveData-Aufrufe ab.
@@ -338,8 +324,7 @@ export default function AriseApp() {
     // Notifications
     if (feedback.levelUps?.length > 0) {
       for (const lu of feedback.levelUps) {
-        setLevelUpAnim({ rank: lu.rank, level: lu.level, rankUp: lu.rankUp });
-        setTimeout(() => setLevelUpAnim(null), 2800);
+        showLevelUp({ rank: lu.rank, level: lu.level, rankUp: lu.rankUp });
       }
     }
 
@@ -395,9 +380,7 @@ export default function AriseApp() {
     }
 
     if (feedback.newTitles?.length > 0) {
-      setNewTitles(TITLES.filter(t => feedback.newTitles.includes(t.id)));
-      clearTimeout(feedbackRef.current);
-      feedbackRef.current = setTimeout(() => setNewTitles([]), 4500);
+      showTitles(TITLES.filter(t => feedback.newTitles.includes(t.id)));
     }
 
     haptic(challenge.type === "milestone" ? "heavy" : "medium");
@@ -670,8 +653,7 @@ export default function AriseApp() {
 
     if (feedback.levelUps?.length > 0) {
       for (const lu of feedback.levelUps) {
-        setLevelUpAnim({ rank: lu.rank, level: lu.level, rankUp: lu.rankUp });
-        setTimeout(() => setLevelUpAnim(null), 2800);
+        showLevelUp({ rank: lu.rank, level: lu.level, rankUp: lu.rankUp });
       }
     }
 
