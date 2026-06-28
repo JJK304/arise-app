@@ -1,8 +1,9 @@
 // ============================================================
 // PREFERENCES CONFIGURATION
-// Alle auswählbaren Optionen für das Preferences-System.
-// Interests: nun in interests.js als strukturierte Datenbank.
-// Paths: alle 12 wählbaren Pfade (Shadow nicht wählbar).
+// Nur noch UI-Optionen (Quest-Länge, Pfade, Balance, Schwierigkeit).
+// Interessen sind AUSSCHLIESSLICH in interests.js:
+//   INTERESTS · INTEREST_LIST · INTEREST_GROUPS · normalizeInterests
+// preferences.js ist KEINE Interest-Quelle mehr.
 // ============================================================
 
 // Quest-Längen
@@ -45,45 +46,4 @@ export const DIFFICULTY_OPTIONS = [
   { id: "easy",   label: "Leicht",  desc: "Weniger Anforderung, einfacherer Einstieg", icon: "🌱" },
   { id: "normal", label: "Normal",  desc: "Standard-Balance",                          icon: "⚖️" },
   { id: "hard",   label: "Schwer",  desc: "Höhere Anforderungen, mehr XP",             icon: "🔥" },
-];
-
-// Legacy: INTERESTS_OPTIONS bleibt als flat-Array für Backward-Compat in App.jsx
-// Wird in Prompt 4 durch das strukturierte System aus interests.js ersetzt.
-export const INTERESTS_OPTIONS = [
-  { id: "physik",          label: "Physik",          icon: "⚛️",  group: "mind"       },
-  { id: "mathe",           label: "Mathe",            icon: "📐",  group: "mind"       },
-  { id: "informatik",      label: "Informatik",       icon: "💡",  group: "mind"       },
-  { id: "programmieren",   label: "Programmieren",    icon: "💻",  group: "tech"       },
-  { id: "elektronik",      label: "Elektronik",       icon: "🔌",  group: "tech"       },
-  { id: "robotik",         label: "Robotik",          icon: "🤖",  group: "tech"       },
-  { id: "krafttraining",   label: "Krafttraining",    icon: "🏋️", group: "body"       },
-  { id: "laufen",          label: "Laufen",           icon: "🏃",  group: "body"       },
-  { id: "mobility",        label: "Mobility",         icon: "🧘",  group: "body"       },
-  { id: "ernaehrung",      label: "Ernährung",        icon: "🥗",  group: "body"       },
-  { id: "schlaf",          label: "Schlaf",           icon: "😴",  group: "recovery"   },
-  { id: "kochen",          label: "Kochen",           icon: "🍳",  group: "craft"      },
-  { id: "zeichnen",        label: "Zeichnen",         icon: "🎨",  group: "creative"   },
-  { id: "musik",           label: "Musik",            icon: "🎵",  group: "creative"   },
-  { id: "design",          label: "Design",           icon: "✏️",  group: "creative"   },
-  { id: "fotografie",      label: "Fotografie",       icon: "📷",  group: "creative"   },
-  { id: "contentcreation", label: "Content Creation", icon: "📱",  group: "creative"   },
-  { id: "socialskills",    label: "Social Skills",    icon: "🤝",  group: "social"     },
-  { id: "kommunikation",   label: "Kommunikation",    icon: "💬",  group: "social"     },
-  { id: "hautpflege",      label: "Hautpflege",       icon: "✨",  group: "social"     },
-  { id: "style",           label: "Style",            icon: "👔",  group: "social"     },
-  { id: "zeitmanagement",  label: "Zeitmanagement",   icon: "⏰",  group: "discipline" },
-  { id: "ordnung",         label: "Ordnung",          icon: "📦",  group: "discipline" },
-  { id: "journaling",      label: "Journaling",       icon: "📓",  group: "discipline" },
-  { id: "finanzen",        label: "Finanzen",         icon: "💰",  group: "discipline" },
-  { id: "karriere",        label: "Karriere",         icon: "📈",  group: "discipline" },
-  { id: "meditation",      label: "Meditation",       icon: "🧘",  group: "recovery"   },
-  { id: "stressmanagement",label: "Stressmanagement", icon: "🌊",  group: "recovery"   },
-  { id: "natur",           label: "Natur",            icon: "🌲",  group: "recovery"   },
-  { id: "reisen",          label: "Reisen",           icon: "✈️",  group: "adventure"  },
-  { id: "outdoor",         label: "Outdoor",          icon: "🏔️", group: "adventure"  },
-  { id: "komfortzone",     label: "Komfortzone",      icon: "🚀",  group: "adventure"  },
-  { id: "sprachen",        label: "Sprachen",         icon: "🌐",  group: "mind"       },
-  { id: "lesen",           label: "Lesen",            icon: "📚",  group: "mind"       },
-  { id: "philosophie",     label: "Philosophie",      icon: "🤔",  group: "mind"       },
-  { id: "deepwork",        label: "Deep Work",        icon: "🎯",  group: "discipline" },
 ];

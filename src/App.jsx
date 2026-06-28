@@ -10,7 +10,7 @@ import { getRankUpStatus, canRankUpTo } from "./lib/rankRequirements.js";
 import { defaultState } from "./data/defaultState.js";
 import { PATHS, getAffinityGain, suggestPaths, canUnlockShadow } from "./data/paths.js";
 import {
-  INTERESTS_OPTIONS, QUEST_LENGTH_OPTIONS,
+  QUEST_LENGTH_OPTIONS,
   ACTIVE_PATHS_OPTIONS, BALANCE_AREAS_OPTIONS,
   DIFFICULTY_OPTIONS,
 } from "./data/preferences.js";

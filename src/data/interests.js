@@ -1525,6 +1525,12 @@ export const LEGACY_INTEREST_MAP = {
  * Normalisiert ein altes Interest-Array auf neue IDs.
  */
 export function normalizeInterests(interests = []) {
-  return interests.map(id => LEGACY_INTEREST_MAP[id] || id)
-    .filter(id => INTERESTS[id] != null);
+  if (!Array.isArray(interests)) return []; // defensiv: korrupte/fehlende Daten
+  const seen = new Set();
+  const out = [];
+  for (const raw of interests) {
+    const id = LEGACY_INTEREST_MAP[raw] || raw;
+    if (INTERESTS[id] != null && !seen.has(id)) { seen.add(id); out.push(id); }
+  }
+  return out; // migriert + gefiltert + dedupliziert, Reihenfolge erhalten
 }
