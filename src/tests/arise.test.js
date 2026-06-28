@@ -2598,3 +2598,24 @@ describe("buildStatHistory (ausgelagert)", () => {
     expect(buildStatHistory(undefined, "STR")).toEqual([]);
   });
 });
+
+// ═══════════════════════════════════════════════════════════
+// MIGRATION — defensiver Import alter/korrupter Daten (Etappe 9)
+// ═══════════════════════════════════════════════════════════
+describe("migrateState — defensiver Import", () => {
+  it("fehlender/ungültiger Rank → 'E' (kein Render-Crash), gültiger bleibt", () => {
+    expect(migrateState({}).rank).toBe("E");
+    expect(migrateState({ rank: "Z" }).rank).toBe("E");
+    expect(migrateState({ rank: "C", level: 3 }).rank).toBe("C");
+  });
+  it("korrupte Arrays werden defensiv zu Arrays", () => {
+    const m = migrateState({ questHistory: "x", goals: null, progressLogs: 42 });
+    expect(Array.isArray(m.questHistory)).toBe(true);
+    expect(Array.isArray(m.goals)).toBe(true);
+    expect(Array.isArray(m.progressLogs)).toBe(true);
+  });
+  it("alte Interest-Strings werden migriert", () => {
+    const m = migrateState({ player: { preferences: { interests: ["fitness", "social"] } } });
+    expect(m.player.preferences.interests).toEqual(["krafttraining", "socialskills"]);
+  });
+});

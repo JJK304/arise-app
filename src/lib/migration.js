@@ -9,6 +9,7 @@ import { catToDomain } from "../data/domains.js";
 import { getDayKey, getWeekKey } from "./dates.js";
 import { normalizeInterests } from "../data/interests.js";
 import { normalizeTitles } from "../data/titles.js";
+import { RANKS } from "../data/ranks.js";
 
 const DEFAULT_AFFINITIES = {
   fighter:    0,
@@ -74,6 +75,11 @@ export function migrateState(raw) {
   if (typeof s.totalXP  !== "number") s.totalXP        = 0;
   if (typeof s.currentStreak !== "number") s.currentStreak = 0;
   if (typeof s.longestStreak !== "number") s.longestStreak = 0;
+  // Rank/Level/XP — der Render hängt direkt davon ab (RANK_COLORS[rank],
+  // XP_PER_LEVEL(rank,level)); fehlende/ungültige Werte defensiv defaulten.
+  if (!RANKS.includes(s.rank))                    s.rank  = "E";
+  if (typeof s.level !== "number" || s.level < 1) s.level = 1;
+  if (typeof s.xp !== "number")                   s.xp    = 0;
 
   // ── Player Model ──
   if (!s.player || typeof s.player !== "object") {
