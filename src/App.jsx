@@ -8,7 +8,7 @@ import { ACHIEVEMENTS } from "./data/achievements.js";
 import { findNewPathMilestones } from "./data/pathMilestones.js";
 import { getRankUpStatus, canRankUpTo } from "./lib/rankRequirements.js";
 import { defaultState } from "./data/defaultState.js";
-import { PATHS, getAffinityGain, suggestPaths, canUnlockShadow } from "./data/paths.js";
+import { PATHS, getAffinityGain, suggestPaths } from "./data/paths.js";
 import {
   QUEST_LENGTH_OPTIONS,
   ACTIVE_PATHS_OPTIONS, BALANCE_AREAS_OPTIONS,

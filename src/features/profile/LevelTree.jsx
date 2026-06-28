@@ -8,7 +8,7 @@
 // Leichtgewichtig, ohne neue Dependencies, mobile-tauglich.
 // ============================================================
 import React from "react";
-import { PATHS } from "../../data/paths.js";
+import { PATHS, canUnlockShadow } from "../../data/paths.js";
 import { GATES, isGateCompleted, isGateUnlocked } from "../../data/gates.js";
 import { getTopSignalPaths } from "../../lib/signals.js";
 import { getPathMastery } from "../../lib/mastery.js";
@@ -195,6 +195,30 @@ function NextAscensionPanel({ state }) {
   );
 }
 
+// ── Hidden Branch: Shadow Ascendant (Endgame) ──────────────
+function ShadowNode({ state }) {
+  const affinities = state.player?.affinities || {};
+  const unlockable = canUnlockShadow(
+    affinities, state.gateProgress || {}, state.goals || [], state.rank || "E",
+    { progressLogs: state.progressLogs || [], weeklyReviews: state.weeklyReviews || [] }
+  );
+  const awakened = (affinities.shadow || 0) > 0;
+  const status = awakened ? "cleared" : unlockable ? "available" : "locked";
+  const label  = awakened   ? "Shadow Ascendant — erweckt"
+               : unlockable ? "Shadow Ascendant — bereit zur Erweckung"
+               :              "Shadow Ascendant — ???";
+  return (
+    <div>
+      <NodeChip label={label} status={status} />
+      {status === "locked" && (
+        <div style={{ fontSize: "0.6rem", color: "#475569", marginTop: 5, lineHeight: 1.5 }}>
+          Endgame-Freischaltung: Rank S · 3 starke Pfade · 3 Gates · 2 Trials · 1 Ziel · 10 Logs / 2 Reviews
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Hauptkomponente ────────────────────────────────────────
 export function LevelTree({ state }) {
   let signalPaths = [];
@@ -213,6 +237,7 @@ export function LevelTree({ state }) {
     <div style={{ marginBottom: 20 }}>
       {section("◈ BRANCH PROGRESS", <BranchProgress state={state} signalPaths={signalPaths} />)}
       {section("◈ ASCENSION TREE", <BranchTree state={state} signalPaths={signalPaths} />)}
+      {section("⧫ HIDDEN BRANCH", <ShadowNode state={state} />)}
       <NextAscensionPanel state={state} />
     </div>
   );

@@ -415,16 +415,31 @@ export function getAffinityGain(challenge) {
  * @param {string}  rank         - state.rank
  * @returns {boolean}
  */
-export function canUnlockShadow(affinities = {}, gateProgress = {}, goals = [], rank = "E") {
+// Shadow Ascendant = Endgame-Hidden-Path. KEINE reine XP-Freischaltung:
+// verlangt Multi-Path-Meisterung + echte, belegte Progression.
+//   Rank >= S · 3 starke Path-Signale · 3 Gates · 2 Trials · 1 Goal ·
+//   (>= 10 Progress-Logs ODER >= 2 Weekly Reviews)
+// opts trägt die belegbaren Daten (progressLogs, weeklyReviews) defensiv nach.
+export function canUnlockShadow(affinities = {}, gateProgress = {}, goals = [], rank = "E", opts = {}) {
+  const { progressLogs = [], weeklyReviews = [] } = opts;
   const RANKS_ORDER = ["E","D","C","B","A","S","SS","SSS"];
   const rankIdx = RANKS_ORDER.indexOf(rank);
 
-  const strongPaths  = Object.entries(affinities).filter(([k,v]) => k !== "shadow" && v >= 20).length;
-  const completedGates = Object.values(gateProgress).filter(g => g.completed).length;
-  const completedGoals = (goals || []).filter(g => g.status === "completed").length;
-  const highEnoughRank = rankIdx >= 4; // A-Rank = index 4
+  const isTrialId = id => String(id).startsWith("trial_");
+  const gp = gateProgress || {};
+  const strongPaths     = Object.entries(affinities).filter(([k,v]) => k !== "shadow" && v >= 20).length;
+  const completedGates  = Object.entries(gp).filter(([id,g]) => g?.completed && !isTrialId(id)).length;
+  const completedTrials = Object.entries(gp).filter(([id,g]) => g?.completed &&  isTrialId(id)).length;
+  const completedGoals  = (goals || []).filter(g => g?.status === "completed").length;
+  const logsOk = (Array.isArray(progressLogs)  ? progressLogs.length  : 0) >= 10
+              || (Array.isArray(weeklyReviews) ? weeklyReviews.length : 0) >= 2;
 
-  return strongPaths >= 3 && completedGates >= 3 && completedGoals >= 2 && highEnoughRank;
+  return rankIdx >= 5            // S-Rank oder höher (Endgame)
+    && strongPaths     >= 3
+    && completedGates  >= 3
+    && completedTrials >= 2
+    && completedGoals  >= 1
+    && logsOk;
 }
 
 // ── Path-Empfehlung ───────────────────────────────────────

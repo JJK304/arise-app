@@ -2553,3 +2553,36 @@ describe("Signal-Gating: neutraler Default", () => {
     expect(out).toHaveLength(0);
   });
 });
+
+// ═══════════════════════════════════════════════════════════
+// SHADOW ASCENDANT — Endgame-Unlock (Etappe 6)
+// ═══════════════════════════════════════════════════════════
+describe("Shadow Ascendant Unlock (Endgame)", () => {
+  const fullAff   = { fighter: 25, scholar: 22, monk: 21 };               // 3 starke Pfade
+  const fullGates = {
+    gate_a: { completed: true }, gate_b: { completed: true }, gate_c: { completed: true }, // 3 Gates
+    trial_fighter_1: { completed: true }, trial_scholar_1: { completed: true },            // 2 Trials
+  };
+  const fullGoals = [{ status: "completed" }];
+  const fullOpts  = { progressLogs: new Array(10).fill({}), weeklyReviews: [] };
+
+  it("standardmäßig NICHT freischaltbar (neuer Nutzer)", () => {
+    expect(canUnlockShadow({}, {}, [], "E")).toBe(false);
+  });
+  it("voll erfüllt (Rank S + 3 Paths + 3 Gates + 2 Trials + 1 Goal + 10 Logs) → freischaltbar", () => {
+    expect(canUnlockShadow(fullAff, fullGates, fullGoals, "S", fullOpts)).toBe(true);
+  });
+  it("Rank A statt S → NICHT freischaltbar (Endgame-Gate)", () => {
+    expect(canUnlockShadow(fullAff, fullGates, fullGoals, "A", fullOpts)).toBe(false);
+  });
+  it("ohne Trials → NICHT freischaltbar", () => {
+    const noTrials = { gate_a:{completed:true}, gate_b:{completed:true}, gate_c:{completed:true} };
+    expect(canUnlockShadow(fullAff, noTrials, fullGoals, "S", fullOpts)).toBe(false);
+  });
+  it("ohne Logs/Reviews → NICHT freischaltbar (keine reine XP-/Gate-Freischaltung)", () => {
+    expect(canUnlockShadow(fullAff, fullGates, fullGoals, "S", { progressLogs: [], weeklyReviews: [] })).toBe(false);
+  });
+  it("2 Weekly Reviews ersetzen die 10 Logs", () => {
+    expect(canUnlockShadow(fullAff, fullGates, fullGoals, "S", { progressLogs: [], weeklyReviews: [{}, {}] })).toBe(true);
+  });
+});

@@ -15,7 +15,7 @@ export function SystemAnalysisCard({ state, sysAnalysis, rc, saveData, setState,
   const affinities      = state.player?.affinities || {};
   const mainPath        = state.player?.mainPath;
   const secPath         = state.player?.secondaryPath;
-  const shadowUnlockable= canUnlockShadow(affinities, state.gateProgress || {}, state.goals || [], state.rank || "E");
+  const shadowUnlockable= canUnlockShadow(affinities, state.gateProgress || {}, state.goals || [], state.rank || "E", { progressLogs: state.progressLogs || [], weeklyReviews: state.weeklyReviews || [] });
   const showSuggestion  = sysAnalysis.suggestedMainPath && (!mainPath || !secPath);
   const msg             = sysAnalysis.suggestedMessage;
 
