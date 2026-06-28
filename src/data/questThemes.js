@@ -114,6 +114,8 @@ export const QUEST_THEMES = {
   xd_adv_1: { domains: ["adventure"], interests: ["komfortzone", "neue_skills"] },
   xd_adv_2: { domains: ["adventure"], interests: ["komfortzone", "selbstbewusstsein"] },
   xd_adv_3: { domains: ["adventure"], interests: ["neue_orte", "komfortzone"] },
+  xd_soc_3: { domains: ["appearance"], interests: ["style", "grooming"] },          // Outfit bewusst wählen
+  xd_soc_4: { domains: ["appearance"], interests: ["grooming", "hautpflege"] },     // Vollständige Pflegeroutine
   xw_e_5:   { domains: ["finance"], interests: ["budgeting"] },
 
   // ── Extra-Dailies/Weeklies (in D gemergt) ──
