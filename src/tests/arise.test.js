@@ -2586,3 +2586,15 @@ describe("Shadow Ascendant Unlock (Endgame)", () => {
     expect(canUnlockShadow(fullAff, fullGates, fullGoals, "S", { progressLogs: [], weeklyReviews: [{}, {}] })).toBe(true);
   });
 });
+
+// ═══════════════════════════════════════════════════════════
+// STAT HISTORY — aus App.jsx ausgelagert (Etappe 7)
+// ═══════════════════════════════════════════════════════════
+import { buildStatHistory } from "../lib/statHistory.js";
+
+describe("buildStatHistory (ausgelagert)", () => {
+  it("leerer/undefined State → leeres Array (defensiv)", () => {
+    expect(buildStatHistory({}, "STR")).toEqual([]);
+    expect(buildStatHistory(undefined, "STR")).toEqual([]);
+  });
+});

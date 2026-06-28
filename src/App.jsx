@@ -2,7 +2,6 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 // Data
 import { RANKS, RANK_COLORS, XP_PER_LEVEL, TOTAL_LEVELS, LEVELS_PER_RANK } from "./data/ranks.js";
-import { STATS_CONFIG, SUB_STATS, CAT_LABELS } from "./data/stats.js";
 import { CHALLENGES_DB } from "./data/challenges.js";
 import { ACHIEVEMENTS } from "./data/achievements.js";
 import { findNewPathMilestones } from "./data/pathMilestones.js";
@@ -66,7 +65,7 @@ import {
 import { saveData, loadData, LS, onSaveError } from "./storage/db.js";
 
 // Components
-import { MiniChart } from "./components/MiniChart.jsx";
+import { StatDetailModal } from "./components/StatDetailModal.jsx";
 import { RadarChart } from "./components/RadarChart.jsx";
 import { LevelTree } from "./features/profile/LevelTree.jsx";
 import { SplashScreen } from "./components/SplashScreen.jsx";
@@ -888,25 +887,6 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
     {id:"more",   icon:"⌬",label:"System"},
   ];
 
-  // Build stat history from completed milestones
-  const buildStatHistory = (statKey) => {
-    const allM = Object.values(CHALLENGES_DB).flatMap(r=>r.milestones);
-    // Use questHistory for milestones (more reliable than completedChallenges)
-    const completedMilestoneIds = new Set([
-      ...(state.completedChallenges || []),
-      ...(state.questHistory || []).filter(h => h.type === "milestone").map(h => h.id),
-    ]);
-    const relevant = allM.filter(m=>(m.subStat||m.stat)===statKey && completedMilestoneIds.has(m.id));
-    // Sort by rank order as proxy for time (we don't store completion timestamps)
-    relevant.sort((a,b)=>{
-      const ra=Object.entries(CHALLENGES_DB).find(([,v])=>v.milestones.includes(a))?.[0]||"E";
-      const rb=Object.entries(CHALLENGES_DB).find(([,v])=>v.milestones.includes(b))?.[0]||"E";
-      return RANKS.indexOf(ra)-RANKS.indexOf(rb);
-    });
-    let cumulative = 0;
-    return relevant.map(m=>{ cumulative+=m.statPts; return { v:cumulative, l:m.title.slice(0,14), pts:m.statPts, title:m.title }; });
-  };
-
   return (
     <>
     {showSplash && <SplashScreen rankColor={rc.primary}/>}
@@ -946,68 +926,8 @@ const unlockedAchievements = ACHIEVEMENTS.filter(a=>(state.unlockedAchievements|
         progressLogs={state.progressLogs || []}
       />
 
-      {/* Stat Detail Modal */}
-      {selectedStat && (() => {
-        const sc = [...STATS_CONFIG, ...Object.entries(SUB_STATS).map(([k,v])=>({key:k,...v}))].find(s=>s.key===selectedStat);
-        if(!sc) return null;
-        const history = buildStatHistory(selectedStat);
-        const currentVal = state.stats[selectedStat]||0;
-        return (
-          <div onClick={()=>setSelectedStat(null)} style={{ position:"fixed",inset:0,zIndex:800,background:"rgba(0,0,0,0.85)",backdropFilter:"blur(4px)",display:"flex",alignItems:"flex-end",justifyContent:"center",padding:"0 0 80px" }}>
-            <div onClick={e=>e.stopPropagation()} style={{ background:rc.bg,border:`1px solid ${sc.color}44`,borderRadius:"20px 20px 0 0",padding:"24px 20px",width:"100%",maxWidth:480,animation:"statModal 0.25s ease",maxHeight:"70vh",overflowY:"auto" }}>
-              {/* Header */}
-              <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:18 }}>
-                <div style={{ display:"flex",alignItems:"center",gap:12 }}>
-                  <div style={{ width:44,height:44,borderRadius:12,background:`${sc.color}18`,border:`1px solid ${sc.color}44`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"1.4rem" }}>{sc.icon}</div>
-                  <div>
-                    <div style={{ fontFamily:"'Orbitron',sans-serif",fontWeight:900,fontSize:"1.1rem",color:sc.color,textShadow:`0 0 10px ${sc.color}88` }}>{sc.label||selectedStat}</div>
-                    <div style={{ fontSize:"0.68rem",color:"#64748b" }}>{sc.desc||""}</div>
-                  </div>
-                </div>
-                <div style={{ textAlign:"right" }}>
-                  <div style={{ fontFamily:"'Orbitron',sans-serif",fontSize:"1.8rem",fontWeight:900,color:sc.color,textShadow:`0 0 12px ${sc.color}`,lineHeight:1 }}>{currentVal}</div>
-                  <div style={{ fontSize:"0.64rem",color:"#64748b",letterSpacing:"0.1em" }}>PUNKTE</div>
-                </div>
-              </div>
-
-              {/* Chart or empty state */}
-              {history.length >= 2 ? (
-                <div style={{ marginBottom:18 }}>
-                  <div style={{ fontSize:"0.64rem",letterSpacing:"0.2em",color:"#64748b",marginBottom:8 }}>STAT-ENTWICKLUNG</div>
-                  <MiniChart data={history} color={sc.color} height={70}/>
-                </div>
-              ) : history.length === 1 ? (
-                <div style={{ background:`${sc.color}08`,border:`1px solid ${sc.color}22`,borderRadius:10,padding:"12px",marginBottom:18,textAlign:"center" }}>
-                  <div style={{ color:sc.color,fontSize:"0.8rem",fontWeight:700,marginBottom:2 }}>Erster Meilenstein erreicht</div>
-                  <div style={{ color:"#64748b",fontSize:"0.72rem" }}>Schließe weitere Meilensteine ab um den Verlauf zu sehen</div>
-                </div>
-              ) : (
-                <div style={{ background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.1)",borderRadius:10,padding:"16px",marginBottom:18,textAlign:"center" }}>
-                  <div style={{ color:"#64748b",fontSize:"0.8rem",marginBottom:4 }}>No Milestones Unlocked Yet</div>
-                  <div style={{ color:"#64748b",fontSize:"0.7rem" }}>Schließe einen Meilenstein ab um deinen ersten Punkt zu verdienen</div>
-                </div>
-              )}
-
-              {/* Completed milestones list */}
-              {history.length > 0 && (
-                <div>
-                  <div style={{ fontSize:"0.64rem",letterSpacing:"0.2em",color:"#64748b",marginBottom:8 }}>FREIGESCHALTETE MEILENSTEINE</div>
-                  <div style={{ display:"flex",flexDirection:"column",gap:6 }}>
-                    {history.map((h,i)=>(
-                      <div key={i} style={{ display:"flex",justifyContent:"space-between",alignItems:"center",background:"rgba(255,255,255,0.02)",border:"1px solid rgba(148,163,184,0.08)",borderRadius:8,padding:"9px 12px" }}>
-                        <div style={{ flex:1,fontSize:"0.78rem",color:"#94a3b8",fontWeight:600 }}>{h.title}</div>
-                        <span style={{ color:sc.color,fontSize:"0.76rem",fontWeight:700,fontFamily:"'Rajdhani',sans-serif",marginLeft:8,flexShrink:0 }}>+{h.pts}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <button onClick={()=>setSelectedStat(null)} style={{ width:"100%",marginTop:18,background:"rgba(255,255,255,0.04)",border:"1px solid rgba(148,163,184,0.12)",color:"#64748b",borderRadius:10,padding:"12px",fontSize:"0.8rem",fontFamily:"'Rajdhani',sans-serif",fontWeight:700,cursor:"pointer",letterSpacing:"0.08em" }}>SCHLIESSEN</button>
-            </div>
-          </div>
-        );
-      })()}
+      {/* Stat Detail Modal — ausgelagert (Etappe 7) */}
+      {selectedStat && <StatDetailModal selectedStat={selectedStat} state={state} rc={rc} onClose={()=>setSelectedStat(null)} />}
 
       {/* Header */}
       <div style={{ padding:"16px 18px 13px",borderBottom:`1px solid ${rc.primary}18`,background:rc.headerBg,backdropFilter:"blur(14px)",position:"sticky",top:0,zIndex:100,transition:"background 1s ease, box-shadow 1s ease",boxShadow:`0 4px 26px ${rc.primary}10` }}>
