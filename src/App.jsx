@@ -30,7 +30,7 @@ import {
 import { useCountUp } from "./lib/useCountUp.js";
 import { migrateState, makeHistoryEntry } from "./lib/migration.js";
 import { generatePersonalizedQuests, generateStarterQuests, getNextBestQuests, getVisibleContent, selectNextMilestones } from "./lib/questGenerator.js";
-import { applyQuestCompletion, applyGateCompletion, canCompleteQuest } from "./lib/questCompletion.js";
+import { applyQuestCompletion, canCompleteQuest } from "./lib/questCompletion.js";
 import { rotateQuestPool, canCompleteCustomQuest, calculateCustomQuestXpBounds } from "./lib/questRotation.js";
 import {
   getTopSignalInterests,
@@ -64,6 +64,7 @@ import { saveData, loadData, LS, onSaveError } from "./storage/db.js";
 import { StatDetailModal } from "./components/StatDetailModal.jsx";
 import { useSystemFeedback } from "./hooks/useSystemFeedback.js";
 import { useProgressLogs } from "./hooks/useProgressLogs.js";
+import { useGateActions } from "./hooks/useGateActions.js";
 import { RadarChart } from "./components/RadarChart.jsx";
 import { LevelTree } from "./features/profile/LevelTree.jsx";
 import { SplashScreen } from "./components/SplashScreen.jsx";
@@ -589,56 +590,11 @@ export default function AriseApp() {
   };
 
   // ── Gate Handlers ──
-  const handleGateStepToggle = (gateId, stepIndex) => {
-    const prev = state.gateProgress?.[gateId] || { stepsDone: [], completed: false };
-    if (prev.completed) return; // Kein Ändern nach Abschluss
-    const stepsDone = prev.stepsDone.includes(stepIndex)
-      ? prev.stepsDone.filter(i => i !== stepIndex)
-      : [...prev.stepsDone, stepIndex];
-    const s = {
-      ...state,
-      gateProgress: { ...state.gateProgress, [gateId]: { ...prev, stepsDone } },
-    };
-    setState(s); saveData("arise_v3", s);
-  };
+  // Gate-Aktionen ausgelagert in useGateActions
+  const { handleGateStepToggle, handleGateClaim } = useGateActions({
+    state, setState, completionOptions, showLevelUp, showClearedCard, checkAchievements, bodyEntries, haptic,
+  });
 
-  const handleGateClaim = (gate) => {
-    const { newState, feedback, alreadyDone } = applyGateCompletion(state, gate, completionOptions);
-    if (alreadyDone) return;
-
-    if (feedback.levelUps?.length > 0) {
-      for (const lu of feedback.levelUps) {
-        showLevelUp({ rank: lu.rank, level: lu.level, rankUp: lu.rankUp });
-      }
-    }
-
-    setState(newState); saveData("arise_v3", newState);
-    haptic("heavy");
-    // Etappe 13: GATE-CLEARED-Karte mit Branch- und Trial-Info
-    {
-      const isTrial = String(gate.id).startsWith("trial_");
-      const pName   = PATHS[gate.path]?.name || gate.path;
-      const pColor  = PATHS[gate.path]?.color || gate.color || "#f59e0b";
-      const lines   = [{ mark: "▸", text: `+${feedback.xp} XP`, color: "#3b82f6" }];
-      lines.push({ mark: "◈", text: gate.discovery
-        ? `Branch unlocked: ${pName} Signal`
-        : `${pName} Signal verstärkt`, color: pColor });
-      try {
-        const nextTrial = GATES.find(g =>
-          g.path === gate.path && String(g.id).startsWith("trial_") &&
-          !isGateCompleted(g.id, newState.gateProgress || {}) &&
-          isGateUnlocked(g, newState.gateProgress || {})
-        );
-        if (nextTrial) lines.push({ mark: "⧫", text: `Next Trial available: ${nextTrial.title.split("—")[0].trim()}`, color: "#00ffff" });
-      } catch (_) {}
-      showClearedCard({
-        kind: isTrial ? "TRIAL CLEARED" : "GATE CLEARED",
-        subtitle: `${gate.title} abgeschlossen`,
-        color: pColor, lines,
-      }, 4200);
-    }
-    setTimeout(() => checkAchievements(newState, bodyEntries), 100);
-  };
 
 
   // ── SETUP SCREEN — SYSTEM · PLAYER REGISTRATION ──
