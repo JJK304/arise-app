@@ -56,10 +56,6 @@ import {
   canClaimGoalReward, calculateGoalReward, markGoalRewardClaimed,
   goalProgressPct, goalStatusLabel, getActiveGoals, getMatchingGoals,
 } from "./lib/goals.js";
-import {
-  createProgressLog, canLogWithBonus, addProgressLog,
-  getRecentLogs, getLogFields, METRIC_LABELS,
-} from "./lib/progressLogs.js";
 
 // Storage
 import { saveData, loadData, LS, onSaveError } from "./storage/db.js";
@@ -67,6 +63,7 @@ import { saveData, loadData, LS, onSaveError } from "./storage/db.js";
 // Components
 import { StatDetailModal } from "./components/StatDetailModal.jsx";
 import { useSystemFeedback } from "./hooks/useSystemFeedback.js";
+import { useProgressLogs } from "./hooks/useProgressLogs.js";
 import { RadarChart } from "./components/RadarChart.jsx";
 import { LevelTree } from "./features/profile/LevelTree.jsx";
 import { SplashScreen } from "./components/SplashScreen.jsx";
@@ -124,8 +121,8 @@ export default function AriseApp() {
   const [showGoalForm, setShowGoalForm] = useState(false);
   const [goalForm, setGoalForm] = useState({ templateId:"learning_goal", title:"", targetValue:"", deadline:"" });
   // Progress Log UI state
-  const [pendingLogQuest, setPendingLogQuest] = useState(null);
-  const [logForm, setLogForm]   = useState({ notes:"", metrics:{} });
+  // Progress-Log-Handling ausgelagert in useProgressLogs
+  const { pendingLogQuest, setPendingLogQuest, logForm, setLogForm, saveProgressLog, dismissLog } = useProgressLogs({ state, setState, showNotif });
   // Weekly Review state
   const [reviewForm, setReviewForm] = useState({ wentWell:"", wasHard:"", learned:"", nextFocus:"" });
   const [showReviewForm, setShowReviewForm] = useState(false);
@@ -395,48 +392,6 @@ export default function AriseApp() {
   };
 
 
-  const saveProgressLog = (quest, formData) => {
-    // Modal IMMER zuerst schließen — kein blockierender Layer bleibt stehen,
-    // egal ob die Log-Verarbeitung unten wirft (Button-Bug-Absicherung).
-    setPendingLogQuest(null);
-    setLogForm({ notes: "", metrics: {} });
-    if (!quest) return;
-    try {
-      // Defensive guards — sicherstellen dass Arrays vorhanden
-      const progressLogs = Array.isArray(state.progressLogs) ? state.progressLogs : [];
-      const goals        = Array.isArray(state.goals)        ? state.goals        : [];
-      // Anti-spam: XP-Bonus nur wenn noch kein Log heute für diese Quest
-      const withBonus = canLogWithBonus(progressLogs, quest.id);
-      // Passende Goals aus State finden
-      const matchingGoal = goals.find(g =>
-        g.status === "active" && (g.domain === quest.domain || g.path === quest.path)
-      );
-      const log = createProgressLog({
-        questId:  quest.id,
-        goalId:   matchingGoal?.id || null,
-        quest,
-        metrics:  (formData && formData.metrics) || {},
-        notes:    (formData && formData.notes)   || "",
-      });
-      let s = { ...state, progressLogs: addProgressLog(progressLogs, log) };
-      // XP-Bonus nur einmal pro Quest/Tag
-      if (withBonus && log.xpBonus > 0) {
-        s.xp      = (s.xp      || 0) + log.xpBonus;
-        s.totalXP = (s.totalXP || 0) + log.xpBonus;
-        showNotif(`⌁ Log gespeichert +${log.xpBonus} XP`, "#8b5cf6");
-      } else {
-        showNotif("⌁ Log gespeichert", "#8b5cf6");
-      }
-      setState(s); saveData("arise_v3", s);
-    } catch (_) {
-      showNotif("⚠ Log konnte nicht gespeichert werden", "#ef4444");
-    }
-  };
-
-  const dismissLog = () => {
-    setPendingLogQuest(null);
-    setLogForm({ notes: "", metrics: {} });
-  };
 
   const saveBodyEntry = () => {
     const entry = { ...bodyForm, date:new Date().toLocaleDateString("de-DE"), ts:Date.now() };
